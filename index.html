@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Färjor till/från Sverige</title>
+<style>
+/* ── Reset & tokens ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy:    #0d2d5e;
+  --blue:    #1a4a8a;
+  --lblue:   #e6eef9;
+  --border:  #cdd8ee;
+  --row-alt: #f4f7fc;
+  --hover:   #dce8f8;
+  --green:   #155c2e;
+  --gbg:     #d4edda;
+  --yellow:  #7a5a00;
+  --ybg:     #fff3cd;
+  --orange:  #8a3800;
+  --obg:     #ffe0c0;
+  --text:    #1a1a2e;
+  --muted:   #5a6580;
+  --radius:  8px;
+  --shadow:  0 1px 4px rgba(0,0,0,.12);
+}
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  background: #edf1f9;
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+header {
+  background: var(--navy);
+  color: white;
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.35);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+header svg { flex-shrink: 0; opacity: .9; }
+header h1 { font-size: 18px; font-weight: 700; letter-spacing: .2px; }
+header .updated {
+  margin-left: auto;
+  font-size: 12px;
+  opacity: .65;
+  white-space: nowrap;
+}
+
+/* ── Controls bar ── */
+.controls {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.ctrl-group { display: flex; align-items: center; gap: 8px; }
+.ctrl-label { font-size: 12px; font-weight: 600; color: var(--blue); white-space: nowrap; }
+
+input[type=date], select {
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 10px;
+  font-size: 13px;
+  color: var(--text);
+  background: white;
+  outline: none;
+  cursor: pointer;
+}
+input[type=date]:focus, select:focus { border-color: var(--blue); }
+
+.seg { display: flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.seg button {
+  padding: 0 16px;
+  height: 34px;
+  border: none;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  transition: background .12s, color .12s;
+  white-space: nowrap;
+}
+.seg button:not(:last-child) { border-right: 1px solid var(--border); }
+.seg button.on { background: var(--blue); color: white; font-weight: 600; }
+.seg button:hover:not(.on) { background: var(--lblue); color: var(--blue); }
+
+/* ── Info bar ── */
+.infobar {
+  background: var(--lblue);
+  border-bottom: 1px solid var(--border);
+  padding: 7px 24px;
+  font-size: 12.5px;
+  color: var(--blue);
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.infobar strong { font-weight: 700; }
+.infobar .sep { color: var(--border); }
+
+/* ── Main layout ── */
+main { padding: 20px 24px; }
+
+/* ── Section heading ── */
+.sec-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.sec-head h2 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--blue);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.pill {
+  background: var(--blue);
+  color: white;
+  border-radius: 20px;
+  padding: 1px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ── Table ── */
+.tbl-wrap {
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  overflow-x: auto;
+  margin-bottom: 28px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  min-width: 680px;
+}
+
+/* Sortable headers */
+thead tr { background: var(--navy); }
+thead th {
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.85);
+  white-space: nowrap;
+  user-select: none;
+}
+thead th.sortable { cursor: pointer; }
+thead th.sortable:hover { color: white; }
+thead th .sort-icon { margin-left: 4px; opacity: .5; font-size: 10px; }
+thead th.sort-asc .sort-icon::after  { content: ' ▲'; opacity: 1; }
+thead th.sort-desc .sort-icon::after { content: ' ▼'; opacity: 1; }
+thead th:not(.sort-asc):not(.sort-desc) .sort-icon::after { content: ' ⇅'; }
+
+tbody tr:nth-child(even) { background: var(--row-alt); }
+tbody tr:hover { background: var(--hover); }
+tbody tr.mot-sv { border-left: 3px solid #1a8a4a; }
+tbody tr.fran-sv { border-left: 3px solid #1a4a8a; }
+
+td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+td:last-child { border-bottom-color: transparent; }
+
+.t-time { font-size: 15px; font-weight: 700; color: var(--navy); white-space: nowrap; }
+.t-anktid { font-size: 13px; font-weight: 500; color: var(--muted); white-space: nowrap; }
+.plus1 { font-size: 10px; color: #c05010; vertical-align: super; margin-left: 1px; }
+.t-rederi { font-weight: 600; font-size: 13px; }
+.t-rutt { color: var(--text); font-size: 13px; }
+.t-hamn { font-size: 12px; color: var(--muted); }
+.arrow { color: var(--border); margin: 0 3px; font-size: 11px; }
+
+/* ── Badges ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  gap: 3px;
+}
+.b-pass  { background: var(--lblue); color: var(--blue); }
+.b-roro  { background: #e2f0e2; color: var(--green); }
+.b-ver   { background: var(--gbg); color: var(--green); }
+.b-del   { background: var(--ybg); color: var(--yellow); }
+.b-ej    { background: var(--obg); color: var(--orange); }
+.b-mot   { background: #e2f0e8; color: var(--green); }
+.b-fran  { background: var(--lblue); color: var(--blue); }
+
+/* ── Intervall section ── */
+.iv-note {
+  background: #fffbe6;
+  border: 1px solid #e8d060;
+  border-radius: var(--radius);
+  padding: 9px 14px;
+  font-size: 12px;
+  color: #6b5000;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+/* ── Empty state ── */
+.empty {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+.empty svg { display: block; margin: 0 auto 12px; opacity: .3; }
+.empty p { font-size: 15px; }
+
+/* ── Loading / Error ── */
+#loading, #error-msg {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--muted);
+  font-size: 15px;
+}
+#error-msg { color: #c00; display: none; }
+#loading .spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  margin: 0 auto 14px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Footer ── */
+footer {
+  background: white;
+  border-top: 1px solid var(--border);
+  padding: 14px 24px;
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+footer a { color: var(--blue); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+.legend { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  header h1 { font-size: 15px; }
+  .controls, main { padding: 10px 12px; }
+  .infobar { padding: 6px 12px; }
+  thead th, td { padding: 7px 8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
+       stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 17l1.5-5.5L12 9l7.5 2.5L21 17"/>
+    <path d="M3 17h18"/>
+    <path d="M7 11.5V7a1 1 0 011-1h8a1 1 0 011 1v4.5"/>
+    <path d="M12 6V4"/>
+  </svg>
+  <h1>Färjor till/från Sverige</h1>
+  <span class="updated" id="updated-label">Laddar…</span>
+</header>
+
+<!-- CONTROLS -->
+<div class="controls">
+  <div class="ctrl-group">
+    <span class="ctrl-label">DATUM</span>
+    <input type="date" id="dp">
+  </div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">RIKTNING</span>
+    <div class="seg">
+      <button id="btn-mot"   onclick="setDir('mot')">⬇ Ankommer till Sverige</button>
+      <button id="btn-fran"  onclick="setDir('fran')">⬆ Avgår från Sverige</button>
+      <button id="btn-bada"  onclick="setDir('bada')">↕ Båda</button>
+    </div>
+  </div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">TYP</span>
+    <select id="kat-filter">
+      <option value="">Alla typer</option>
+      <option value="Passagerare">Passagerare</option>
+      <option value="RORO">RORO</option>
+    </select>
+  </div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">REDERI</span>
+    <select id="rederi-filter">
+      <option value="">Alla rederier</option>
+    </select>
+  </div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">HAMN</span>
+    <select id="hamn-filter">
+      <option value="">Alla hamnar</option>
+    </select>
+  </div>
+</div>
+
+<!-- INFO BAR -->
+<div class="infobar" id="infobar">Laddar data…</div>
+
+<!-- MAIN -->
+<main id="main">
+  <div id="loading">
+    <div class="spinner"></div>
+    Hämtar tidtabellsdata…
+  </div>
+  <div id="error-msg">
+    ⚠️ Kunde inte ladda <code>farjor_data.json</code>.<br>
+    Kontrollera att filen finns i samma mapp som index.html.
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <span>Källa: <em>Farjor_Sverige_v2_normaliserad.xlsx</em> via <code>farjor_data.json</code></span>
+  <div class="legend">
+    Status:
+    <span class="badge b-ver">✓ Verifierad</span>
+    <span class="badge b-del">~ Delvis</span>
+    <span class="badge b-ej">? EJ verifierad</span>
+  </div>
+</footer>
+
+<script>
+// ──────────────────────────────────────────────
+//  Globals
+// ──────────────────────────────────────────────
+const DAGMAP  = ['Sön','Mån','Tis','Ons','Tor','Fre','Lör'];
+const DAGLONG = {
+  'Mån':'måndag','Tis':'tisdag','Ons':'onsdag',
+  'Tor':'torsdag','Fre':'fredag','Lör':'lördag','Sön':'söndag'
+};
+
+let DATA      = null;   // loaded JSON
+let DIR       = 'mot';  // mot | fran | bada
+let SORT_COL  = 'avgtid';
+let SORT_DIR  = 'asc';
+
+// ──────────────────────────────────────────────
+//  Helpers
+// ──────────────────────────────────────────────
+function esc(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function parseMin(t) {
+  if (!t) return 9999;
+  const m = t.match(/(\d{1,2}):(\d{2})/);
+  return m ? +m[1]*60 + +m[2] : 9999;
+}
+
+function today() {
+  return new Date().toISOString().slice(0,10);
+}
+
+function longDate(iso) {
+  const d = new Date(iso + 'T12:00:00');
+  return d.toLocaleDateString('sv-SE',
+    {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+}
+
+function weekday(iso) {
+  return DAGMAP[new Date(iso + 'T12:00:00').getDay()];
+}
+
+function verBadge(v) {
+  if (!v) return '';
+  if (v.startsWith('Verifierad')) return '<span class="badge b-ver">✓ Verifierad</span>';
+  if (v.startsWith('Delvis'))     return '<span class="badge b-del">~ Delvis</span>';
+  return '<span class="badge b-ej">? EJ verif.</span>';
+}
+
+function katBadge(k) {
+  return k === 'Passagerare'
+    ? '<span class="badge b-pass">🚢 Passagerare</span>'
+    : '<span class="badge b-roro">🚛 RORO</span>';
+}
+
+// ──────────────────────────────────────────────
+//  Filter + render
+// ──────────────────────────────────────────────
+function currentFilters() {
+  return {
+    dag:    weekday(document.getElementById('dp').value || today()),
+    kat:    document.getElementById('kat-filter').value,
+    rederi: document.getElementById('rederi-filter').value,
+    hamn:   document.getElementById('hamn-filter').value,
+  };
+}
+
+function applyFilters() {
+  if (!DATA) return;
+  const {dag, kat, rederi, hamn} = currentFilters();
+
+  let rows = DATA.schema.filter(r => {
+    if (r.veckodag !== dag) return false;
+    if (DIR === 'mot'  && !r.mot_sverige)  return false;
+    if (DIR === 'fran' && !r.fran_sverige) return false;
+    if (DIR === 'bada' && !r.mot_sverige && !r.fran_sverige) return false;
+    if (kat    && r.kategori !== kat)   return false;
+    if (rederi && r.rederi   !== rederi) return false;
+    if (hamn   && r.avghamn  !== hamn && r.ankhamn !== hamn) return false;
+    return true;
+  });
+
+  // Sort
+  rows.sort((a,b) => {
+    let va, vb;
+    if (SORT_COL === 'avgtid') { va = parseMin(a.avgtid); vb = parseMin(b.avgtid); }
+    else if (SORT_COL === 'rederi') { va = a.rederi; vb = b.rederi; }
+    else if (SORT_COL === 'rutt')   { va = a.rutt;   vb = b.rutt;   }
+    else { va = a[SORT_COL]; vb = b[SORT_COL]; }
+    if (va < vb) return SORT_DIR === 'asc' ? -1 : 1;
+    if (va > vb) return SORT_DIR === 'asc' ?  1 : -1;
+    return 0;
+  });
+
+  // Intervall (direction filter only, no day filter)
+  let ivRows = DATA.intervall.filter(r => {
+    if (DIR === 'mot'  && !r.mot_sverige)  return false;
+    if (DIR === 'fran' && !r.fran_sverige) return false;
+    if (DIR === 'bada' && !r.mot_sverige && !r.fran_sverige) return false;
+    if (kat    && r.kategori !== kat)   return false;
+    if (rederi && r.rederi   !== rederi) return false;
+    return true;
+  });
+
+  renderInfoBar(rows, ivRows, dag);
+  renderTable(rows, ivRows);
+}
+
+function renderInfoBar(rows, ivRows, dag) {
+  const iso  = document.getElementById('dp').value || today();
+  const date = longDate(iso);
+  const dirl = DIR === 'mot' ? 'Ankommer till Sverige'
+             : DIR === 'fran'? 'Avgår från Sverige'
+             : 'Båda riktningarna';
+  document.getElementById('infobar').innerHTML =
+    `<strong>${rows.length}</strong> avgångar &nbsp;·&nbsp;
+     ${esc(dirl)} &nbsp;·&nbsp;
+     ${esc(date)}
+     ${ivRows.length ? `&nbsp;<span class="sep">|</span>&nbsp; + <strong>${ivRows.length}</strong> intervallturer (se nedan)` : ''}`;
+}
+
+function thSort(col, label) {
+  const icon = '<span class="sort-icon"></span>';
+  const cls  = SORT_COL === col ? (SORT_DIR === 'asc' ? ' sort-asc' : ' sort-desc') : '';
+  return `<th class="sortable${cls}" onclick="doSort('${col}')">${label}${icon}</th>`;
+}
+
+function renderTable(rows, ivRows) {
+  const main = document.getElementById('main');
+  let html = '';
+
+  // ── Direction heading ──
+  const dirLabel = DIR === 'mot'  ? '⬇ Ankommer till Sverige'
+                 : DIR === 'fran' ? '⬆ Avgår från Sverige'
+                 : '↕ All trafik';
+  html += `<div class="sec-head">
+    <h2>${dirLabel}</h2>
+    <span class="pill">${rows.length}</span>
+  </div>`;
+
+  if (rows.length === 0) {
+    html += `<div class="empty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M8 12h8M12 8v8"/>
+      </svg>
+      <p>Inga avgångar matchar ditt urval för vald dag.</p>
+    </div>`;
+  } else {
+    html += `<div class="tbl-wrap"><table>
+      <thead><tr>
+        ${thSort('avgtid','Avg.tid')}
+        <th>Ank.tid</th>
+        ${thSort('rederi','Rederi')}
+        ${thSort('rutt','Rutt')}
+        <th>Avgångshamn</th>
+        <th>Ankomsthamn</th>
+        <th>Typ</th>
+        <th>Status</th>
+      </tr></thead><tbody>`;
+
+    for (const r of rows) {
+      const trCls = r.mot_sverige ? 'mot-sv' : 'fran-sv';
+      const anktid = r.anktid
+        ? esc(r.anktid) + (r.nasta_dag ? '<span class="plus1" title="Anländer nästa dag">+1</span>' : '')
+        : '—';
+      html += `<tr class="${trCls}">
+        <td class="t-time">${esc(r.avgtid)||'—'}</td>
+        <td class="t-anktid">${anktid}</td>
+        <td class="t-rederi">${esc(r.rederi)}</td>
+        <td class="t-rutt">${esc(r.rutt)}</td>
+        <td class="t-hamn">${esc(r.avghamn)}</td>
+        <td class="t-hamn">${esc(r.ankhamn)}</td>
+        <td>${katBadge(r.kategori)}</td>
+        <td>${verBadge(r.verifiering)}</td>
+      </tr>`;
+    }
+    html += `</tbody></table></div>`;
+  }
+
+  // ── Intervall section ──
+  if (ivRows.length > 0) {
+    html += `<div class="sec-head" style="margin-top:8px">
+      <h2>⏱ Intervalltrafik</h2>
+      <span class="pill">${ivRows.length}</span>
+    </div>
+    <div class="iv-note">
+      Dessa rutter har komplexa eller varierande tidtabeller som inte kan specificeras per veckodag.
+      Kontrollera aktuell tidtabell direkt hos respektive rederi.
+    </div>
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th>Rederi</th><th>Rutt</th><th>Veckodagar</th>
+        <th>Avgångstid</th><th>Frekvens</th><th>Anmärkning</th><th>Status</th>
+      </tr></thead><tbody>`;
+
+    for (const r of ivRows) {
+      html += `<tr>
+        <td class="t-rederi">${esc(r.rederi)}</td>
+        <td class="t-rutt">${esc(r.rutt)}</td>
+        <td>${esc(r.veckodagar)}</td>
+        <td>${esc(r.avgtid)||'—'}</td>
+        <td>${esc(r.frekvens)||'—'}</td>
+        <td style="font-size:11px;color:var(--muted);max-width:280px">${esc(r.anmarkning)}</td>
+        <td>${verBadge(r.verifiering)}</td>
+      </tr>`;
+    }
+    html += `</tbody></table></div>`;
+  }
+
+  main.innerHTML = html;
+}
+
+// ──────────────────────────────────────────────
+//  Sort
+// ──────────────────────────────────────────────
+function doSort(col) {
+  if (SORT_COL === col) {
+    SORT_DIR = SORT_DIR === 'asc' ? 'desc' : 'asc';
+  } else {
+    SORT_COL = col;
+    SORT_DIR = 'asc';
+  }
+  applyFilters();
+}
+
+// ──────────────────────────────────────────────
+//  Direction toggle
+// ──────────────────────────────────────────────
+function setDir(d) {
+  DIR = d;
+  document.querySelectorAll('.seg button').forEach(b => b.classList.remove('on'));
+  document.getElementById('btn-' + (d==='bada'?'bada':d==='fran'?'fran':'mot')).classList.add('on');
+  applyFilters();
+}
+
+// ──────────────────────────────────────────────
+//  Populate dropdowns
+// ──────────────────────────────────────────────
+function fillDropdowns() {
+  const rSel = document.getElementById('rederi-filter');
+  DATA.meta.rederier.forEach(r => {
+    const o = document.createElement('option');
+    o.value = r; o.textContent = r;
+    rSel.appendChild(o);
+  });
+
+  const hSel = document.getElementById('hamn-filter');
+  DATA.meta.hamnar.forEach(h => {
+    const o = document.createElement('option');
+    o.value = h; o.textContent = h;
+    hSel.appendChild(o);
+  });
+}
+
+// ──────────────────────────────────────────────
+//  Load data
+// ──────────────────────────────────────────────
+async function loadData() {
+  try {
+    const res = await fetch('farjor_data.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    DATA = await res.json();
+
+    // Update header label
+    document.getElementById('updated-label').textContent =
+      'Uppdaterad ' + (DATA.meta.uppdaterad || '–');
+
+    fillDropdowns();
+    document.getElementById('loading').style.display = 'none';
+
+    // Wire up change events
+    document.getElementById('dp').addEventListener('change', applyFilters);
+    document.getElementById('kat-filter').addEventListener('change', applyFilters);
+    document.getElementById('rederi-filter').addEventListener('change', applyFilters);
+    document.getElementById('hamn-filter').addEventListener('change', applyFilters);
+
+    applyFilters();
+  } catch(e) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error-msg').style.display = 'block';
+    document.getElementById('error-msg').innerHTML =
+      `⚠️ Kunde inte ladda <code>farjor_data.json</code>: ${e.message}<br>
+       Kontrollera att filen finns i samma mapp som <code>farjor.html</code> och att sidan körs via en webbserver (inte direkt från filsystemet).`;
+  }
+}
+
+// ──────────────────────────────────────────────
+//  Init
+// ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('dp').value = today();
+  setDir('mot');   // default: ankommer till Sverige
+  loadData();
+});
+</script>
+</body>
+</html>

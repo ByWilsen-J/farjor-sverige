@@ -1,0 +1,22 @@
+# Excel-källfiler (lagras lokalt, pushas inte till GitHub)
+*.xlsx
+*.xlsm
+*.xls
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Gamla skript
+generera_html.py
+normalisera.py
+overrides.py
+pdf_export_macro.bas
+
+# Mac
+.DS_Store
+
+# Övrigt
+*.md
+*.bas
