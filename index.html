@@ -154,7 +154,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   background: white;
-  min-width: 680px;
+  min-width: 560px;
 }
 
 /* Sortable headers */
@@ -309,9 +309,9 @@ footer a:hover { text-decoration: underline; }
   <div class="ctrl-group">
     <span class="ctrl-label">RIKTNING</span>
     <div class="seg">
-      <button id="btn-mot"   onclick="setDir('mot')">⬇ Ankommer till Sverige</button>
-      <button id="btn-fran"  onclick="setDir('fran')">⬆ Avgår från Sverige</button>
-      <button id="btn-bada"  onclick="setDir('bada')">↕ Båda</button>
+      <button id="btn-avgmot"  onclick="setDir('avgmot')">⬇ Avgår mot Sverige</button>
+      <button id="btn-ankmot"  onclick="setDir('ankmot')">🇸🇪 Ankommer till Sverige</button>
+      <button id="btn-fran"    onclick="setDir('fran')">⬆ Avgår från Sverige</button>
     </div>
   </div>
 
@@ -376,7 +376,7 @@ const DAGLONG = {
 };
 
 let DATA      = null;   // loaded JSON
-let DIR       = 'mot';  // mot | fran | bada
+let DIR       = 'avgmot';  // avgmot | ankmot | fran
 let SORT_COL  = 'avgtid';
 let SORT_DIR  = 'asc';
 
@@ -439,22 +439,20 @@ function applyFilters() {
 
   let rows = DATA.schema.filter(r => {
     if (r.veckodag !== dag) return false;
-    if (DIR === 'mot'  && !r.mot_sverige)  return false;
+    if ((DIR === 'avgmot' || DIR === 'ankmot') && !r.mot_sverige)  return false;
     if (DIR === 'fran' && !r.fran_sverige) return false;
-    if (DIR === 'bada' && !r.mot_sverige && !r.fran_sverige) return false;
     if (kat    && r.kategori !== kat)   return false;
     if (rederi && r.rederi   !== rederi) return false;
     if (hamn   && r.avghamn  !== hamn && r.ankhamn !== hamn) return false;
     return true;
   });
 
-  // Sort
+  // Sort: ankmot sorterar på ankomsttid, övriga på avgångstid
   rows.sort((a,b) => {
     let va, vb;
-    if (SORT_COL === 'avgtid') { va = parseMin(a.avgtid); vb = parseMin(b.avgtid); }
+    if (DIR === 'ankmot')           { va = parseMin(a.anktid); vb = parseMin(b.anktid); }
     else if (SORT_COL === 'rederi') { va = a.rederi; vb = b.rederi; }
-    else if (SORT_COL === 'rutt')   { va = a.rutt;   vb = b.rutt;   }
-    else { va = a[SORT_COL]; vb = b[SORT_COL]; }
+    else                            { va = parseMin(a.avgtid); vb = parseMin(b.avgtid); }
     if (va < vb) return SORT_DIR === 'asc' ? -1 : 1;
     if (va > vb) return SORT_DIR === 'asc' ?  1 : -1;
     return 0;
@@ -462,9 +460,8 @@ function applyFilters() {
 
   // Intervall (direction filter only, no day filter)
   let ivRows = DATA.intervall.filter(r => {
-    if (DIR === 'mot'  && !r.mot_sverige)  return false;
+    if ((DIR === 'avgmot' || DIR === 'ankmot') && !r.mot_sverige)  return false;
     if (DIR === 'fran' && !r.fran_sverige) return false;
-    if (DIR === 'bada' && !r.mot_sverige && !r.fran_sverige) return false;
     if (kat    && r.kategori !== kat)   return false;
     if (rederi && r.rederi   !== rederi) return false;
     return true;
@@ -477,9 +474,9 @@ function applyFilters() {
 function renderInfoBar(rows, ivRows, dag) {
   const iso  = document.getElementById('dp').value || today();
   const date = longDate(iso);
-  const dirl = DIR === 'mot' ? 'Ankommer till Sverige'
-             : DIR === 'fran'? 'Avgår från Sverige'
-             : 'Båda riktningarna';
+  const dirl = DIR === 'avgmot' ? 'Avgår mot Sverige'
+             : DIR === 'ankmot' ? 'Ankommer till Sverige'
+             : 'Avgår från Sverige';
   document.getElementById('infobar').innerHTML =
     `<strong>${rows.length}</strong> avgångar &nbsp;·&nbsp;
      ${esc(dirl)} &nbsp;·&nbsp;
@@ -498,9 +495,9 @@ function renderTable(rows, ivRows) {
   let html = '';
 
   // ── Direction heading ──
-  const dirLabel = DIR === 'mot'  ? '⬇ Ankommer till Sverige'
-                 : DIR === 'fran' ? '⬆ Avgår från Sverige'
-                 : '↕ All trafik';
+  const dirLabel = DIR === 'avgmot' ? '⬇ Avgår mot Sverige'
+                 : DIR === 'ankmot' ? '🇸🇪 Ankommer till Sverige'
+                 : '⬆ Avgår från Sverige';
   html += `<div class="sec-head">
     <h2>${dirLabel}</h2>
     <span class="pill">${rows.length}</span>
@@ -521,7 +518,6 @@ function renderTable(rows, ivRows) {
         ${thSort('avgtid','Avg.tid')}
         <th>Ank.tid</th>
         ${thSort('rederi','Rederi')}
-        ${thSort('rutt','Rutt')}
         <th>Avgångshamn</th>
         <th>Ankomsthamn</th>
         <th>Typ</th>
@@ -537,7 +533,6 @@ function renderTable(rows, ivRows) {
         <td class="t-time">${esc(r.avgtid)||'—'}</td>
         <td class="t-anktid">${anktid}</td>
         <td class="t-rederi">${esc(r.rederi)}</td>
-        <td class="t-rutt">${esc(r.rutt)}</td>
         <td class="t-hamn">${esc(r.avghamn)}</td>
         <td class="t-hamn">${esc(r.ankhamn)}</td>
         <td>${katBadge(r.kategori)}</td>
@@ -599,7 +594,7 @@ function doSort(col) {
 function setDir(d) {
   DIR = d;
   document.querySelectorAll('.seg button').forEach(b => b.classList.remove('on'));
-  document.getElementById('btn-' + (d==='bada'?'bada':d==='fran'?'fran':'mot')).classList.add('on');
+  document.getElementById('btn-' + d).classList.add('on');
   applyFilters();
 }
 
@@ -659,7 +654,7 @@ async function loadData() {
 // ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('dp').value = today();
-  setDir('mot');   // default: ankommer till Sverige
+  setDir('avgmot');  // default: avgår mot Sverige
   loadData();
 });
 </script>
