@@ -27,12 +27,14 @@ HEADERS = {
 }
 
 ROUTES = {
+    "GOFR": "Gothenburg – Frederikshavn",
     "GDKA": "Gdynia – Karlskrona",
     "GOKI": "Gothenburg – Kiel",
     "TGRO": "Trelleborg – Rostock",
 }
 
 PORT_NAMES = {
+    "Frederikshavn": "Frederikshavn",
     "Gothenburg": "Göteborg",
     "Göteborg": "Göteborg",
     "Kiel": "Kiel",
@@ -43,6 +45,9 @@ PORT_NAMES = {
 }
 
 SHIP_NAMES = {
+    "STENA DANICA": "Stena Danica",
+    "STENA JUTLANDICA": "Stena Jutlandica",
+    "STENA JUTLANDICA (C)": "Stena Jutlandica",
     "STENA EBBA": "Stena Ebba",
     "STENA ESTELLE": "Stena Estelle",
     "STENA SPIRIT": "Stena Spirit",
