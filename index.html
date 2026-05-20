@@ -403,7 +403,6 @@
       <div class="sb-linje"><a class="sb-lnk" href="https://www.ttline.com/en/timetables/" target="_blank">TT-Line &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.dfds.com/sv-se/fraktfarjor-och-logistik/rutter-och-tidtabeller" target="_blank">DFDS &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.polsca.com/schedule" target="_blank">POLSCA &#8594;</a></div>
-      <div class="sb-linje"><a class="sb-lnk" href="https://www.unityline.pl/" target="_blank" rel="noopener">Unity Line &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.wasaline.com/tidtabell/" target="_blank">Wasaline &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.eckerolinjen.se/turlista" target="_blank">Eckerö Linjen &#8594;</a></div>
       <div class="sb-sek-hdr">Live AIS-spårning</div>
@@ -412,9 +411,9 @@
       <div class="sb-linje"><a class="sb-lnk" href="https://www.marinetraffic.com/en/ais/home/centerx:13.15/centery:55.55/zoom:10" target="_blank" rel="noopener">MarineTraffic — Trelleborg/Ystad &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.vesseltracker.com/en/Ships.html" target="_blank" rel="noopener">VesselFinder — Östersjön &#8594;</a></div>
       <div class="sb-sek-hdr">Hamnar — liveinformation</div>
-      <div class="sb-linje"><a class="sb-lnk" href="https://www.stockholmshamnar.se/hamnar/vartahamnen/om-vartahamnen/" target="_blank" rel="noopener">Stockholms Hamnar &#8594;</a></div>
-      <div class="sb-linje"><a class="sb-lnk" href="https://www.portofgothenburg.com/shipping-services/arrivals-and-departures/" target="_blank" rel="noopener">Port of Gothenburg &#8594;</a></div>
-      <div class="sb-linje"><a class="sb-lnk" href="https://www.trelleborgshamn.se/" target="_blank" rel="noopener">Trelleborgs Hamn &#8594;</a></div>
+      <div class="sb-linje"><a class="sb-lnk" href="https://www.stockholmshamnar.se/fartygsanloep/" target="_blank" rel="noopener">Stockholms Hamnar &#8594;</a></div>
+      <div class="sb-linje"><a class="sb-lnk" href="https://www.portofgothenburg.com/maritime/arrivals-departures/" target="_blank" rel="noopener">Port of Gothenburg &#8594;</a></div>
+      <div class="sb-linje"><a class="sb-lnk" href="https://www.trelleborgshamn.se/en/english/about-the-port/arrivals-and-departures/" target="_blank" rel="noopener">Trelleborgs Hamn &#8594;</a></div>
     </div>
 
     <div class="sb-kort">
@@ -845,9 +844,12 @@ function byggDirektResultat(absLista, depInfo, opts={}){
     duration,
   };
 }
-function normaliseraAvgangstid(raw, port){
+function normaliseraAvgangstid(raw, port, specText){
   const localMinutes = tidTillMinuter(raw);
-  const tzOffset = hamnTz(port);
+  // Respektera explicit tidszon-markör i specText (t.ex. "08:00 (SE)") om sådan finns.
+  // Annars: använd avg-hamnens lokala tidszon.
+  const m = String(specText || raw || '').match(/\(([^)]+)\)/);
+  const tzOffset = m ? markorTz(m[1]) : hamnTz(port);
   if(localMinutes == null){
     return {
       text: String(raw||'—').trim() || '—',
@@ -1662,7 +1664,7 @@ function rendera(){
 
 function bygRad(rad, r, länk, depDatum = valdDat){
   const depVd = VD[depDatum.getDay()];
-  const depInfo = normaliseraAvgangstid(rad.avgtid_raw||rad.avgtid||'', rad.avghamn||'');
+  const depInfo = normaliseraAvgangstid(rad.avgtid_raw||rad.avgtid||'', rad.avghamn||'', rad.avgtid||'');
   const avgMeta = hämtaAvgangsMeta(rad, depDatum);
   const ankInfo = byggExaktAnkomst(avgMeta, depInfo, depDatum, rad.ankhamn||'')
     || normaliseraAnkomsttid(rad.anktid||'', depInfo, depVd, rad.ankhamn||'');
