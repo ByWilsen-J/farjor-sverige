@@ -276,10 +276,10 @@ function rendera(){
   // Polsca: datum-specifika (har fartygsnamn)
   ((DATA.polsca_datum||{})[ds]||[]).forEach(rad=>{
     roro.push({
-      rederi:fixR(rad.rederi||''),avgtid:rad.avgtid_raw||rad.avgtid||'',anktid:rad.anktid||'',
+      rederi:fixR(rad.rederi||''),avgtid:rad.avgtid||'',anktid:rad.anktid||'',
       avghamn:rad.avghamn||'',ankhamn:rad.ankhamn||'',
       fartyg:getFar(rad),anm:'',länk:'https://www.polsca.com/schedule',
-      ndag:rad.nasta_dag||false,grå:!!(rad.grå)
+      ndag:rad.nasta_dag||false,grå:false
     });
   });
 
@@ -289,10 +289,10 @@ function rendera(){
     if(UTESLUT.has(or)||POLSCA.has(or)) return;
     if(!matchar(rad.veckodag,valdVd)) return;
     const r=fixR(or);
-    const o={rederi:r,avgtid:rad.avgtid_raw||rad.avgtid||'',anktid:rad.anktid||'',
+    const o={rederi:r,avgtid:rad.avgtid||'',anktid:rad.anktid||'',
       avghamn:rad.avghamn||'',ankhamn:rad.ankhamn||'',
       fartyg:getFar(rad),anm:trunkAnm(rad.anmarkning||''),
-      länk:getLnk(r),ndag:rad.nasta_dag||false,grå:!!(rad.grå)};
+      länk:getLnk(r),ndag:rad.nasta_dag||false,grå:false};
     const k=getKat(rad);
     if(k==='pass') pass.push(o);
     else if(k==='roro') roro.push(o);
