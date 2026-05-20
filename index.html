@@ -8,122 +8,159 @@
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --blå:#1a4a7a;--blå-ljus:#2868a8;--gul:#f5c842;
-      --grå:#6b7280;--grå-ljus:#f3f4f6;--kant:#e5e7eb;
-      --text:#111827;--dim:#6b7280;--vit:#ffffff;
-      --grön:#145214;--grön-ljus:#e8f0e8;
+      /* Modern palett — lugnare bottenton, tydligare accentfärger */
+      --blå:#1e3a5f;--blå-ljus:#3b82c4;--blå-mörk:#13294a;
+      --gul:#f5b840;
+      --grå:#64748b;--grå-ljus:#f1f5f9;--grå-mid:#e2e8f0;
+      --kant:#e2e8f0;--kant-stark:#cbd5e1;
+      --text:#0f172a;--text-mjuk:#334155;--dim:#64748b;--vit:#ffffff;
+      --bg:#f8fafc;
+      /* Riktningsfärger */
+      --in:#0d8a4f;--in-ljus:#dcfce7;--in-mörk:#0a6b3e;
+      --ut:#1e63b8;--ut-ljus:#dbeafe;--ut-mörk:#1d4ed8;
+      --mot:#b85a00;--mot-ljus:#ffedd5;--mot-mörk:#92400e;
+      --varning:#dc2626;
+      --skugga:0 1px 2px rgba(15,23,42,.04),0 1px 3px rgba(15,23,42,.08);
+      --skugga-hover:0 4px 12px rgba(15,23,42,.08);
     }
-    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:14px;color:var(--text);background:#f8fafc;min-height:100vh}
-    header{background:var(--blå);color:var(--vit);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;border-bottom:4px solid var(--gul)}
-    .hdr-label{font-size:.74rem;opacity:.76;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
-    .hdr-datum{font-size:1.15rem;font-weight:700}
-    .hdr-vecka{font-size:.92rem;opacity:.92}
-    .layout{display:grid;grid-template-columns:1fr 280px;gap:16px;max-width:1380px;margin:0 auto;padding:14px 12px;align-items:start}
-    @media(max-width:920px){.layout{grid-template-columns:1fr}}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:15px;line-height:1.5;color:var(--text);background:var(--bg);min-height:100vh}
+    header{background:linear-gradient(135deg,var(--blå-mörk),var(--blå));color:var(--vit);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;border-bottom:3px solid var(--gul);box-shadow:var(--skugga)}
+    .hdr-grupp{display:flex;flex-direction:column;gap:2px}
+    .hdr-label{font-size:.70rem;opacity:.74;text-transform:uppercase;letter-spacing:.10em;font-weight:600}
+    .hdr-datum{font-size:1.24rem;font-weight:700;letter-spacing:-.01em}
+    .hdr-vecka{font-size:.96rem;opacity:.94;font-weight:500}
+    .layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;max-width:1420px;margin:0 auto;padding:18px 16px;align-items:start}
+    @media(max-width:920px){.layout{grid-template-columns:1fr;padding:12px}}
     main{min-width:0}
-    .dat-pick{border:1px solid var(--kant);border-radius:6px;padding:6px 8px;font-size:.82rem;color:var(--text);background:var(--vit);cursor:pointer}
-    .xl-knapp{width:100%;padding:7px 13px;border-radius:7px;border:1px solid var(--blå-ljus);background:var(--vit);color:var(--blå);font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
-    .xl-knapp:hover{background:var(--blå);color:var(--vit)}
-    .apply-btn{width:100%;padding:8px 13px;border-radius:7px;border:1px solid var(--blå);background:var(--blå);color:var(--vit);font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s}
-    .apply-btn:hover{background:var(--blå-ljus);border-color:var(--blå-ljus)}
+    .dat-pick{border:1px solid var(--kant);border-radius:8px;padding:8px 10px;font-size:.92rem;color:var(--text);background:var(--vit);cursor:pointer;font-weight:500}
+    .dat-pick:focus{outline:2px solid var(--blå-ljus);outline-offset:1px}
+    .xl-knapp{width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--blå);background:var(--vit);color:var(--blå);font-size:.85rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
+    .xl-knapp:hover{background:var(--blå);color:var(--vit);box-shadow:var(--skugga-hover)}
+    .apply-btn{width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--blå);background:var(--blå);color:var(--vit);font-size:.90rem;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.01em}
+    .apply-btn:hover{background:var(--blå-ljus);border-color:var(--blå-ljus);box-shadow:var(--skugga-hover)}
     /* ── Spinner ── */
-    #laddare{text-align:center;padding:40px;color:var(--dim)}
-    .spinner{width:32px;height:32px;border:3px solid var(--kant);border-top-color:var(--blå);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px}
+    #laddare{text-align:center;padding:60px 20px;color:var(--dim);font-size:.94rem}
+    .spinner{width:36px;height:36px;border:3px solid var(--kant);border-top-color:var(--blå);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px}
     @keyframes spin{to{transform:rotate(360deg)}}
     /* ── Sektioner ── */
-    .sektion{background:var(--vit);border:1px solid var(--kant);border-radius:10px;margin-bottom:12px;overflow:hidden}
-    .sek-hdr{padding:9px 14px;background:var(--grå-ljus);border-bottom:1px solid var(--kant);display:flex;align-items:center;gap:8px}
-    .sek-hdr h2{font-size:.86rem;font-weight:700;color:var(--blå);text-transform:uppercase;letter-spacing:.05em}
-    .sek-hdr .cnt{background:var(--blå);color:var(--vit);border-radius:10px;padding:1px 8px;font-size:.7rem;font-weight:600}
-    .sek-sv .sek-hdr{background:var(--grön-ljus)}
-    .sek-sv .sek-hdr h2{color:var(--grön)}
-    .sek-sv .sek-hdr .cnt{background:var(--grön)}
+    .sektion{background:var(--vit);border:1px solid var(--kant);border-radius:12px;margin-bottom:16px;overflow:hidden;box-shadow:var(--skugga)}
+    .sek-hdr{padding:14px 20px;background:var(--vit);border-bottom:1px solid var(--kant);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .sek-hdr h2{font-size:1.02rem;font-weight:700;color:var(--text);letter-spacing:-.005em}
+    .sek-hdr .cnt{background:var(--blå);color:var(--vit);border-radius:999px;padding:3px 11px;font-size:.74rem;font-weight:700;font-variant-numeric:tabular-nums;min-width:32px;text-align:center}
+    .sek-hdr .sub{margin-left:auto;font-size:.80rem;color:var(--dim);font-weight:500}
+    /* Sektionsfärgning beroende på vy */
+    .sek-in{border-top:3px solid var(--in)}
+    .sek-in .cnt{background:var(--in)}
+    .sek-ut{border-top:3px solid var(--ut)}
+    .sek-ut .cnt{background:var(--ut)}
+    .sek-mot{border-top:3px solid var(--mot)}
+    .sek-mot .cnt{background:var(--mot)}
+    .sek-blandad{border-top:3px solid var(--blå-ljus)}
+    /* ── Riktnings-badge på rad ── */
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:.66rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;line-height:1.5;white-space:nowrap;font-variant-numeric:tabular-nums}
+    .badge-in{background:var(--in-ljus);color:var(--in-mörk);border:1px solid #bbf7d0}
+    .badge-ut{background:var(--ut-ljus);color:var(--ut-mörk);border:1px solid #bfdbfe}
+    .badge-mot{background:var(--mot-ljus);color:var(--mot-mörk);border:1px solid #fed7aa}
+    .rikt-c{width:128px;padding-right:6px}
     /* ── Tabell ── */
     .tbl-wrap{overflow-x:auto}
-    table{width:100%;border-collapse:collapse;font-size:.81rem}
-    thead th{padding:6px 9px;text-align:left;font-weight:400;font-size:.71rem;color:var(--dim);text-transform:uppercase;letter-spacing:.04em;background:var(--grå-ljus);border-bottom:1px solid var(--kant);white-space:nowrap}
-    thead th.sort-aktiv{font-weight:700;color:var(--text)}
-    thead th:first-child{padding-left:14px}
+    table{width:100%;border-collapse:collapse;font-size:.92rem}
+    thead th{padding:11px 12px;text-align:left;font-weight:600;font-size:.74rem;color:var(--text-mjuk);text-transform:uppercase;letter-spacing:.06em;background:var(--grå-ljus);border-bottom:1px solid var(--kant-stark);white-space:nowrap}
+    thead th.sort-aktiv{color:var(--blå);font-weight:700}
+    thead th.sort-aktiv::after{content:' ▼';font-size:.65rem;opacity:.6}
+    thead th:first-child{padding-left:20px}
+    thead th:last-child{padding-right:20px}
     tbody tr{border-bottom:1px solid var(--kant)}
     tbody tr:last-child{border-bottom:none}
-    tbody tr:hover{background:#f0f5ff}
-    tbody td{padding:6px 8px;vertical-align:middle}
-    tbody td:first-child{padding-left:14px}
-    .tid-cell{display:flex;flex-direction:column;gap:1px}
-    .tid{font-variant-numeric:tabular-nums;font-weight:400;white-space:nowrap}
-    .tid.fet{font-weight:700}
-    .vtid-dag{font-size:.68rem;color:var(--dim);font-weight:500;letter-spacing:.02em}
-    .overfart{white-space:nowrap;color:var(--dim);font-variant-numeric:tabular-nums}
-    .hamn-kod{font-variant-numeric:tabular-nums;font-weight:600;letter-spacing:.04em}
+    tbody tr:hover{background:#f8fafc}
+    tbody td{padding:12px 12px;vertical-align:middle}
+    tbody td:first-child{padding-left:20px}
+    tbody td:last-child{padding-right:20px}
+    tbody tr.passerad td{opacity:.52}
+    .tid-cell{display:flex;flex-direction:column;gap:2px;min-width:62px}
+    .tid{font-variant-numeric:tabular-nums;font-weight:500;font-size:.98rem;white-space:nowrap;letter-spacing:-.005em}
+    .tid.fet{font-weight:700;color:var(--text)}
+    .vtid-dag{font-size:.70rem;color:var(--dim);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+    .overfart{white-space:nowrap;color:var(--text-mjuk);font-variant-numeric:tabular-nums;font-size:.88rem}
+    .hamn-kod{font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:.04em;color:var(--text);font-size:.92rem}
     .hamn-avg{text-align:right}
-    .rutt-sep-c{width:22px;text-align:center;color:#94a3b8}
-    .rutt-sep{display:inline-block;min-width:12px;text-align:center;color:#9ca3af;font-weight:700}
-    .rl{color:var(--blå);text-decoration:none;font-weight:700}
+    .rutt-sep-c{width:22px;text-align:center;color:var(--kant-stark)}
+    .rutt-sep{display:inline-block;min-width:12px;text-align:center;color:var(--kant-stark);font-weight:700}
+    .rl{color:var(--blå);text-decoration:none;font-weight:700;font-size:.93rem}
     .rl:hover{text-decoration:underline}
-    .fartyg{color:var(--dim);font-style:italic;font-size:.79rem}
-    .fartyg.tom{color:#d1d5db;font-style:normal}
-    .lnk-c{width:36px;text-align:center}
-    .tlnk{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:5px;background:var(--grå-ljus);border:1px solid var(--kant);color:var(--blå);text-decoration:none;font-size:.72rem;transition:all .15s}
+    .fartyg{color:var(--text-mjuk);font-style:italic;font-size:.86rem}
+    .fartyg.tom{color:var(--kant-stark);font-style:normal}
+    .lnk-c{width:42px;text-align:center}
+    .tlnk{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:6px;background:var(--grå-ljus);border:1px solid var(--kant);color:var(--blå);text-decoration:none;font-size:.78rem;transition:all .15s;font-weight:700}
     .tlnk:hover{background:var(--blå);color:var(--vit);border-color:var(--blå)}
     /* ── Info-tooltip ── */
-    .info-c{width:28px;text-align:center}
-    .info-knapp{position:relative;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:none;border:1px solid #d1d5db;color:#9ca3af;font-size:.7rem;cursor:pointer;font-style:italic;font-weight:700;font-family:Georgia,serif;vertical-align:middle;transition:all .15s;user-select:none}
+    .info-c{width:32px;text-align:center}
+    .info-knapp{position:relative;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:none;border:1px solid var(--kant-stark);color:var(--dim);font-size:.72rem;cursor:pointer;font-style:italic;font-weight:700;font-family:Georgia,serif;vertical-align:middle;transition:all .15s;user-select:none}
     .info-knapp:hover,.info-knapp:focus{background:var(--blå);color:var(--vit);border-color:var(--blå);outline:none}
-    .info-pop{display:none;position:absolute;right:26px;top:50%;transform:translateY(-50%);background:#fff;border:1px solid var(--kant);border-radius:8px;padding:10px 12px;min-width:220px;max-width:280px;box-shadow:0 4px 12px rgba(0,0,0,.12);font-size:.74rem;line-height:1.55;color:var(--text);z-index:100;text-align:left;font-style:normal}
+    .info-pop{display:none;position:absolute;right:28px;top:50%;transform:translateY(-50%);background:#fff;border:1px solid var(--kant);border-radius:8px;padding:11px 13px;min-width:240px;max-width:300px;box-shadow:0 6px 16px rgba(15,23,42,.14);font-size:.78rem;line-height:1.55;color:var(--text);z-index:100;text-align:left;font-style:normal;font-weight:400;letter-spacing:0;text-transform:none}
     .info-pop a{color:var(--blå-ljus);text-decoration:none;word-break:break-all}
     .info-pop a:hover{text-decoration:underline}
     .info-pop strong{color:var(--text)}
     .info-knapp:hover .info-pop,.info-knapp:focus .info-pop{display:block}
     /* ── Sidebar ── */
-    .sidebar{position:sticky;top:12px}
-    .sb-kort{background:var(--vit);border:1px solid var(--kant);border-radius:10px;overflow:hidden;margin-bottom:12px}
-    .sb-hdr{padding:8px 14px;background:var(--blå);color:var(--vit);font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
-    .sb-dat{padding:10px 14px;border-bottom:1px solid var(--kant)}
-    .sb-dat label{font-size:.73rem;color:var(--dim);display:block;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
-    .sb-dat input[type=date]{width:100%;border:1px solid var(--kant);border-radius:6px;padding:6px 8px;font-size:.83rem;color:var(--text)}
-    .sb-filter label,.sb-export label,.sb-apply label{font-size:.73rem;color:var(--dim);display:block;margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
-    .sb-filter,.sb-export{padding:10px 14px;border-bottom:1px solid var(--kant)}
-    .sb-select{width:100%;border:1px solid var(--kant);border-radius:6px;padding:7px 8px;font-size:.83rem;color:var(--text);background:var(--vit)}
-    .vy-knapp{display:block;width:100%;text-align:left;padding:9px 14px;border:none;border-bottom:1px solid var(--kant);background:var(--vit);cursor:pointer;font-size:.83rem;color:var(--dim);transition:background .12s;font-weight:500}
-    .vy-knapp:last-child{border-bottom:none}
-    .vy-knapp:hover{background:var(--grå-ljus)}
-    .vy-knapp.vald{background:#f8fafc;color:var(--blå);font-weight:700}
-    .vy-knapp.aktiv{background:#eff6ff;color:var(--blå);font-weight:700}
-    .vy-knapp.aktiv::before{content:'▶ ';font-size:.6rem}
-    .sb-apply{padding:10px 14px;border-bottom:1px solid var(--kant)}
-    .sb-pending{font-size:.72rem;color:var(--dim);line-height:1.45;margin-top:8px}
-    .sb-linje{padding:8px 14px;border-bottom:1px solid var(--kant);display:flex;flex-direction:column;gap:2px}
+    .sidebar{position:sticky;top:14px;display:flex;flex-direction:column;gap:14px}
+    .sb-kort{background:var(--vit);border:1px solid var(--kant);border-radius:12px;overflow:hidden;box-shadow:var(--skugga)}
+    .sb-hdr{padding:11px 16px;background:linear-gradient(135deg,var(--blå-mörk),var(--blå));color:var(--vit);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+    .sb-dat{padding:12px 16px;border-bottom:1px solid var(--kant)}
+    .sb-dat label{font-size:.72rem;color:var(--dim);display:block;margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+    .sb-dat input[type=date]{width:100%;border:1px solid var(--kant);border-radius:8px;padding:8px 10px;font-size:.92rem;color:var(--text)}
+    .sb-filter label,.sb-export label,.sb-apply label{font-size:.72rem;color:var(--dim);display:block;margin-bottom:7px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+    .sb-filter,.sb-export{padding:12px 16px;border-bottom:1px solid var(--kant)}
+    .sb-select{width:100%;border:1px solid var(--kant);border-radius:8px;padding:8px 10px;font-size:.92rem;color:var(--text);background:var(--vit)}
+    .vy-grupp{display:flex;flex-direction:column;border-bottom:1px solid var(--kant)}
+    .vy-grupp-titel{font-size:.70rem;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:10px 16px 6px;background:var(--grå-ljus)}
+    .vy-knapp{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:11px 16px;border:none;border-top:1px solid var(--kant);background:var(--vit);cursor:pointer;font-size:.90rem;color:var(--text-mjuk);transition:all .12s;font-weight:500}
+    .vy-knapp:first-of-type{border-top:none}
+    .vy-knapp:hover{background:var(--grå-ljus);color:var(--text)}
+    .vy-knapp .vy-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--kant-stark);flex-shrink:0}
+    .vy-knapp[data-vy="ankomst"] .vy-dot{background:var(--in)}
+    .vy-knapp[data-vy="mot"] .vy-dot{background:var(--mot)}
+    .vy-knapp[data-vy="fran"] .vy-dot{background:var(--ut)}
+    .vy-knapp[data-vy="alla"] .vy-dot{background:var(--blå-ljus)}
+    .vy-knapp.vald{background:#eff6ff;color:var(--blå);font-weight:700}
+    .vy-knapp.aktiv{background:#dbeafe;color:var(--blå-mörk);font-weight:700;border-left:4px solid var(--blå);padding-left:12px}
+    .sb-apply{padding:12px 16px;border-bottom:1px solid var(--kant)}
+    .sb-pending{font-size:.78rem;color:var(--text-mjuk);line-height:1.5;margin-top:10px;padding:8px 10px;background:var(--grå-ljus);border-radius:6px}
+    .sb-linje{padding:10px 16px;border-bottom:1px solid var(--kant);display:flex;flex-direction:column;gap:3px}
     .sb-linje:last-child{border-bottom:none}
-    .sb-namn{font-weight:600;font-size:.82rem}
-    .sb-rutt{font-size:.76rem;color:var(--dim)}
-    .sb-info{font-size:.72rem;color:var(--dim);font-style:italic}
-    .sb-lnk{font-size:.74rem;color:#2868a8;text-decoration:none}
+    .sb-namn{font-weight:600;font-size:.86rem;color:var(--text)}
+    .sb-rutt{font-size:.78rem;color:var(--text-mjuk)}
+    .sb-info{font-size:.74rem;color:var(--dim);font-style:italic}
+    .sb-lnk{font-size:.78rem;color:var(--blå-ljus);text-decoration:none;font-weight:500}
     .sb-lnk:hover{text-decoration:underline}
-    .sb-liten{font-size:.71rem;color:var(--dim);padding:10px 14px;line-height:1.55}
-    .sb-meta{font-size:.71rem;color:var(--dim);padding:0 14px 10px;line-height:1.55}
-    .sb-sek-hdr{padding:6px 14px;background:#f8fafc;border-bottom:1px solid var(--kant);font-size:.68rem;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
-    footer{text-align:center;padding:16px;font-size:.72rem;color:var(--dim);border-top:1px solid var(--kant);margin-top:6px}
+    .sb-liten{font-size:.78rem;color:var(--text-mjuk);padding:12px 16px;line-height:1.6}
+    .sb-meta{font-size:.74rem;color:var(--dim);padding:0 16px 12px;line-height:1.55}
+    .sb-sek-hdr{padding:8px 16px;background:var(--grå-ljus);border-bottom:1px solid var(--kant);font-size:.70rem;font-weight:700;color:var(--text-mjuk);text-transform:uppercase;letter-spacing:.06em}
+    footer{text-align:center;padding:20px;font-size:.76rem;color:var(--dim);border-top:1px solid var(--kant);margin-top:10px;background:var(--vit)}
     /* ── Print / PDF ── */
     @media print{
       body{background:#fff;font-size:10px}
       header{background:#fff!important;color:#000!important;border-bottom:2px solid #000;padding:6px 0}
-      .layout{display:block;padding:0}
-      .sidebar,footer,.info-knapp{display:none!important}
-      .sektion{border:1px solid #ccc;page-break-inside:avoid;margin-bottom:8px}
-      .sek-hdr{background:#eee!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-      .sek-hdr h2{color:#000!important}
+      .layout{display:block;padding:0;max-width:none}
+      .sidebar,footer,.info-knapp,.lnk-c,.info-c{display:none!important}
+      .sektion{border:1px solid #aaa;page-break-inside:avoid;margin-bottom:10px;box-shadow:none;border-radius:0}
+      .sek-hdr{background:#eee!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:6px 10px}
+      .sek-hdr h2{color:#000!important;font-size:11px}
       tbody tr:hover{background:none}
       .tlnk,.rl{color:#000;text-decoration:none}
+      thead th{padding:5px 7px;font-size:9px}
+      tbody td{padding:5px 7px}
+      .badge{border:1px solid #888;background:#fff!important;color:#000!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
     }
   </style>
 </head>
 <body>
 <header>
-  <div>
-    <div class="hdr-label">Aktuell lista</div>
+  <div class="hdr-grupp">
+    <div class="hdr-label">Aktuell vy</div>
     <div class="hdr-datum" id="hdr-datum">–</div>
   </div>
-  <div>
+  <div class="hdr-grupp" style="text-align:right">
     <div class="hdr-label">Veckodag</div>
     <div class="hdr-vecka" id="hdr-vdag">–</div>
   </div>
@@ -135,11 +172,11 @@
 
     <!-- VY: Alla ankomster / avgångar -->
     <div id="view-alla" style="display:none">
-      <div class="sektion sek-sv" id="sek-alla" style="display:none">
-        <div class="sek-hdr"><h2 id="alla-rubrik">–</h2><span class="cnt" id="cnt-alla">0</span></div>
+      <div class="sektion sek-blandad" id="sek-alla" style="display:none">
+        <div class="sek-hdr"><h2 id="alla-rubrik">–</h2><span class="cnt" id="cnt-alla">0</span><span class="sub">sorterat på svensk händelse (ankomst/avgång)</span></div>
         <div class="tbl-wrap">
           <table><thead><tr>
-            <th class="lnk-c">&#8599;</th><th>Rederi</th>
+            <th class="lnk-c">&#8599;</th><th class="rikt-c">Riktning</th><th>Rederi</th>
             <th data-sort="avg">Avg&shy;tid</th><th data-sort="ank">Ank&shy;tid</th>
             <th class="hamn-avg">Avg.hamn</th><th class="rutt-sep-c">–</th><th>Ank.hamn</th><th>Fartyg</th><th>Överfart</th><th class="info-c">&#9432;</th>
           </tr></thead><tbody id="tb-alla"></tbody></table>
@@ -149,11 +186,11 @@
 
     <!-- VY: Filter (mot/ankomst/från) -->
     <div id="view-filter" style="display:none">
-      <div class="sektion sek-sv">
-        <div class="sek-hdr"><h2 id="filter-rubrik">–</h2><span class="cnt" id="cnt-filter">0</span></div>
+      <div class="sektion" id="sek-filter">
+        <div class="sek-hdr"><h2 id="filter-rubrik">–</h2><span class="cnt" id="cnt-filter">0</span><span class="sub" id="filter-sub"></span></div>
         <div class="tbl-wrap">
           <table><thead><tr>
-            <th class="lnk-c">&#8599;</th><th>Rederi</th>
+            <th class="lnk-c">&#8599;</th><th class="rikt-c">Riktning</th><th>Rederi</th>
             <th data-sort="avg">Avg&shy;tid</th><th data-sort="ank">Ank&shy;tid</th>
             <th class="hamn-avg">Avg.hamn</th><th class="rutt-sep-c">–</th><th>Ank.hamn</th><th>Fartyg</th><th>Överfart</th><th class="info-c">&#9432;</th>
           </tr></thead><tbody id="tb-filter"></tbody></table>
@@ -164,27 +201,29 @@
 
   <aside class="sidebar">
     <div class="sb-kort">
-      <div class="sb-hdr">Visa lista</div>
+      <div class="sb-hdr">Välj vy</div>
+      <div class="vy-grupp-titel">Operativ vy</div>
+      <button class="vy-knapp aktiv vald" data-vy="ankomst" onclick="väljVy(this)"><span class="vy-dot"></span>Ankomster till Sverige</button>
+      <button class="vy-knapp" data-vy="mot" onclick="väljVy(this)"><span class="vy-dot"></span>Avgångar mot Sverige</button>
+      <button class="vy-knapp" data-vy="fran" onclick="väljVy(this)"><span class="vy-dot"></span>Avgår från Sverige</button>
+      <div class="vy-grupp-titel" style="border-top:1px solid var(--kant)">Översikt</div>
+      <button class="vy-knapp" data-vy="alla" onclick="väljVy(this)"><span class="vy-dot"></span>Alla ankomster + avgångar</button>
       <div class="sb-dat">
         <label>Datum</label>
         <input type="date" id="dat-pick-sb" class="dat-pick" style="width:100%">
       </div>
       <div class="sb-filter">
-        <label>Rederi</label>
+        <label>Filtrera på rederi</label>
         <select id="rederi-filter" class="sb-select"></select>
       </div>
-      <button class="vy-knapp" data-vy="alla" onclick="väljVy(this)">Alla ankomster / avgångar</button>
-      <button class="vy-knapp" data-vy="mot" onclick="väljVy(this)">&#8617; Avgångar mot Sverige</button>
-      <button class="vy-knapp aktiv vald" data-vy="ankomst" onclick="väljVy(this)">&#x26F4; Ankomster till Sverige</button>
-      <button class="vy-knapp" data-vy="fran" onclick="väljVy(this)">&#8618; Avgår från Sverige</button>
       <div class="sb-apply">
         <label>Uppdatera visning</label>
         <button class="apply-btn" id="apply-controls">Visa vald lista</button>
         <div class="sb-pending" id="pending-info">Ankomster till Sverige för dagens datum visas som standard.</div>
       </div>
       <div class="sb-export">
-        <label>Export / utskrift</label>
-        <button class="xl-knapp" onclick="exportExcel()">&#8659; Skriv ut lista (Excel)</button>
+        <label>Export</label>
+        <button class="xl-knapp" onclick="exportExcel()">&#8659; Exportera till Excel</button>
       </div>
     </div>
 
@@ -261,11 +300,33 @@ const VD  = ['Sön','Mån','Tis','Ons','Tor','Fre','Lör']; // index=getDay()
 const VDL = ['Söndag','Måndag','Tisdag','Onsdag','Torsdag','Fredag','Lördag'];
 const VD_INDEX = Object.fromEntries(VD.map((namn, i) => [namn, i]));
 const VIEW_LABELS = {
-  alla:'Alla ankomster / avgångar',
+  alla:'Alla ankomster + avgångar',
   mot:'Avgångar mot Sverige',
   ankomst:'Ankomster till Sverige',
   fran:'Avgår från Sverige',
 };
+// Sektionsklass per vy — styr färgad övre rand i sektionen
+const VIEW_SEKTION_CLASS = {
+  alla:'sek-blandad',
+  mot:'sek-mot',
+  ankomst:'sek-in',
+  fran:'sek-ut',
+};
+// Undertext i sektions-header per vy (kort förklaring)
+const VIEW_SUB = {
+  alla:'sorterat på svensk händelse (ankomst eller avgång)',
+  mot:'avgår från utländsk hamn med kurs mot Sverige',
+  ankomst:'landar i svensk hamn under valt dygn',
+  fran:'avgår från svensk hamn under valt dygn',
+};
+// Riktnings-badge per rad (använder rad._riktning som sätts före rendering)
+function riktningsBadge(rad){
+  const r = rad._riktning || 'okänd';
+  if(r === 'inkommande') return '<span class="badge badge-in" title="Färjan landar i svensk hamn under valt dygn">↓ Inkommande</span>';
+  if(r === 'utgaende')   return '<span class="badge badge-ut" title="Färjan avgår från svensk hamn under valt dygn">↑ Utgående</span>';
+  if(r === 'motsverige') return '<span class="badge badge-mot" title="Färjan avgår från utländsk hamn med kurs mot Sverige">→ Mot Sverige</span>';
+  return '';
+}
 const ARRIVAL_LOOKBACK_DAYS = 3;
 const EXTRA_ROUTE_INFO = {
   'TT-Line|Travemünde|Trelleborg':{
@@ -425,7 +486,10 @@ const TIDZON_MARKOR = {
   'GB':-60,
   'UK':-60,
 };
-// Viking Line port codes (portnamn → VL-kod)
+// Viking Line port codes (portnamn → VL-kod).
+// Mariehamn ('MAR') stannar i mapen som referens men ingår inte i VL_RUTTER
+// eftersom rutterna mot/från Mariehamn är destinationsskifte i samma färja
+// (Stockholm–Mariehamn–Helsingfors) och hanteras som STO↔HEL.
 const VL_PORTER = {
   'Stockholm':'STO','Helsingfors':'HEL','Åbo':'TKU',
   'Kapellskär':'KAP','Mariehamn':'MAR',
@@ -1286,6 +1350,10 @@ function kandidaterFörValtDatum(){
   }
   return [...map.values()].map(v=>v.rad);
 }
+// Märk rader i en lista med riktning — sätts precis innan rendering eftersom
+// samma rad-objekt kan ingå i flera vy-set (t.ex. en tur som både avgår och
+// ankommer Sverige samma dygn). Märkning på objektet är därför vy-specifik.
+function märk(rader, riktning){ rader.forEach(r=>r._riktning = riktning); return rader; }
 function rendera(){
   if(!DATA) return;
   const ds = dStr(valdDat);
@@ -1294,11 +1362,9 @@ function rendera(){
   const frånSverige = kandidater.filter(o=>o._franSverige && o._depDate === ds);
   const avgMotSverige = tillSverige.filter(o=>o._depDate === ds);
   const ankTillSverige = tillSverige.filter(o=>o._arrDate === ds);
-  const allaHändelser = [...ankTillSverige, ...frånSverige].sort((a,b)=>(a._sortSvenskHändelse??Number.MAX_SAFE_INTEGER) - (b._sortSvenskHändelse??Number.MAX_SAFE_INTEGER));
 
   uppdateraRederiFilter(kandidater);
   byggRederiOversikt(kandidater);
-  const allaFiltrerade = filtreraPåRederi(allaHändelser);
   const motFiltrerade = filtreraPåRederi(avgMotSverige);
   const ankFiltrerade = filtreraPåRederi(ankTillSverige);
   const franFiltrerade = filtreraPåRederi(frånSverige);
@@ -1312,20 +1378,40 @@ function rendera(){
   const rubrikDatum = fmtDat(valdDat);
   document.getElementById('alla-rubrik').textContent = `${VIEW_LABELS.alla} · ${rubrikDatum}`;
   document.getElementById('filter-rubrik').textContent = `${VIEW_LABELS[viewMode]||'Lista'} · ${rubrikDatum}`;
+  const subEl = document.getElementById('filter-sub');
+  if(subEl) subEl.textContent = VIEW_SUB[viewMode] || '';
+
+  // Sektionsklass (färgad övre rand) per vy
+  const filterSek = document.getElementById('sek-filter');
+  if(filterSek){
+    filterSek.classList.remove('sek-in','sek-ut','sek-mot','sek-blandad');
+    filterSek.classList.add(VIEW_SEKTION_CLASS[viewMode] || 'sek-blandad');
+  }
 
   document.getElementById('view-alla').style.display = viewMode === 'alla' ? '' : 'none';
   document.getElementById('view-filter').style.display = viewMode === 'alla' ? 'none' : '';
 
+  // Märk rader OMEDELBART innan render (vy-specifikt perspektiv vinner)
   if(viewMode==='alla'){
+    // Blandad vy: re-märk i exakt denna ordning så ankomster blir 'inkommande'
+    // även om samma objekt också är 'frånSverige' i någon edge-case.
+    märk(frånSverige, 'utgaende');
+    märk(ankTillSverige, 'inkommande');
+    const allaHändelser = [...ankTillSverige, ...frånSverige]
+      .sort((a,b)=>(a._sortSvenskHändelse??Number.MAX_SAFE_INTEGER) - (b._sortSvenskHändelse??Number.MAX_SAFE_INTEGER));
+    const allaFiltrerade = filtreraPåRederi(allaHändelser);
     fyll('tb-alla', allaFiltrerade, 'sek-alla', 'cnt-alla');
     visadeRader = allaFiltrerade;
   } else if(viewMode==='mot'){
+    märk(motFiltrerade, 'motsverige');
     fyllFilter(motFiltrerade);
     visadeRader = motFiltrerade;
   } else if(viewMode==='ankomst'){
+    märk(ankFiltrerade, 'inkommande');
     fyllFilter(ankFiltrerade);
     visadeRader = ankFiltrerade;
   } else {
+    märk(franFiltrerade, 'utgaende');
     fyllFilter(franFiltrerade);
     visadeRader = franFiltrerade;
   }
@@ -1393,7 +1479,7 @@ function fyllFilter(rader){
 
 function bygTr(rad){
   const tr = document.createElement('tr');
-  if(rad.grå) tr.classList.add('grå');
+  if(rad.passerad) tr.classList.add('passerad');
 
   // Tider med veckodag
   const avKlass = rad._fetKolumn === 'avg' ? 'tid fet' : 'tid';
@@ -1408,10 +1494,13 @@ function bygTr(rad){
     : `<span class="fartyg tom">—</span>`;
 
   // Länk-ikon
-  const lh = rad.länk ? `<a class="tlnk" href="${esc(rad.länk)}" target="_blank" rel="noopener" title="${esc(rad.rederi)}">&#8599;</a>` : '';
+  const lh = rad.länk ? `<a class="tlnk" href="${esc(rad.länk)}" target="_blank" rel="noopener" title="Öppna tidtabell hos ${esc(rad.rederi)}">&#8599;</a>` : '';
   // Rederi
-  const färg = REDERI_FARG[rad.rederi] || '#1a4a7a';
+  const färg = REDERI_FARG[rad.rederi] || 'var(--blå)';
   const rh = rad.länk ? `<a class="rl" href="${esc(rad.länk)}" target="_blank" rel="noopener" style="color:${esc(färg)}">${esc(rad.rederi)}</a>` : `<strong style="color:${esc(färg)}">${esc(rad.rederi)}</strong>`;
+
+  // Riktnings-badge
+  const bh = riktningsBadge(rad);
 
   // Info-tooltip
   const verTxt = rad.verifiering ? `<strong>Verifiering:</strong> ${esc(rad.verifiering)}<br>` : '';
@@ -1425,6 +1514,7 @@ function bygTr(rad){
 
   tr.innerHTML = `
     <td class="lnk-c">${lh}</td>
+    <td class="rikt-c">${bh}</td>
     <td>${rh}</td>
     <td>${avTid}</td>
     <td>${anTid}</td>
@@ -1439,30 +1529,108 @@ function bygTr(rad){
 }
 
 // ── Excel-export ──
+// Mappa riktning till tydlig textetikett för Excel
+function riktningsText(rad){
+  const r = rad._riktning;
+  if(r === 'inkommande') return 'INKOMMANDE';
+  if(r === 'utgaende')   return 'UTGÅENDE';
+  if(r === 'motsverige') return 'MOT SVERIGE';
+  return '';
+}
 function exportExcel(){
-  const huvud = ['REDERI','AVG TID (SE)','AVG DAG','ANK TID (SE)','ANK DAG','AVGÅNGSHAMN','ANKOMSTHAMN','FARTYG','ÖVERFART'];
+  const datum = dStr(valdDat);
+  const vyTxt = VIEW_LABELS[viewMode] || 'Lista';
+  const vdagTxt = VDL[valdDat.getDay()];
+  const rederiTxt = valtRederi === 'alla' ? 'Alla rederier' : valtRederi;
+  const uppdaterad = DATA?.meta?.uppdaterad || '';
+
+  // Två-rads förklarings-header (slås ihop) + tom rad + tabellrubriker + data
+  const titel = `Färjor Sverige — ${vyTxt}`;
+  const subtitel = `${vdagTxt} ${datum} · Filter: ${rederiTxt} · Antal rader: ${visadeRader.length}${uppdaterad?`  ·  Källdata uppdaterad: ${uppdaterad}`:''}`;
+
+  const huvud = [
+    'RIKTNING','REDERI','AVG TID (SE)','AVG DAG','ANK TID (SE)','ANK DAG',
+    'AVGÅNGSHAMN','ANKOMSTHAMN','FARTYG','ÖVERFART','VERIFIERING','ANMÄRKNING','KÄLLA'
+  ];
   const rader = visadeRader.map(r=>[
-    r.rederi, r.avgtid, r.avVdag, r.anktid, r.ankVdag, r.avghamn, r.ankhamn, r.fartyg||'', r.överfart||''
+    riktningsText(r),
+    r.rederi,
+    r.avgtid,
+    r.avVdag,
+    r.anktid,
+    r.ankVdag,
+    r.avghamn,
+    r.ankhamn,
+    r.fartyg || '',
+    r.överfart || '',
+    r.verifiering || '',
+    r.anm || '',
+    r.källa || ''
   ]);
 
-  const arktitel = VIEW_LABELS[viewMode]||'Lista';
-  const ws = XLSX.utils.aoa_to_sheet([huvud, ...rader]);
+  const aoa = [
+    [titel],
+    [subtitel],
+    [],
+    huvud,
+    ...rader
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
 
   // Kolumnbredder
-  ws['!cols'] = [{wch:22},{wch:12},{wch:10},{wch:12},{wch:10},{wch:12},{wch:18},{wch:18},{wch:22}];
-  // Fet rubrik
-  const range = XLSX.utils.decode_range(ws['!ref']);
-  for(let c=range.s.c; c<=range.e.c; c++){
-    const cell = XLSX.utils.encode_cell({r:0,c});
-    if(!ws[cell]) continue;
-    ws[cell].s = {font:{bold:true},fill:{fgColor:{rgb:'DBEAFE'}}};
+  ws['!cols'] = [
+    {wch:14},  // RIKTNING
+    {wch:22},  // REDERI
+    {wch:13},  // AVG TID
+    {wch:9},   // AVG DAG
+    {wch:13},  // ANK TID
+    {wch:9},   // ANK DAG
+    {wch:16},  // AVG HAMN
+    {wch:16},  // ANK HAMN
+    {wch:24},  // FARTYG
+    {wch:14},  // ÖVERFART
+    {wch:14},  // VERIFIERING
+    {wch:42},  // ANMÄRKNING
+    {wch:36}   // KÄLLA
+  ];
+
+  // Slå ihop titel och subtitel över hela bredden
+  const sista = huvud.length - 1;
+  ws['!merges'] = [
+    { s:{r:0,c:0}, e:{r:0,c:sista} },
+    { s:{r:1,c:0}, e:{r:1,c:sista} }
+  ];
+
+  // Frys rubrikraden (titel+subtitel+tom rad+huvud = 4 rader frusna)
+  ws['!freeze'] = { xSplit:0, ySplit:4 };
+  // Autofilter på rubriken
+  ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s:{r:3,c:0}, e:{r:3+rader.length,c:sista} }) };
+
+  // Cell-styling (fungerar i Excel som öppnar filen via Office-formatter, ignoreras av SheetJS CE i vissa fall — men skadar inte)
+  if(ws['A1']) ws['A1'].s = { font:{bold:true,sz:14}, alignment:{horizontal:'left'} };
+  if(ws['A2']) ws['A2'].s = { font:{italic:true,sz:11,color:{rgb:'334155'}}, alignment:{horizontal:'left'} };
+  for(let c=0; c<=sista; c++){
+    const cellRef = XLSX.utils.encode_cell({r:3,c});
+    if(ws[cellRef]) ws[cellRef].s = {
+      font:{bold:true,color:{rgb:'FFFFFF'}},
+      fill:{patternType:'solid',fgColor:{rgb:'1E3A5F'}},
+      alignment:{horizontal:'left',vertical:'center',wrapText:false}
+    };
   }
 
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, arktitel.slice(0,31));
+  // Radhöjd för rubrikraden
+  ws['!rows'] = ws['!rows'] || [];
+  ws['!rows'][0] = { hpt: 22 };
+  ws['!rows'][1] = { hpt: 18 };
+  ws['!rows'][3] = { hpt: 22 };
 
-  const datum = dStr(valdDat);
-  const rederiDel = valtRederi === 'alla' ? 'alla_rederier' : valtRederi.toLowerCase().replace(/[^a-z0-9åäö]+/gi,'_');
+  const wb = XLSX.utils.book_new();
+  // Bladnamn: kort + giltigt (Excel max 31 tecken, inga : \ / ? * [ ])
+  const bladnamn = vyTxt.replace(/[:\\/?*\[\]]/g,'').slice(0,31);
+  XLSX.utils.book_append_sheet(wb, ws, bladnamn);
+
+  const rederiDel = valtRederi === 'alla' ? 'alla' : valtRederi.toLowerCase().replace(/[^a-z0-9åäöéè]+/gi,'_');
   const filnamn = `farjor_${datum}_${viewMode}_${rederiDel}.xlsx`;
   XLSX.writeFile(wb, filnamn);
 }
