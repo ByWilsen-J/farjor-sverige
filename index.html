@@ -1011,15 +1011,6 @@ function ärPasseradTidpunkt(dayOffset, minutes, datumBas = valdDat){
   if(datum > nu.datum) return false;
   return minutes <= nu.minuter;
 }
-function ärPasseradRad(depInfo, ankInfo, motSverige, franSverige, depDatum){
-  if(motSverige && !franSverige){
-    const avgPasserad = ärPasseradTidpunkt(depInfo.dayOffset, depInfo.minutes, depDatum);
-    const ankPasserad = ärPasseradTidpunkt(ankInfo.dayOffset, ankInfo.minutes, depDatum);
-    return avgPasserad && ankPasserad;
-  }
-  const svenskTidpunkt = svenskTidpunktFörRad(depInfo, ankInfo, motSverige, franSverige);
-  return ärPasseradTidpunkt(svenskTidpunkt.dayOffset, svenskTidpunkt.minutes, depDatum);
-}
 function svenskTidpunktFörRad(depInfo, ankInfo, motSverige, franSverige){
   if(motSverige && !franSverige && Number.isFinite(ankInfo.sortAbs)){
     return {
@@ -1545,6 +1536,18 @@ function uppdateraSorteringUI(){
     th.classList.toggle('sort-aktiv', th.dataset.sort === aktiv);
   });
 }
+function uppdateraRadRiktning(rad, riktning){
+  rad._riktning = riktning;
+  rad._fetKolumn = riktning === 'inkommande' ? 'ank' : 'avg';
+  if(riktning === 'inkommande'){
+    rad.passerad = !!rad._passeradAnk;
+  }else if(riktning === 'motsverige'){
+    rad.passerad = !!(rad._passeradAvg && rad._passeradAnk);
+  }else{
+    rad.passerad = !!rad._passeradAvg;
+  }
+  return rad;
+}
 function tidsCellState(rad){
   const riktning = rad._riktning || '';
   return {
@@ -1595,7 +1598,7 @@ function kandidaterFörValtDatum(){
 // Märk rader i en lista med riktning — sätts precis innan rendering eftersom
 // samma rad-objekt kan ingå i flera vy-set (t.ex. en tur som både avgår och
 // ankommer Sverige samma dygn). Märkning på objektet är därför vy-specifik.
-function märk(rader, riktning){ rader.forEach(r=>r._riktning = riktning); return rader; }
+function märk(rader, riktning){ rader.forEach(r=>uppdateraRadRiktning(r, riktning)); return rader; }
 function rendera(){
   if(!DATA) return;
   const ds = dStr(valdDat);
@@ -1673,8 +1676,8 @@ function bygRad(rad, r, länk, depDatum = valdDat){
   const motSverige = rad.mot_sverige===true || SVENSKA_HAMNAR.has(rad.ankhamn);
   const franSverige = rad.fran_sverige===true || SVENSKA_HAMNAR.has(rad.avghamn);
   const svenskTidpunkt = svenskTidpunktFörRad(depInfo, ankInfo, motSverige, franSverige);
-  const passerad = ärPasseradRad(depInfo, ankInfo, motSverige, franSverige, depDatum);
-  const fetKolumn = (motSverige && !franSverige) ? 'ank' : 'avg';
+  const passeradAvg = ärPasseradTidpunkt(depInfo.dayOffset, depInfo.minutes, depDatum);
+  const passeradAnk = ärPasseradTidpunkt(ankInfo.dayOffset, ankInfo.minutes, depDatum);
   return {
     rederi:r,
     avgtid:depInfo.text||'—',
@@ -1685,13 +1688,15 @@ function bygRad(rad, r, länk, depDatum = valdDat){
     fartyg:getFar(rad, depDatum),
     länk,
     grå:false,
-    passerad,
+    passerad:false,
     avVdag:veckodagEfterOffset(depDatum, depInfo.dayOffset),
     ankVdag:veckodagEfterOffset(depDatum, ankInfo.dayOffset),
     källa:avgMeta?.kalla || rad.kalla||länk||'',
     verifiering:rad.verifiering||'',
     anm:rensaAnm(rad.anmarkning||''),
-    _fetKolumn:fetKolumn,
+    _fetKolumn:'avg',
+    _passeradAvg:passeradAvg,
+    _passeradAnk:passeradAnk,
     _depDate:depDate,
     _arrDate:arrDate,
     _motSverige:motSverige,

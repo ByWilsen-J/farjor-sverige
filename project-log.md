@@ -10,6 +10,10 @@ Senaste UI-iteration: tabellen visar nu irrelevanta tidskolumner i ljusgrått pe
 
 ## Senaste ändringar
 
+- 2026-05-20: Rättade riktningstolkning i `index.html` efter regressionsfel i tabellrader.
+  - Flyttade beslut om `passerad`-status och vilken tidskolumn som ska vara visuellt primär från ruttbygget till den faktiska radlabeln (`Inkommande`, `Utgående`, `Mot Sverige`).
+  - Det gör att samma resa nu kan visas korrekt i olika vyer utan att återanvända fel status eller fel fetmarkerad tid från en annan riktning.
+  - `Inkommande` använder nu alltid ankomsttid som primär/aktuell tid, `Utgående` avgångstid och `Mot Sverige` avgångstid, samtidigt som `Mot Sverige` fortsatt kräver att både avgång och ankomst har passerat för att räknas som inaktuell.
 - 2026-05-20: Justerade riktningstider och byggde om användarpanelen i `index.html`.
   - `Inkommande`: avgångstiden tonas nu ned i ljusgrått eftersom svensk ankomst är den relevanta händelsen.
   - `Utgående`: ankomsttiden tonas nu ned i ljusgrått eftersom svensk avgång är den relevanta händelsen.
@@ -116,6 +120,7 @@ Senaste UI-iteration: tabellen visar nu irrelevanta tidskolumner i ljusgrått pe
 
 ## Problem / blockerare
 
+- Senaste regressionsfelet kom från att riktning/specifik radlabel sattes senare än passerad-/betoningslogiken. Den delen är nu korrigerad i frontend.
 - Vissa rader saknar fortfarande fartygsnamn när API:ets avgångstid avviker från det normaliserade veckoschemat, t.ex. försenade/ändrade avgångar.
 - Viking Lines server-side API-anrop ger 403 Forbidden i `update_fartyg.py`. Frontend/anmarkningsfallback ger fortfarande vissa Viking-namn, men API-flödet behöver återupptäckas.
 - Unity Line finns inte som egen datumkälla i nuvarande JSON, så full separering eller exakt avgångsimport kräver ny importkedja.
@@ -158,5 +163,6 @@ Senaste UI-iteration: tabellen visar nu irrelevanta tidskolumner i ljusgrått pe
 
 ## Historik
 
+- 2026-05-20 18:07 CEST: Regressionsfix för label-baserad tidslogik dokumenterad i projektloggen.
 - 2026-05-20 16:29 CEST: UI-justering för riktningstider och användarpanel dokumenterad i projektloggen.
 - 2026-05-20: Projektlogg skapad efter felsökning av saknade/felaktiga fartygsnamn i listvyn.
