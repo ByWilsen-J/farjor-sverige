@@ -274,6 +274,14 @@ const FKODER = {
   'CI':'Viking Cinderella','GA':'Gabriella','GR':'Viking Grace',
   'GL':'Viking Glory','XP':'Viking XPRS','AB':'Amorella',
 };
+const KANDA_FARTYG = [
+  'Aurora Botnia','M/S Eckerö',
+  'Viking Glory','Viking Cinderella','Birka Gotland','Gabriella','Viking Grace','Viking XPRS',
+  'Silja Symphony','Silja Serenade','Baltic Princess',
+  'Stena Ebba','Stena Estelle','Stena Spirit','Estelle','Spirit',
+  'Sfix','Sirena Seaways','Luna Seaways','Robin Hood','Optima Seaways','Nils Holgersson','Nils Dacke','Marco Polo',
+  'Gryf','Mazovia','Copernicus','Jan Śniadecki',
+];
 const UTESLUT = new Set(['CLdN / Cobelfret','Wagenborg','Wallenius SOL','SCA Logistics']);
 const POLSCA  = new Set(['Polferries (POLSCA)']);
 const SVENSKA_HAMNAR = new Set([
@@ -295,6 +303,7 @@ const DFDS_PORTER = {
   'Paldiski':'EEPLN','Kapellskär':'SEKPS',
   'Klaipėda':'LTKLJ','Karlshamn':'SEKAN','Trelleborg':'SETRG',
   'Göteborg':'SEGOT','Gent':'BEGNE','Immingham':'GBIMM',
+  'Ghent':'BEGNE',
 };
 
 // ── State ──
@@ -313,17 +322,42 @@ let dfdsFetchedDate = '';
 // ── Helpers ──
 function fixR(r){ return r==='DFDS (tidigare Tallink Silja)'?'DFDS':r; }
 function getLnk(r){ return LANK[r]||''; }
-function dStr(d){ return d.toISOString().slice(0,10); }
+function dStr(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const dag = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${dag}`;
+}
 function fmtDat(d){ return d.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
 function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 // Extrahera fartygsnamn från anmärkning (mönster: "Fartygsnamn. Övrig text")
 function namnetFrånAnm(anm){
   if(!anm) return '';
-  const dot = anm.indexOf('.');
+  const s = anm.replace(/\[.*?\]/g,' ').replace(/\s+/g,' ').trim();
+
+  const rotation = s.match(/(?:fartyg i rotation|fartygen i rotation|rotation):\s*([^.]+)/i);
+  if(rotation){
+    const namn = rotation[1]
+      .split(/,|\boch\b|\//i)
+      .map(x=>x.trim())
+      .filter(Boolean)
+      .map(x=>x.startsWith('Stena ') ? x : (/^(Estelle|Spirit|Ebba)$/i.test(x) ? 'Stena '+x : x));
+    if(namn.length) return [...new Set(namn)].join(' / ');
+  }
+
+  const hittade = KANDA_FARTYG.filter(namn => {
+    const escNamn = namn.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    return new RegExp(`(^|[^A-Za-zÅÄÖåäö])${escNamn}([^A-Za-zÅÄÖåäö]|$)`,'i').test(s);
+  });
+  if(hittade.length) return [...new Set(hittade)].join(' / ');
+
+  const dot = s.indexOf('.');
   if(dot > 0 && dot < 36){
-    const c = anm.slice(0,dot).trim();
-    if(c && !c.includes(',') && c.split(' ').length <= 4) return c;
+    const c = s.slice(0,dot).trim();
+    const serUtSomFartyg = c && !c.includes(',') && c.split(' ').length <= 4;
+    const serUtSomKalla = /^(verifierat|per[-\s]?dag|notera|ändring|ingen trafik|begränsad trafik|extra avg|vårschema|daglig|kontrollera)\b/i.test(c);
+    if(serUtSomFartyg && !serUtSomKalla && !c.includes('://') && !c.includes('.com')) return c;
   }
   return '';
 }
@@ -425,6 +459,8 @@ async function hämtaDFDSFartyg(dateStr){
     ['EEPLN','SEKPS'],['SEKPS','EEPLN'], // Paldiski↔Kapellskär
     ['LTKLJ','SEKAN'],['SEKAN','LTKLJ'], // Klaipeda↔Karlshamn
     ['LTKLJ','SETRG'],['SETRG','LTKLJ'], // Klaipeda↔Trelleborg
+    ['GBIMM','SEGOT'],['SEGOT','GBIMM'], // Immingham↔Göteborg
+    ['BEGNE','SEGOT'],['SEGOT','BEGNE'], // Ghent/Gent↔Göteborg
   ];
   const dFran = new Date(dateStr+'T00:00:00Z').toISOString();
   const dTill = new Date(dateStr+'T23:59:59Z').toISOString();
@@ -469,16 +505,20 @@ async function init(){
   document.getElementById('view-alla').style.display='';
 
   // Datum-lyssnare (huvud)
-  document.getElementById('dat-pick-main').addEventListener('change', e=>{
+  document.getElementById('dat-pick-main').addEventListener('change', async e=>{
     if(!e.target.value) return;
     const nd = parseDate(e.target.value);
-    sättDatum(nd); aktivera(nd.getDay()); rendera();
+    sättDatum(nd); aktivera(nd.getDay());
+    await hämtaFartyg(dStr(nd));
+    rendera();
   });
   // Datum-lyssnare (sidebar)
-  document.getElementById('dat-pick-sb').addEventListener('change', e=>{
+  document.getElementById('dat-pick-sb').addEventListener('change', async e=>{
     if(!e.target.value) return;
     const nd = parseDate(e.target.value);
-    sättDatum(nd); aktivera(nd.getDay()); rendera();
+    sättDatum(nd); aktivera(nd.getDay());
+    await hämtaFartyg(dStr(nd));
+    rendera();
   });
 
   await hämtaFartyg(dStr(nu));
@@ -554,7 +594,7 @@ function rendera(){
   const combined=[], frakt=[], motSv=[];
   const ds = dStr(valdDat);
   const avVdag = VD[valdDat.getDay()];
-  const anVdag = (rad) => VD[(valdDat.getDay()+(rad.ndag?1:0))%7];
+  const anVdag = (rad) => VD[(valdDat.getDay()+((rad.nasta_dag||rad.ndag)?1:0))%7];
 
   // Polsca (datum-specifika)
   ((DATA.polsca_datum||{})[ds]||[]).forEach(rad=>{
@@ -645,7 +685,8 @@ function bygTr(rad){
 
   // Tider med veckodag
   const avTid = `<div class="tid-cell"><span class="tid">${esc(rad.avgtid)}</span><span class="vtid-dag">${esc(rad.avVdag)}</span></div>`;
-  const ankSuff = rad.ndag ? `<span class="ndag">+1</span>` : '';
+  const harDagSuffix = /\+1|nästa\s+dag/i.test(rad.anktid||'');
+  const ankSuff = rad.ndag && !harDagSuffix ? `<span class="ndag">+1</span>` : '';
   const anTid = `<div class="tid-cell"><span class="tid">${esc(rad.anktid)}${ankSuff}</span><span class="vtid-dag">${esc(rad.ankVdag)}</span></div>`;
 
   // Fartyg

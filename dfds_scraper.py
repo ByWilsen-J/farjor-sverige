@@ -10,6 +10,8 @@ Rutter som täcks (berör Sverige):
   EEPLN ↔ SEKPS  (Paldiski – Kapellskär)
   LTKLJ ↔ SEKAN  (Klaipeda – Karlshamn)
   LTKLJ ↔ SETRG  (Klaipeda – Trelleborg)
+  GBIMM ↔ SEGOT  (Immingham – Göteborg)
+  BEGNE ↔ SEGOT  (Ghent – Göteborg)
 """
 
 import logging
@@ -28,7 +30,7 @@ PORT_NAMES = {
     "SEKAN": "Karlshamn",
     "SETRG": "Trelleborg",
     "SEGOT": "Göteborg",
-    "BEGNE": "Gent",
+    "BEGNE": "Ghent",
     "GBIMM": "Immingham",
     "GBNCL": "Newcastle",
     "DKEBJ": "Esbjerg",
@@ -40,6 +42,8 @@ RUTTER = [
     ("EEPLN","SEKPS"), ("SEKPS","EEPLN"),
     ("LTKLJ","SEKAN"), ("SEKAN","LTKLJ"),
     ("LTKLJ","SETRG"), ("SETRG","LTKLJ"),
+    ("GBIMM","SEGOT"), ("SEGOT","GBIMM"),
+    ("BEGNE","SEGOT"), ("SEGOT","BEGNE"),
 ]
 
 logging.basicConfig(

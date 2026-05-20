@@ -20,6 +20,9 @@ from pathlib import Path
 import viking_line_scraper as vl
 import tallink_scraper      as tl
 import dfds_scraper         as dfds
+import finnlines_scraper    as finn
+import stena_line_scraper   as stena
+import ttline_scraper       as ttline
 
 DATA_FILE = Path(__file__).parent / "farjor_data.json"
 
@@ -99,6 +102,21 @@ def main():
     log.info("=== DFDS ===")
     dfds_sailings = dfds.fetch_all(from_date, to_date)
     lägg_till(dfds_sailings)
+
+    # ── Finnlines ──
+    log.info("=== Finnlines ===")
+    finn_sailings = finn.fetch_all(from_date, to_date)
+    lägg_till(finn_sailings)
+
+    # ── Stena Line ──
+    log.info("=== Stena Line ===")
+    stena_sailings = stena.fetch_all(from_date, to_date)
+    lägg_till(stena_sailings)
+
+    # ── TT-Line ──
+    log.info("=== TT-Line ===")
+    ttline_sailings = ttline.fetch_all(from_date, to_date)
+    lägg_till(ttline_sailings)
 
     # Spara tillbaka
     data["fartyg_datum"] = fartyg_datum
