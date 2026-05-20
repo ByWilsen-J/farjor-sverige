@@ -48,7 +48,8 @@
     /* ── Tabell ── */
     .tbl-wrap{overflow-x:auto}
     table{width:100%;border-collapse:collapse;font-size:.82rem}
-    thead th{padding:6px 9px;text-align:left;font-weight:600;font-size:.71rem;color:var(--dim);text-transform:uppercase;letter-spacing:.04em;background:var(--grå-ljus);border-bottom:1px solid var(--kant);white-space:nowrap}
+    thead th{padding:6px 9px;text-align:left;font-weight:400;font-size:.71rem;color:var(--dim);text-transform:uppercase;letter-spacing:.04em;background:var(--grå-ljus);border-bottom:1px solid var(--kant);white-space:nowrap}
+    thead th.sort-aktiv{font-weight:700;color:var(--text)}
     thead th:first-child{padding-left:14px}
     tbody tr{border-bottom:1px solid var(--kant)}
     tbody tr:last-child{border-bottom:none}
@@ -57,8 +58,10 @@
     tbody td:first-child{padding-left:14px}
     .tid-cell{display:flex;flex-direction:column;gap:1px}
     .tid{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
-    .ndag{font-size:.68rem;color:var(--dim);font-weight:400}
     .vtid-dag{font-size:.68rem;color:var(--dim);font-weight:500;letter-spacing:.02em}
+    .tid-status{font-size:.66rem;color:#9ca3af;font-weight:500;letter-spacing:.01em}
+    .overfart{white-space:nowrap;color:var(--dim);font-variant-numeric:tabular-nums}
+    .hamn-kod{font-variant-numeric:tabular-nums;font-weight:600;letter-spacing:.04em}
     .rl{color:var(--blå);text-decoration:none;font-weight:600}
     .rl:hover{text-decoration:underline}
     .fartyg{color:var(--dim);font-style:italic;font-size:.79rem}
@@ -67,7 +70,7 @@
     .tlnk{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:5px;background:var(--grå-ljus);border:1px solid var(--kant);color:var(--blå);text-decoration:none;font-size:.72rem;transition:all .15s}
     .tlnk:hover{background:var(--blå);color:var(--vit);border-color:var(--blå)}
     tr.grå td,.grå .tid,.grå .vtid-dag{color:#9ca3af}
-    tr.grå .fartyg{color:#d1d5db}
+    tr.grå .fartyg,.grå .overfart,.grå .tid-status{color:#c0c6d1}
     /* ── Info-tooltip ── */
     .info-c{width:28px;text-align:center}
     .info-knapp{position:relative;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:none;border:1px solid #d1d5db;color:#9ca3af;font-size:.7rem;cursor:pointer;font-style:italic;font-weight:700;font-family:Georgia,serif;vertical-align:middle;transition:all .15s;user-select:none}
@@ -140,7 +143,7 @@
         <div class="tbl-wrap">
           <table><thead><tr>
             <th class="lnk-c">&#8599;</th><th>Rederi</th>
-            <th>Avg&shy;tid</th><th>Ank&shy;tid</th>
+            <th data-sort="avg">Avg&shy;tid</th><th data-sort="ank">Ank&shy;tid</th><th>Överfart</th>
             <th>Avgångshamn</th><th>Ankomsthamn</th><th>Fartyg</th><th class="info-c">&#9432;</th>
           </tr></thead><tbody id="tb-combined"></tbody></table>
         </div>
@@ -150,7 +153,7 @@
         <div class="tbl-wrap">
           <table><thead><tr>
             <th class="lnk-c">&#8599;</th><th>Rederi</th>
-            <th>Avg&shy;tid</th><th>Ank&shy;tid</th>
+            <th data-sort="avg">Avg&shy;tid</th><th data-sort="ank">Ank&shy;tid</th><th>Överfart</th>
             <th>Avgångshamn</th><th>Ankomsthamn</th><th>Fartyg</th><th class="info-c">&#9432;</th>
           </tr></thead><tbody id="tb-frakt"></tbody></table>
         </div>
@@ -164,7 +167,7 @@
         <div class="tbl-wrap">
           <table><thead><tr>
             <th class="lnk-c">&#8599;</th><th>Rederi</th>
-            <th>Avg&shy;tid</th><th>Ank&shy;tid</th>
+            <th data-sort="avg">Avg&shy;tid</th><th data-sort="ank">Ank&shy;tid</th><th>Överfart</th>
             <th>Avgångshamn</th><th>Ankomsthamn</th><th>Fartyg</th><th class="info-c">&#9432;</th>
           </tr></thead><tbody id="tb-filter"></tbody></table>
         </div>
@@ -221,12 +224,13 @@
       <div class="sb-linje"><a class="sb-lnk" href="https://www.ttline.com/en/timetables/" target="_blank">TT-Line &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.dfds.com/sv-se/fraktfarjor-och-logistik/rutter-och-tidtabeller" target="_blank">DFDS &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.polsca.com/schedule" target="_blank">POLSCA &#8594;</a></div>
+      <div class="sb-linje"><a class="sb-lnk" href="https://www.unityline.pl/" target="_blank" rel="noopener">Unity Line &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.wasaline.com/tidtabell/" target="_blank">Wasaline &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.eckerolinjen.se/turlista" target="_blank">Eckerö Linjen &#8594;</a></div>
       <div class="sb-sek-hdr">Live AIS-spårning</div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.marinetraffic.com/en/ais/home/centerx:18/centery:59/zoom:7" target="_blank" rel="noopener">MarineTraffic — Östersjön &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.marinetraffic.com/en/ais/home/centerx:11.97/centery:57.7/zoom:10" target="_blank" rel="noopener">MarineTraffic — Göteborg &#8594;</a></div>
-      <div class="sb-linje"><a class="sb-lnk" href="https://www.marinetraffic.com/en/ais/home/centerx:13.15/centery:55.55/zoom:10" target="_blank" rel="noopener">MarineTraffic — Trelleborg/Ystad &#8594;</div>
+      <div class="sb-linje"><a class="sb-lnk" href="https://www.marinetraffic.com/en/ais/home/centerx:13.15/centery:55.55/zoom:10" target="_blank" rel="noopener">MarineTraffic — Trelleborg/Ystad &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.vesseltracker.com/en/Ships.html" target="_blank" rel="noopener">VesselFinder — Östersjön &#8594;</a></div>
       <div class="sb-sek-hdr">Hamnar — liveinformation</div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.stockholmshamnar.se/hamnar/vartahamnen/om-vartahamnen/" target="_blank" rel="noopener">Stockholms Hamnar &#8594;</a></div>
@@ -237,8 +241,8 @@
     <div class="sb-kort">
       <div class="sb-hdr">Om sidan</div>
       <div class="sb-liten">
-        Fartygsnamn för Viking Line hämtas live via deras booking-API. Övriga rederier uppdateras var 14:e dag via schemalagda skript.<br><br>
-        <em>Alla tider är lokala. "+1" = ankomst nästkommande dag.</em>
+        Fartygsnamn hämtas live när rederiet erbjuder det, annars från schemalagda uppdateringar i datalagret var 14:e dag.<br><br>
+        Alla tider visas i svensk tid. Ankomstdag visas under tiden och överfartens längd i en egen kolumn för snabbare överblick.
       </div>
     </div>
   </aside>
@@ -251,6 +255,7 @@
 const VD  = ['Sön','Mån','Tis','Ons','Tor','Fre','Lör']; // index=getDay()
 const VDL = ['Söndag','Måndag','Tisdag','Onsdag','Torsdag','Fredag','Lördag'];
 const VISA_ORD = [1,2,3,4,5,6,0]; // visningsordning: Mån→Sön
+const VD_INDEX = Object.fromEntries(VD.map((namn, i) => [namn, i]));
 
 const LANK = {
   'Viking Line':'https://www.sales.vikingline.com/find-trip/timetable/traffic-bulletin/',
@@ -261,6 +266,7 @@ const LANK = {
   'Stena Line':'https://stenalinefreight.com/timetable/',
   'TT-Line':'https://www.ttline.com/en/timetables/',
   'Polferries (POLSCA)':'https://www.polsca.com/schedule',
+  'Unity Line':'https://www.unityline.pl/',
   'Wasaline':'https://www.wasaline.com/tidtabell/',
   'Eckerö Linjen':'https://www.eckerolinjen.se/turlista',
 };
@@ -269,8 +275,8 @@ const STATFARTYG = {
   'Eckerö Linjen':'M/S Eckerö',
 };
 const FKODER = {
-  'GAL':'Gryf','MAZ':'Mazovia','COP':'Copernicus','JAN':'Jan Śniadecki',
-  'WAW':'Wawel','POL':'Polonia','SKA':'Skania','VAR':'Varlberga','EPS':'EPS',
+  'GAL':'Galileusz','MAZ':'Mazovia','COP':'Copernicus','JAN':'Jan Śniadecki',
+  'WAW':'Wawel','POL':'Polonia','SKA':'Skania','VAR':'Varlberga','EPS':'Epsilon',
   'CI':'Viking Cinderella','GA':'Gabriella','GR':'Viking Grace',
   'GL':'Viking Glory','XP':'Viking XPRS','AB':'Amorella',
 };
@@ -280,7 +286,7 @@ const KANDA_FARTYG = [
   'Silja Symphony','Silja Serenade','Baltic Princess',
   'Stena Ebba','Stena Estelle','Stena Spirit','Estelle','Spirit',
   'Sfix','Sirena Seaways','Luna Seaways','Robin Hood','Optima Seaways','Nils Holgersson','Nils Dacke','Marco Polo',
-  'Gryf','Mazovia','Copernicus','Jan Śniadecki',
+  'Galileusz','Epsilon','Polonia','Skania','Mazovia','Copernicus','Jan Śniadecki',
 ];
 const UTESLUT = new Set(['CLdN / Cobelfret','Wagenborg','Wallenius SOL','SCA Logistics']);
 const POLSCA  = new Set(['Polferries (POLSCA)']);
@@ -289,6 +295,64 @@ const SVENSKA_HAMNAR = new Set([
   'Göteborg','Trelleborg','Ystad','Malmö','Helsingborg',
   'Karlskrona','Karlshamn','Oxelösund','Umeå','Gävle','Varberg',
 ]);
+const HAMN_KODER = {
+  'Eckerö':'ECK',
+  'Gdańsk':'GDN',
+  'Gdynia':'GDY',
+  'Ghent':'GNT',
+  'Gent':'GNT',
+  'Grisslehamn':'GRH',
+  'Göteborg':'GOT',
+  'Helsingfors':'HEL',
+  'Immingham':'IMM',
+  'Kapellskär':'KAP',
+  'Karlshamn':'KSH',
+  'Karlskrona':'KSK',
+  'Kiel':'KIE',
+  'Killingholme':'KIL',
+  'Klaipėda':'KLA',
+  'Malmö':'MMA',
+  'Mariehamn':'MHQ',
+  'Naantali':'NAA',
+  'Nynäshamn':'NYN',
+  'Oxelösund':'OXL',
+  'Paldiski':'PAL',
+  'Riga':'RIX',
+  'Rostock':'ROS',
+  'Stockholm':'STO',
+  'Travemünde':'TRA',
+  'Trelleborg':'TRE',
+  'Umeå':'UME',
+  'Vasa':'VAA',
+  'Ystad':'YST',
+  'Åbo':'ABO',
+  'Świnoujście':'SWI',
+};
+const HAMN_TZ = {
+  'Eckerö':60,
+  'Helsingfors':60,
+  'Immingham':-60,
+  'Killingholme':-60,
+  'Klaipėda':60,
+  'Mariehamn':60,
+  'Naantali':60,
+  'Paldiski':60,
+  'Riga':60,
+  'Vasa':60,
+  'Åbo':60,
+};
+const TIDZON_MARKOR = {
+  'SE':0,
+  'FI':60,
+  'EE':60,
+  'ET':60,
+  'LT':60,
+  'LV':60,
+  'ÅLAND':60,
+  'ALAND':60,
+  'GB':-60,
+  'UK':-60,
+};
 // Viking Line port codes (portnamn → VL-kod)
 const VL_PORTER = {
   'Stockholm':'STO','Helsingfors':'HEL','Åbo':'TKU',
@@ -330,6 +394,291 @@ function dStr(d){
 }
 function fmtDat(d){ return d.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
 function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function pad2(n){ return String(n).padStart(2,'0'); }
+function mod(n,m){ return ((n % m) + m) % m; }
+function floorDiv(n,d){ return Math.floor(n / d); }
+function tidTillMinuter(tid){
+  const m = String(tid||'').match(/(\d{2}):(\d{2})/);
+  return m ? (parseInt(m[1],10) * 60) + parseInt(m[2],10) : null;
+}
+function minuterTillTid(totalMin){
+  const mins = mod(totalMin, 1440);
+  const h = floorDiv(mins, 60);
+  const m = mins % 60;
+  return `${pad2(h)}:${pad2(m)}`;
+}
+function isoEfterOffset(d, offset){
+  const x = new Date(d);
+  x.setDate(x.getDate() + offset);
+  return dStr(x);
+}
+function veckodagEfterOffset(d, offset){
+  const x = new Date(d);
+  x.setDate(x.getDate() + offset);
+  return VD[x.getDay()];
+}
+function hamnKod(namn){ return HAMN_KODER[namn] || namn; }
+function hamnHtml(namn){
+  const vis = hamnKod(namn||'');
+  const title = vis !== (namn||'') ? ` title="${esc(namn)}"` : '';
+  return `<span class="hamn-kod"${title}>${esc(vis)}</span>`;
+}
+function hamnTz(port){ return HAMN_TZ[port] ?? 0; }
+function markorTz(markor){
+  const key = String(markor||'').trim().toUpperCase();
+  return TIDZON_MARKOR[key] ?? 0;
+}
+function tidzonFörSpec(spec, fallbackPort){
+  const m = String(spec||'').match(/\(([^)]+)\)/);
+  return m ? markorTz(m[1]) : hamnTz(fallbackPort);
+}
+function absolutSvenskMin(localDayOffset, localMinutes, tzOffset){
+  return (localDayOffset * 1440) + localMinutes - tzOffset;
+}
+function infoFrånAbsolut(abs){
+  return {
+    abs,
+    dayOffset: floorDiv(abs, 1440),
+    minutes: mod(abs, 1440),
+    tid: minuterTillTid(abs),
+  };
+}
+function stockholmNu(){
+  const fmt = new Intl.DateTimeFormat('sv-SE',{
+    timeZone:'Europe/Stockholm',
+    year:'numeric',
+    month:'2-digit',
+    day:'2-digit',
+    hour:'2-digit',
+    minute:'2-digit',
+    hourCycle:'h23',
+  });
+  const parts = Object.fromEntries(
+    fmt.formatToParts(new Date())
+      .filter(p=>p.type !== 'literal')
+      .map(p=>[p.type, p.value])
+  );
+  return {
+    datum:`${parts.year}-${parts.month}-${parts.day}`,
+    minuter:(parseInt(parts.hour,10) * 60) + parseInt(parts.minute,10),
+    date:new Date(parseInt(parts.year,10), parseInt(parts.month,10)-1, parseInt(parts.day,10)),
+  };
+}
+function formatVaraktighet(minuter, approx=false){
+  if(!Number.isFinite(minuter) || minuter < 0) return '';
+  const h = floorDiv(minuter, 60);
+  const m = minuter % 60;
+  const bas = m ? `${h} h ${pad2(m)} min` : `${h} h`;
+  return approx ? `ca ${bas}` : bas;
+}
+function formatVaraktighetLista(minuterLista, approx=false, separator=' / '){
+  const värden = minuterLista.filter(v=>Number.isFinite(v) && v >= 0);
+  if(!värden.length) return '';
+  if(värden.length === 1) return formatVaraktighet(värden[0], approx);
+  if(separator === '–' && värden.every(v=>v % 60 === 0)){
+    const timmar = värden.map(v=>v/60).sort((a,b)=>a-b);
+    return `${approx?'ca ':''}${timmar[0]}–${timmar[timmar.length-1]} h`;
+  }
+  const bas = värden.map(v=>formatVaraktighet(v)).join(separator);
+  return approx ? `ca ${bas}` : bas;
+}
+function väljKortasteKandidat(absLista, depAbs){
+  return absLista
+    .filter(abs=>Number.isFinite(abs) && (abs - depAbs) > 0)
+    .sort((a,b)=>(a - depAbs) - (b - depAbs))[0] ?? null;
+}
+function förenklaTidtext(spec){
+  return String(spec||'')
+    .replace(/\s*\((SE|FI|EE|ET|LT|LV|Åland|Aland)\)/gi,'')
+    .replace(/\bnästa dag\b/gi,'')
+    .replace(/\+1/gi,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function byggDirektResultat(absLista, depInfo, opts={}){
+  const rena = absLista.filter(Number.isFinite).sort((a,b)=>a-b);
+  if(!rena.length) return null;
+  const info = rena.map(infoFrånAbsolut);
+  const text = `${opts.approx?'ca ':''}${info.map(i=>i.tid).join(opts.separator ?? ' / ')}`;
+  const duration = opts.durationText || formatVaraktighetLista(
+    rena.map(abs=>abs - depInfo.absSw),
+    false,
+    opts.durationSeparator ?? ' / '
+  ) || '—';
+  return {
+    text,
+    dayOffset: info[0].dayOffset,
+    sortAbs: info[0].abs,
+    duration,
+  };
+}
+function normaliseraAvgangstid(raw, port){
+  const localMinutes = tidTillMinuter(raw);
+  const tzOffset = hamnTz(port);
+  const approx = /\bca\b/i.test(String(raw||''));
+  if(localMinutes == null){
+    return {
+      text: String(raw||'—').trim() || '—',
+      localMinutes:null,
+      tzOffset,
+      absSw:Number.MAX_SAFE_INTEGER,
+      dayOffset:0,
+      minutes:null,
+    };
+  }
+  const absSw = absolutSvenskMin(0, localMinutes, tzOffset);
+  const info = infoFrånAbsolut(absSw);
+  return {
+    text:`${approx?'ca ':''}${info.tid}`,
+    localMinutes,
+    tzOffset,
+    absSw,
+    dayOffset:info.dayOffset,
+    minutes:info.minutes,
+  };
+}
+function byggFrånVaraktighet(raw, depInfo){
+  const m = String(raw||'').match(/^\+(\d+)(?:[–-](\d+))?\s*h/i);
+  if(!m) return null;
+  const start = parseInt(m[1],10) * 60;
+  const end = m[2] ? parseInt(m[2],10) * 60 : null;
+  if(end == null){
+    const abs = depInfo.absSw + start;
+    const info = infoFrånAbsolut(abs);
+    return {
+      text:info.tid,
+      dayOffset:info.dayOffset,
+      sortAbs:abs,
+      duration:formatVaraktighet(start),
+    };
+  }
+  return byggDirektResultat(
+    [depInfo.absSw + start, depInfo.absSw + end],
+    depInfo,
+    {separator:'–',durationSeparator:'–'}
+  );
+}
+function byggFrånSammaDag(raw, depInfo, depVdag, arrPort){
+  const m = String(raw||'').match(/^((?:Mån|Tis|Ons|Tor|Fre|Lör|Sön)(?:\/(?:Mån|Tis|Ons|Tor|Fre|Lör|Sön))*)\s*→\s*(\d{2}:\d{2})\s*samma dag/i);
+  if(!m) return null;
+  const tillåtna = m[1].split('/').map(s=>s.trim());
+  if(!tillåtna.includes(depVdag)) return null;
+  const localMinutes = tidTillMinuter(m[2]);
+  const abs = absolutSvenskMin(0, localMinutes, tidzonFörSpec(raw, arrPort));
+  if((abs - depInfo.absSw) <= 0) return null;
+  const info = infoFrånAbsolut(abs);
+  return {
+    text:info.tid,
+    dayOffset:info.dayOffset,
+    sortAbs:abs,
+    duration:formatVaraktighet(abs - depInfo.absSw),
+  };
+}
+function byggFrånExempelMönster(raw, depInfo, depVdag, arrPort){
+  const m = String(raw||'').match(/^((?:Mån|Tis|Ons|Tor|Fre|Lör|Sön)(?:\/(?:Mån|Tis|Ons|Tor|Fre|Lör|Sön))*)\s*;\s*(Mån|Tis|Ons|Tor|Fre|Lör|Sön)\s+ank\s+(Mån|Tis|Ons|Tor|Fre|Lör|Sön)\s+(\d{2}:\d{2})/i);
+  if(!m) return null;
+  const tillåtna = m[1].split('/').map(s=>s.trim());
+  if(!tillåtna.includes(depVdag)) return null;
+  const depEx = m[2];
+  const arrEx = m[3];
+  const localMinutes = tidTillMinuter(m[4]);
+  const localDayOffset = mod(VD_INDEX[arrEx] - VD_INDEX[depEx], 7);
+  let abs = absolutSvenskMin(localDayOffset, localMinutes, tidzonFörSpec(raw, arrPort));
+  let duration = abs - depInfo.absSw;
+  if(duration <= 0) duration += 7 * 1440;
+  abs = depInfo.absSw + duration;
+  const info = infoFrånAbsolut(abs);
+  return {
+    text:info.tid,
+    dayOffset:info.dayOffset,
+    sortAbs:abs,
+    duration:formatVaraktighet(duration),
+  };
+}
+function byggFrånVeckodagsTider(raw, depInfo, depVdag, arrPort){
+  const träffar = [...String(raw||'').matchAll(/\b(Mån|Tis|Ons|Tor|Fre|Lör|Sön)\s+(\d{2}:\d{2})/g)];
+  if(!träffar.length) return null;
+  const arrTz = tidzonFörSpec(raw, arrPort);
+  const kandidater = träffar.map(([, dag, tid])=>{
+    const localDayOffset = mod(VD_INDEX[dag] - VD_INDEX[depVdag], 7);
+    let abs = absolutSvenskMin(localDayOffset, tidTillMinuter(tid), arrTz);
+    if((abs - depInfo.absSw) <= 0) abs += 7 * 1440;
+    return abs;
+  });
+  const vald = väljKortasteKandidat(kandidater, depInfo.absSw);
+  if(vald == null) return null;
+  const info = infoFrånAbsolut(vald);
+  return {
+    text:info.tid,
+    dayOffset:info.dayOffset,
+    sortAbs:vald,
+    duration:formatVaraktighet(vald - depInfo.absSw),
+  };
+}
+function byggFrånDirektaTider(raw, depInfo, arrPort){
+  const spec = String(raw||'');
+  const approx = /\bca\b/i.test(spec);
+  const arrTz = tidzonFörSpec(spec, arrPort);
+  const nästaDag = /\+1|nästa\s+dag/i.test(spec);
+  const spann = spec.match(/\b(\d{2})\s*[–-]\s*(\d{2})(?:\+1|\s*nästa\s+dag)?\b/i);
+  if(spann && !spec.includes(':')){
+    const dayOffset = nästaDag ? 1 : 0;
+    const startAbs = absolutSvenskMin(dayOffset, parseInt(spann[1],10) * 60, arrTz);
+    const endAbs = absolutSvenskMin(dayOffset, parseInt(spann[2],10) * 60, arrTz);
+    return byggDirektResultat(
+      [
+        (!nästaDag && (startAbs - depInfo.absSw) <= 0) ? startAbs + 1440 : startAbs,
+        (!nästaDag && (endAbs - depInfo.absSw) <= 0) ? endAbs + 1440 : endAbs,
+      ],
+      depInfo,
+      {approx,separator:'–',durationSeparator:'–'}
+    );
+  }
+  const träffar = [...spec.matchAll(/(\d{2}):(\d{2})/g)];
+  if(!träffar.length) return null;
+  const dayOffset = nästaDag ? 1 : 0;
+  const absLista = träffar.map(([,h,m])=>{
+    const abs = absolutSvenskMin(dayOffset, (parseInt(h,10) * 60) + parseInt(m,10), arrTz);
+    return (!nästaDag && (abs - depInfo.absSw) <= 0) ? abs + 1440 : abs;
+  });
+  return byggDirektResultat(
+    absLista,
+    depInfo,
+    {
+      approx,
+      separator:träffar.length > 1 ? ' / ' : '',
+      durationSeparator:träffar.length > 1 ? ' / ' : ' / ',
+    }
+  );
+}
+function byggFallbackAnkomst(raw){
+  const nästaDag = /\+1|nästa\s+dag/i.test(String(raw||'')) ? 1 : 0;
+  return {
+    text:förenklaTidtext(raw) || '—',
+    dayOffset:nästaDag,
+    sortAbs:Number.MAX_SAFE_INTEGER,
+    duration:'—',
+  };
+}
+function normaliseraAnkomsttid(raw, depInfo, depVdag, arrPort){
+  if(!raw){
+    return {text:'—',dayOffset:0,sortAbs:Number.MAX_SAFE_INTEGER,duration:'—'};
+  }
+  return byggFrånVaraktighet(raw, depInfo)
+    || byggFrånSammaDag(raw, depInfo, depVdag, arrPort)
+    || byggFrånExempelMönster(raw, depInfo, depVdag, arrPort)
+    || byggFrånVeckodagsTider(raw, depInfo, depVdag, arrPort)
+    || byggFrånDirektaTider(raw, depInfo, arrPort)
+    || byggFallbackAnkomst(raw);
+}
+function ärPasseradAvgång(depInfo){
+  if(!Number.isFinite(depInfo.absSw)) return false;
+  const nu = stockholmNu();
+  const depDatum = isoEfterOffset(valdDat, depInfo.dayOffset);
+  if(depDatum < nu.datum) return true;
+  if(depDatum > nu.datum) return false;
+  return depInfo.minutes <= nu.minuter;
+}
 
 // Extrahera fartygsnamn från anmärkning (mönster: "Fartygsnamn. Övrig text")
 function namnetFrånAnm(anm){
@@ -492,8 +841,9 @@ async function init(){
     return;
   }
   // Uppdateringstid
-  const nu = new Date();
-  const tid = nu.toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'});
+  const nuInfo = stockholmNu();
+  const nu = nuInfo.date;
+  const tid = minuterTillTid(nuInfo.minuter);
   const upd = DATA.meta?.uppdaterad||'';
   document.getElementById('upd').textContent = (upd?'Data: '+upd+'  ·  ':'')+' Laddad '+tid;
 
@@ -547,14 +897,15 @@ async function hämtaFartyg(dateStr){
 // ── Dagnavigation ──
 function byggNav(){
   const c = document.getElementById('dag-tabs');
-  const idagGD = new Date().getDay();
+  const idag = stockholmNu().date;
+  const idagGD = idag.getDay();
   VISA_ORD.forEach(gd=>{
     const b = document.createElement('button');
     b.className = 'dag-tab'+(gd===idagGD?' idag':'');
     b.textContent = VD[gd];
     b.dataset.gd  = gd;
     b.addEventListener('click', async ()=>{
-      const nu2 = new Date();
+      const nu2 = stockholmNu().date;
       const off = (gd - nu2.getDay() + 7) % 7;
       const nd  = new Date(nu2); nd.setDate(nu2.getDate()+off);
       sättDatum(nd); aktivera(gd);
@@ -580,12 +931,18 @@ function byttVy(btn){
   alla.style.display   = viewMode==='alla' ? '' : 'none';
   filter.style.display = viewMode==='alla' ? 'none' : '';
   const titlar = {
-    mot:'Avgångar mot Sverige — sorterat på avgångstid',
-    ankomst:'Ankomster till Sverige — sorterat på ankomsttid',
-    fran:'Avgår från Sverige — sorterat på avgångstid',
+    mot:'Avgångar mot Sverige',
+    ankomst:'Ankomster till Sverige',
+    fran:'Avgår från Sverige',
   };
   if(viewMode!=='alla') document.getElementById('filter-rubrik').textContent = titlar[viewMode]||'';
   rendera();
+}
+function uppdateraSorteringUI(){
+  const aktiv = viewMode === 'ankomst' ? 'ank' : 'avg';
+  document.querySelectorAll('th[data-sort]').forEach(th=>{
+    th.classList.toggle('sort-aktiv', th.dataset.sort === aktiv);
+  });
 }
 
 // ── Rendering ──
@@ -593,15 +950,13 @@ function rendera(){
   if(!DATA) return;
   const combined=[], frakt=[], motSv=[];
   const ds = dStr(valdDat);
-  const avVdag = VD[valdDat.getDay()];
-  const anVdag = (rad) => VD[(valdDat.getDay()+((rad.nasta_dag||rad.ndag)?1:0))%7];
 
   // Polsca (datum-specifika)
   ((DATA.polsca_datum||{})[ds]||[]).forEach(rad=>{
     const r = fixR(rad.rederi||'');
-    const o = bygRad(rad, r, 'https://www.polsca.com/schedule', avVdag, anVdag(rad));
+    const o = bygRad(rad, r, 'https://www.polsca.com/schedule');
     combined.push(o);
-    if(SVENSKA_HAMNAR.has(rad.ankhamn)) motSv.push({...o,_sortAnk:rad.anktid||''});
+    if(SVENSKA_HAMNAR.has(rad.ankhamn)) motSv.push(o);
   });
 
   // Veckoschemat
@@ -610,24 +965,24 @@ function rendera(){
     if(UTESLUT.has(or)||POLSCA.has(or)) return;
     if(!matchar(rad.veckodag,valdVd)) return;
     const r = fixR(or);
-    const o = bygRad(rad, r, getLnk(r), avVdag, anVdag(rad));
+    const o = bygRad(rad, r, getLnk(r));
     const k = getKat(rad);
     if(k==='frakt') frakt.push(o);
     else            combined.push(o);
     const motSverige = rad.mot_sverige===true  || SVENSKA_HAMNAR.has(rad.ankhamn);
-    const frånSverige = rad.fran_sverige===true || SVENSKA_HAMNAR.has(rad.avghamn);
-    if(motSverige)  motSv.push({...o,_sortAnk:rad.anktid||''});
+    if(motSverige) motSv.push(o);
   });
 
   // Sortering
-  const srtAvg = a => a.sort((x,y)=>(x.avgtid||'').localeCompare(y.avgtid||''));
-  const srtAnk = a => a.sort((x,y)=>(x._sortAnk||x.anktid||'').localeCompare(y._sortAnk||y.anktid||''));
-  const srtFrån = a => { // fran: avgår från Sverige
+  const srtAvg = a => a.sort((x,y)=>(x._sortAvg??Number.MAX_SAFE_INTEGER) - (y._sortAvg??Number.MAX_SAFE_INTEGER));
+  const srtAnk = a => a.sort((x,y)=>(x._sortAnk??Number.MAX_SAFE_INTEGER) - (y._sortAnk??Number.MAX_SAFE_INTEGER));
+  const srtFrån = () => { // fran: avgår från Sverige
     const fr = [...combined, ...frakt].filter(o=>SVENSKA_HAMNAR.has(o.avghamn));
-    return fr.sort((x,y)=>(x.avgtid||'').localeCompare(y.avgtid||''));
+    return fr.sort((x,y)=>(x._sortAvg??Number.MAX_SAFE_INTEGER) - (y._sortAvg??Number.MAX_SAFE_INTEGER));
   };
 
   srtAvg(combined); srtAvg(frakt);
+  uppdateraSorteringUI();
 
   if(viewMode==='alla'){
     fyll('tb-combined',combined,'sek-combined','cnt-combined');
@@ -645,20 +1000,28 @@ function rendera(){
   }
 }
 
-function bygRad(rad, r, länk, avVdag, ankVdag){
+function bygRad(rad, r, länk){
+  const depInfo = normaliseraAvgangstid(rad.avgtid_raw||rad.avgtid||'', rad.avghamn||'');
+  const ankInfo = normaliseraAnkomsttid(rad.anktid||'', depInfo, valdVd, rad.ankhamn||'');
+  const passerad = ärPasseradAvgång(depInfo);
   return {
     rederi:r,
-    avgtid:rad.avgtid_raw||rad.avgtid||'',
-    anktid:rad.anktid||'',
+    avgtid:depInfo.text||'—',
+    anktid:ankInfo.text||'—',
+    överfart:ankInfo.duration||'—',
     avghamn:rad.avghamn||'',
     ankhamn:rad.ankhamn||'',
     fartyg:getFar(rad),
-    länk, ndag:rad.nasta_dag||false,
-    grå:!!(rad.grå), avVdag, ankVdag,
+    länk,
+    grå:!!(rad.grå) || passerad,
+    passerad,
+    avVdag:veckodagEfterOffset(valdDat, depInfo.dayOffset),
+    ankVdag:veckodagEfterOffset(valdDat, ankInfo.dayOffset),
     källa:rad.kalla||länk||'',
     verifiering:rad.verifiering||'',
     anm:rensaAnm(rad.anmarkning||''),
-    _sortAnk:rad.anktid||'',
+    _sortAvg:depInfo.absSw,
+    _sortAnk:ankInfo.sortAbs,
   };
 }
 
@@ -684,10 +1047,10 @@ function bygTr(rad){
   if(rad.grå) tr.classList.add('grå');
 
   // Tider med veckodag
-  const avTid = `<div class="tid-cell"><span class="tid">${esc(rad.avgtid)}</span><span class="vtid-dag">${esc(rad.avVdag)}</span></div>`;
-  const harDagSuffix = /\+1|nästa\s+dag/i.test(rad.anktid||'');
-  const ankSuff = rad.ndag && !harDagSuffix ? `<span class="ndag">+1</span>` : '';
-  const anTid = `<div class="tid-cell"><span class="tid">${esc(rad.anktid)}${ankSuff}</span><span class="vtid-dag">${esc(rad.ankVdag)}</span></div>`;
+  const passTxt = rad.passerad ? `<span class="tid-status">Tidpunkt passerad</span>` : '';
+  const avTid = `<div class="tid-cell"><span class="tid">${esc(rad.avgtid)}</span><span class="vtid-dag">${esc(rad.avVdag)}</span>${passTxt}</div>`;
+  const anTid = `<div class="tid-cell"><span class="tid">${esc(rad.anktid)}</span><span class="vtid-dag">${esc(rad.ankVdag)}</span></div>`;
+  const öfTid = `<span class="overfart">${esc(rad.överfart||'—')}</span>`;
 
   // Fartyg
   const fh = rad.fartyg
@@ -714,8 +1077,9 @@ function bygTr(rad){
     <td>${rh}</td>
     <td>${avTid}</td>
     <td>${anTid}</td>
-    <td>${esc(rad.avghamn)}</td>
-    <td>${esc(rad.ankhamn)}</td>
+    <td>${öfTid}</td>
+    <td>${hamnHtml(rad.avghamn)}</td>
+    <td>${hamnHtml(rad.ankhamn)}</td>
     <td>${fh}</td>
     <td class="info-c">${ih}</td>
   `;
@@ -724,9 +1088,9 @@ function bygTr(rad){
 
 // ── Excel-export ──
 function exportExcel(){
-  const huvud = ['REDERI','AVG TID','ANK TID','AVGÅNGSHAMN','ANKOMSTHAMN','FARTYG'];
+  const huvud = ['REDERI','AVG TID (SE)','AVG DAG','ANK TID (SE)','ANK DAG','ÖVERFART','AVGÅNGSHAMN','ANKOMSTHAMN','FARTYG'];
   const rader = visadeRader.map(r=>[
-    r.rederi, r.avgtid, r.anktid, r.avghamn, r.ankhamn, r.fartyg||''
+    r.rederi, r.avgtid, r.avVdag, r.anktid, r.ankVdag, r.överfart||'', r.avghamn, r.ankhamn, r.fartyg||''
   ]);
 
   const vyNamn = {
@@ -739,7 +1103,7 @@ function exportExcel(){
   const ws = XLSX.utils.aoa_to_sheet([huvud, ...rader]);
 
   // Kolumnbredder
-  ws['!cols'] = [{wch:22},{wch:10},{wch:10},{wch:20},{wch:20},{wch:22}];
+  ws['!cols'] = [{wch:22},{wch:12},{wch:10},{wch:12},{wch:10},{wch:12},{wch:18},{wch:18},{wch:22}];
   // Fet rubrik
   const range = XLSX.utils.decode_range(ws['!ref']);
   for(let c=range.s.c; c<=range.e.c; c++){
