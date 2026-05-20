@@ -1319,6 +1319,32 @@ function schemaRadÄrAktivFörDatum(rad, depDatum){
   if(!intervall) return true;
   return isoInomIntervall(dStr(depDatum), intervall.start, intervall.end);
 }
+function schemaDublettNyckel(rad, depDatum){
+  return [
+    normRederi(rad.rederi || ''),
+    dStr(depDatum),
+    rad.avghamn || '',
+    rad.ankhamn || '',
+    rad.veckodag || '',
+    rad.anktid || '',
+    rad.kategori || '',
+  ].join('|');
+}
+function skaHoppaÖverSchemaDublett(rad, depDatum, sedda){
+  const key = schemaDublettNyckel(rad, depDatum);
+  const avgRaw = rad.avgtid_raw || rad.avgtid || '';
+  const avgMin = tidTillMinuter(avgRaw);
+  if(!sedda.has(key)){
+    sedda.set(key, [{avgRaw, avgMin}]);
+    return false;
+  }
+  const poster = sedda.get(key);
+  const exakt = poster.some(p=>p.avgRaw === avgRaw);
+  const nära = Number.isFinite(avgMin) && poster.some(p=>Number.isFinite(p.avgMin) && Math.abs(p.avgMin - avgMin) <= 15);
+  if(exakt || nära) return true;
+  poster.push({avgRaw, avgMin});
+  return false;
+}
 
 // Anmärkning för info-tooltip: ta bort fartygsnamn från inledningen
 function rensaAnm(anm){
@@ -1584,6 +1610,7 @@ function tidsCellState(rad){
 // ── Rendering ──
 function kandidaterFörValtDatum(){
   const map = new Map();
+  const seddaSchemaDubletter = new Map();
   const läggTill = (rad, depDatum, prioritet) => {
     const r = normRederi(rad.rederi||'');
     const o = bygRad(rad, r, getLnk(r), depDatum);
@@ -1605,6 +1632,7 @@ function kandidaterFörValtDatum(){
       if(UTESLUT.has(or)) return;
       if(!matchar(rad.veckodag, depVd)) return;
       if(!schemaRadÄrAktivFörDatum(rad, depDatum)) return;
+      if(skaHoppaÖverSchemaDublett(rad, depDatum, seddaSchemaDubletter)) return;
       läggTill(rad, depDatum, 1);
     });
 

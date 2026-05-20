@@ -10,6 +10,12 @@ Senaste UI-iteration: tabellen visar nu irrelevanta tidskolumner i ljusgrått pe
 
 ## Senaste ändringar
 
+- 2026-05-20: Lade till generell schemadedupering i `index.html`.
+  - Gick igenom dubblettmönster systematiskt i `schema`, `avgangar_datum` och `polsca_datum`.
+  - Datumimporterna visade inga motsvarande när-dubbletter; problemet låg i veckoschemat.
+  - Lade därför in en kandidatfiltrering som tar bort uppenbara schemadubletter innan rendering:
+    exakta kopior med samma rutt/tid samt nästan-identiska schemaavgångar inom 15 minuter med samma rutt och ankomsttid.
+  - Det fångar bl.a. POLSCA `Świnoujście → Ystad` `22:45/22:55` och dubbla Viking-rader `Stockholm ↔ Mariehamn` utan att röra datumrader eller live-import.
 - 2026-05-20: Filtrerade bort felaktig Viking-specialtid i `index.html`.
   - Hittade att en avvikande Viking Line-rad för `Helsingfors → Stockholm` låg kvar som om den vore normal veckotrafik, vilket skapade en extra inkommande 10:00-rad i majvyn.
   - Lade till datumstyrd filtrering för den avvikande Viking-tiden så den bara visas inom sitt marsintervall i stället för året runt.
@@ -125,6 +131,7 @@ Senaste UI-iteration: tabellen visar nu irrelevanta tidskolumner i ljusgrått pe
 
 ## Problem / blockerare
 
+- Veckoschemat innehåller fortfarande vissa manuellt inlagda undantag och parallella varianter. Frontenden deduperar nu de uppenbara fallen, men datalagret kan fortfarande behöva en separat städning senare.
 - Vissa schemaundantag ligger fortfarande som veckorader med anmärkning i datalagret. Den här omgången säkrade Viking-specialtiden, men fler undantag kan på sikt behöva samma typ av datumstyrning.
 - Senaste regressionsfelet kom från att riktning/specifik radlabel sattes senare än passerad-/betoningslogiken. Den delen är nu korrigerad i frontend.
 - Vissa rader saknar fortfarande fartygsnamn när API:ets avgångstid avviker från det normaliserade veckoschemat, t.ex. försenade/ändrade avgångar.
@@ -169,6 +176,7 @@ Senaste UI-iteration: tabellen visar nu irrelevanta tidskolumner i ljusgrått pe
 
 ## Historik
 
+- 2026-05-20 18:22 CEST: Generell dedupering av veckoschema infördes efter genomgång av flera liknande dublettfall.
 - 2026-05-20 18:12 CEST: Viking-specialtid för Helsingfors → Stockholm begränsades till rätt datumintervall.
 - 2026-05-20 18:07 CEST: Regressionsfix för label-baserad tidslogik dokumenterad i projektloggen.
 - 2026-05-20 16:29 CEST: UI-justering för riktningstider och användarpanel dokumenterad i projektloggen.
