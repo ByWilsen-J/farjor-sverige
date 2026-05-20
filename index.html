@@ -4,99 +4,113 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Färjor Sverige — Tidtabeller</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
       --blå:#1a4a7a;--blå-ljus:#2868a8;--gul:#f5c842;
       --grå:#6b7280;--grå-ljus:#f3f4f6;--kant:#e5e7eb;
       --text:#111827;--dim:#6b7280;--vit:#ffffff;
-      --sv-blå:#006AA7;--sv-gul:#FECC02;
+      --grön:#145214;--grön-ljus:#e8f0e8;
     }
     body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:14px;color:var(--text);background:#f8fafc;min-height:100vh}
-    header{background:var(--blå);color:var(--vit);padding:14px 20px;display:flex;align-items:baseline;gap:14px;border-bottom:4px solid var(--gul);flex-wrap:wrap}
-    header h1{font-size:1.25rem;font-weight:700}
-    header .sub{font-size:.82rem;opacity:.75}
-    header .upd{margin-left:auto;font-size:.76rem;opacity:.7;white-space:nowrap}
-    .layout{display:grid;grid-template-columns:1fr 268px;gap:16px;max-width:1360px;margin:0 auto;padding:16px 12px;align-items:start}
-    @media(max-width:900px){.layout{grid-template-columns:1fr}}
-    /* Dag-nav */
-    .dag-nav{background:var(--vit);border:1px solid var(--kant);border-radius:10px;padding:12px 14px;margin-bottom:12px}
-    .dag-nav-rad1{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
-    .dag-nav-rad2{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-    .dag-nav label{font-size:.78rem;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+    header{background:var(--blå);color:var(--vit);padding:12px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:4px solid var(--gul)}
+    header h1{font-size:1.2rem;font-weight:700}
+    header .sub{font-size:.8rem;opacity:.75}
+    header .upd{margin-left:auto;font-size:.74rem;opacity:.65;white-space:nowrap}
+    .layout{display:grid;grid-template-columns:1fr 280px;gap:16px;max-width:1380px;margin:0 auto;padding:14px 12px;align-items:start}
+    @media(max-width:920px){.layout{grid-template-columns:1fr}}
+    /* ── Dagnavigation ── */
+    .dag-nav{background:var(--vit);border:1px solid var(--kant);border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .dag-nav label{font-size:.75rem;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
     .dag-tabs{display:flex;gap:4px;flex-wrap:wrap}
-    .dag-tab{padding:5px 11px;border-radius:6px;border:1px solid var(--kant);background:var(--vit);cursor:pointer;font-size:.83rem;font-weight:500;color:var(--dim);transition:all .15s}
+    .dag-tab{padding:5px 10px;border-radius:6px;border:1px solid var(--kant);background:var(--vit);cursor:pointer;font-size:.82rem;font-weight:500;color:var(--dim);transition:all .15s}
     .dag-tab:hover{background:var(--grå-ljus)}
     .dag-tab.active{background:var(--blå);color:var(--vit);border-color:var(--blå)}
     .dag-tab.idag{position:relative}
-    .dag-tab.idag::after{content:'';position:absolute;bottom:3px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--gul)}
-    .dat-picker{border:1px solid var(--kant);border-radius:6px;padding:5px 8px;font-size:.83rem;color:var(--text);cursor:pointer;background:var(--vit)}
-    .dag-info{font-size:.82rem;color:var(--dim);margin-left:4px}
-    .nav-knappar{margin-left:auto;display:flex;gap:8px}
-    .dl-knapp{padding:6px 14px;border-radius:7px;border:1px solid var(--blå-ljus);background:var(--vit);color:var(--blå);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
-    .dl-knapp:hover{background:var(--blå);color:var(--vit)}
-    /* Spinner */
+    .dag-tab.idag::after{content:'';position:absolute;bottom:2px;right:3px;width:5px;height:5px;border-radius:50%;background:var(--gul)}
+    .dat-pick{border:1px solid var(--kant);border-radius:6px;padding:5px 8px;font-size:.82rem;color:var(--text);background:var(--vit);cursor:pointer}
+    .dag-info{font-size:.8rem;color:var(--dim);white-space:nowrap}
+    .xl-knapp{margin-left:auto;padding:5px 13px;border-radius:7px;border:1px solid var(--blå-ljus);background:var(--vit);color:var(--blå);font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
+    .xl-knapp:hover{background:var(--blå);color:var(--vit)}
+    /* ── Spinner ── */
     #laddare{text-align:center;padding:40px;color:var(--dim)}
-    .spinner{width:32px;height:32px;border:3px solid var(--kant);border-top-color:var(--blå);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+    .spinner{width:32px;height:32px;border:3px solid var(--kant);border-top-color:var(--blå);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px}
     @keyframes spin{to{transform:rotate(360deg)}}
-    /* Sektioner */
+    /* ── Sektioner ── */
     .sektion{background:var(--vit);border:1px solid var(--kant);border-radius:10px;margin-bottom:12px;overflow:hidden}
-    .sek-hdr{padding:10px 14px;background:var(--grå-ljus);border-bottom:1px solid var(--kant);display:flex;align-items:center;gap:8px}
-    .sek-hdr h2{font-size:.88rem;font-weight:700;color:var(--blå);text-transform:uppercase;letter-spacing:.05em}
-    .sek-hdr .cnt{background:var(--blå);color:var(--vit);border-radius:10px;padding:1px 8px;font-size:.72rem;font-weight:600}
-    .sek-sverige .sek-hdr{background:#e8f0e8}
-    .sek-sverige .sek-hdr h2{color:#145214}
-    .sek-sverige .sek-hdr .cnt{background:#145214}
-    /* Tabell */
+    .sek-hdr{padding:9px 14px;background:var(--grå-ljus);border-bottom:1px solid var(--kant);display:flex;align-items:center;gap:8px}
+    .sek-hdr h2{font-size:.86rem;font-weight:700;color:var(--blå);text-transform:uppercase;letter-spacing:.05em}
+    .sek-hdr .cnt{background:var(--blå);color:var(--vit);border-radius:10px;padding:1px 8px;font-size:.7rem;font-weight:600}
+    .sek-sv .sek-hdr{background:var(--grön-ljus)}
+    .sek-sv .sek-hdr h2{color:var(--grön)}
+    .sek-sv .sek-hdr .cnt{background:var(--grön)}
+    /* ── Tabell ── */
     .tbl-wrap{overflow-x:auto}
-    table{width:100%;border-collapse:collapse;font-size:.83rem}
-    thead th{padding:7px 10px;text-align:left;font-weight:600;font-size:.73rem;color:var(--dim);text-transform:uppercase;letter-spacing:.04em;background:var(--grå-ljus);border-bottom:1px solid var(--kant);white-space:nowrap}
+    table{width:100%;border-collapse:collapse;font-size:.82rem}
+    thead th{padding:6px 9px;text-align:left;font-weight:600;font-size:.71rem;color:var(--dim);text-transform:uppercase;letter-spacing:.04em;background:var(--grå-ljus);border-bottom:1px solid var(--kant);white-space:nowrap}
     thead th:first-child{padding-left:14px}
     tbody tr{border-bottom:1px solid var(--kant)}
     tbody tr:last-child{border-bottom:none}
     tbody tr:hover{background:#f0f5ff}
-    tbody td{padding:8px 10px;vertical-align:middle}
+    tbody td{padding:7px 9px;vertical-align:middle}
     tbody td:first-child{padding-left:14px}
-    .tid{font-variant-numeric:tabular-nums;font-weight:600}
-    .ndag{font-size:.7rem;color:var(--dim);font-weight:400;margin-left:2px}
+    .tid-cell{display:flex;flex-direction:column;gap:1px}
+    .tid{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+    .ndag{font-size:.68rem;color:var(--dim);font-weight:400}
+    .vtid-dag{font-size:.68rem;color:var(--dim);font-weight:500;letter-spacing:.02em}
     .rl{color:var(--blå);text-decoration:none;font-weight:600}
     .rl:hover{text-decoration:underline}
-    .fartyg{color:var(--dim);font-style:italic;font-size:.8rem}
+    .fartyg{color:var(--dim);font-style:italic;font-size:.79rem}
     .fartyg.tom{color:#d1d5db;font-style:normal}
-    .anm{font-size:.74rem;color:var(--dim);max-width:160px}
-    .lnk-c{width:38px;text-align:center}
+    .lnk-c{width:36px;text-align:center}
     .tlnk{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:5px;background:var(--grå-ljus);border:1px solid var(--kant);color:var(--blå);text-decoration:none;font-size:.72rem;transition:all .15s}
     .tlnk:hover{background:var(--blå);color:var(--vit);border-color:var(--blå)}
-    tr.grå td,tr.grå .tid{color:#9ca3af}
+    tr.grå td,.grå .tid,.grå .vtid-dag{color:#9ca3af}
     tr.grå .fartyg{color:#d1d5db}
-    /* Sidebar */
+    /* ── Info-tooltip ── */
+    .info-c{width:28px;text-align:center}
+    .info-knapp{position:relative;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:none;border:1px solid #d1d5db;color:#9ca3af;font-size:.7rem;cursor:pointer;font-style:italic;font-weight:700;font-family:Georgia,serif;vertical-align:middle;transition:all .15s;user-select:none}
+    .info-knapp:hover,.info-knapp:focus{background:var(--blå);color:var(--vit);border-color:var(--blå);outline:none}
+    .info-pop{display:none;position:absolute;right:26px;top:50%;transform:translateY(-50%);background:#fff;border:1px solid var(--kant);border-radius:8px;padding:10px 12px;min-width:220px;max-width:280px;box-shadow:0 4px 12px rgba(0,0,0,.12);font-size:.74rem;line-height:1.55;color:var(--text);z-index:100;text-align:left;font-style:normal}
+    .info-pop a{color:var(--blå-ljus);text-decoration:none;word-break:break-all}
+    .info-pop a:hover{text-decoration:underline}
+    .info-pop strong{color:var(--text)}
+    .info-knapp:hover .info-pop,.info-knapp:focus .info-pop{display:block}
+    /* ── Sidebar ── */
     .sidebar{position:sticky;top:12px}
     .sb-kort{background:var(--vit);border:1px solid var(--kant);border-radius:10px;overflow:hidden;margin-bottom:12px}
-    .sb-hdr{padding:9px 14px;background:var(--blå);color:var(--vit);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
-    .sb-linje{padding:9px 14px;border-bottom:1px solid var(--kant);display:flex;flex-direction:column;gap:3px}
+    .sb-hdr{padding:8px 14px;background:var(--blå);color:var(--vit);font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+    .sb-dat{padding:10px 14px;border-bottom:1px solid var(--kant)}
+    .sb-dat label{font-size:.73rem;color:var(--dim);display:block;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+    .sb-dat input[type=date]{width:100%;border:1px solid var(--kant);border-radius:6px;padding:6px 8px;font-size:.83rem;color:var(--text)}
+    .vy-knapp{display:block;width:100%;text-align:left;padding:9px 14px;border:none;border-bottom:1px solid var(--kant);background:var(--vit);cursor:pointer;font-size:.83rem;color:var(--dim);transition:background .12s;font-weight:500}
+    .vy-knapp:last-child{border-bottom:none}
+    .vy-knapp:hover{background:var(--grå-ljus)}
+    .vy-knapp.aktiv{background:#eff6ff;color:var(--blå);font-weight:700}
+    .vy-knapp.aktiv::before{content:'▶ ';font-size:.6rem}
+    .sb-linje{padding:8px 14px;border-bottom:1px solid var(--kant);display:flex;flex-direction:column;gap:2px}
     .sb-linje:last-child{border-bottom:none}
-    .sb-namn{font-weight:600;font-size:.83rem}
-    .sb-rutt{font-size:.78rem;color:var(--dim)}
-    .sb-info{font-size:.74rem;color:var(--dim);font-style:italic}
-    .sb-lnk{font-size:.75rem;color:#2868a8;text-decoration:none}
+    .sb-namn{font-weight:600;font-size:.82rem}
+    .sb-rutt{font-size:.76rem;color:var(--dim)}
+    .sb-info{font-size:.72rem;color:var(--dim);font-style:italic}
+    .sb-lnk{font-size:.74rem;color:#2868a8;text-decoration:none}
     .sb-lnk:hover{text-decoration:underline}
-    .sb-liten{font-size:.72rem;color:var(--dim);padding:10px 14px;line-height:1.55}
-    footer{text-align:center;padding:20px;font-size:.74rem;color:var(--dim);border-top:1px solid var(--kant);margin-top:10px}
+    .sb-liten{font-size:.71rem;color:var(--dim);padding:10px 14px;line-height:1.55}
+    .sb-sek-hdr{padding:6px 14px;background:#f8fafc;border-bottom:1px solid var(--kant);font-size:.68rem;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
+    footer{text-align:center;padding:16px;font-size:.72rem;color:var(--dim);border-top:1px solid var(--kant);margin-top:6px}
     /* ── Print / PDF ── */
     @media print{
-      body{background:#fff;font-size:11px}
-      header{background:#fff!important;color:#000!important;border:none;border-bottom:2px solid #000;padding:8px 0}
-      header .sub{opacity:1;color:#555}
+      body{background:#fff;font-size:10px}
+      header{background:#fff!important;color:#000!important;border-bottom:2px solid #000;padding:6px 0}
       .layout{display:block;padding:0}
-      .dag-nav,.sidebar,.nav-knappar,footer{display:none!important}
-      .sektion{border:1px solid #ccc;page-break-inside:avoid;margin-bottom:10px}
+      .dag-nav,.sidebar,.xl-knapp,footer,.info-knapp{display:none!important}
+      .sektion{border:1px solid #ccc;page-break-inside:avoid;margin-bottom:8px}
       .sek-hdr{background:#eee!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
       .sek-hdr h2{color:#000!important}
       tbody tr:hover{background:none}
       .tlnk,.rl{color:#000;text-decoration:none}
-      #print-datum{display:block!important}
     }
-    #print-datum{display:none;font-size:.8rem;margin-top:4px;color:#555}
   </style>
 </head>
 <body>
@@ -108,76 +122,98 @@
 
 <div class="layout">
   <main>
+    <!-- Dagflikar + datumväljare + Excel-knapp -->
     <div class="dag-nav">
-      <div class="dag-nav-rad1">
-        <label>Visa dag:</label>
-        <div class="dag-tabs" id="dag-tabs"></div>
-        <input type="date" id="dat-picker" class="dat-picker">
-        <div class="dag-info" id="dag-info"></div>
-        <div class="nav-knappar">
-          <button class="dl-knapp" onclick="skrivUtPDF()">&#8659; Ladda ner PDF</button>
-        </div>
-      </div>
-      <div id="print-datum"></div>
+      <label>Dag:</label>
+      <div class="dag-tabs" id="dag-tabs"></div>
+      <input type="date" id="dat-pick-main" class="dat-pick">
+      <span class="dag-info" id="dag-info"></span>
+      <button class="xl-knapp" onclick="exportExcel()">&#8659; Skriv ut lista (Excel)</button>
     </div>
 
     <div id="laddare"><div class="spinner"></div>Hämtar tidtabellsdata…</div>
 
-    <div class="sektion" id="sek-combined" style="display:none">
-      <div class="sek-hdr"><h2>Passagerare &amp; RORO / Kombi</h2><span class="cnt" id="cnt-combined">0</span></div>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th class="lnk-c">Länk</th><th>Rederi</th><th>Avg tid</th><th>Ank tid</th><th>Avgångshamn</th><th>Ankomsthamn</th><th>Fartyg</th><th>Anm</th></tr></thead>
-        <tbody id="tb-combined"></tbody>
-      </table></div>
+    <!-- VY: Alla avgångar -->
+    <div id="view-alla" style="display:none">
+      <div class="sektion" id="sek-combined" style="display:none">
+        <div class="sek-hdr"><h2>Passagerare &amp; RORO / Kombi</h2><span class="cnt" id="cnt-combined">0</span></div>
+        <div class="tbl-wrap">
+          <table><thead><tr>
+            <th class="lnk-c">&#8599;</th><th>Rederi</th>
+            <th>Avg&shy;tid</th><th>Ank&shy;tid</th>
+            <th>Avgångshamn</th><th>Ankomsthamn</th><th>Fartyg</th><th class="info-c">&#9432;</th>
+          </tr></thead><tbody id="tb-combined"></tbody></table>
+        </div>
+      </div>
+      <div class="sektion" id="sek-frakt" style="display:none">
+        <div class="sek-hdr"><h2>Fraktfärjor</h2><span class="cnt" id="cnt-frakt">0</span></div>
+        <div class="tbl-wrap">
+          <table><thead><tr>
+            <th class="lnk-c">&#8599;</th><th>Rederi</th>
+            <th>Avg&shy;tid</th><th>Ank&shy;tid</th>
+            <th>Avgångshamn</th><th>Ankomsthamn</th><th>Fartyg</th><th class="info-c">&#9432;</th>
+          </tr></thead><tbody id="tb-frakt"></tbody></table>
+        </div>
+      </div>
     </div>
 
-    <div class="sektion" id="sek-frakt" style="display:none">
-      <div class="sek-hdr"><h2>Fraktfärjor</h2><span class="cnt" id="cnt-frakt">0</span></div>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th class="lnk-c">Länk</th><th>Rederi</th><th>Avg tid</th><th>Ank tid</th><th>Avgångshamn</th><th>Ankomsthamn</th><th>Fartyg</th><th>Anm</th></tr></thead>
-        <tbody id="tb-frakt"></tbody>
-      </table></div>
-    </div>
-
-    <div class="sektion sek-sverige" id="sek-sverige" style="display:none">
-      <div class="sek-hdr"><h2>&#8617; Avgångar mot Sverige</h2><span class="cnt" id="cnt-sverige">0</span></div>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th class="lnk-c">Länk</th><th>Rederi</th><th>Avg tid</th><th>Ank tid</th><th>Avgångshamn</th><th>Ankomsthamn</th><th>Fartyg</th><th>Anm</th></tr></thead>
-        <tbody id="tb-sverige"></tbody>
-      </table></div>
+    <!-- VY: Filter (mot/ankomst/från) -->
+    <div id="view-filter" style="display:none">
+      <div class="sektion sek-sv">
+        <div class="sek-hdr"><h2 id="filter-rubrik">–</h2><span class="cnt" id="cnt-filter">0</span></div>
+        <div class="tbl-wrap">
+          <table><thead><tr>
+            <th class="lnk-c">&#8599;</th><th>Rederi</th>
+            <th>Avg&shy;tid</th><th>Ank&shy;tid</th>
+            <th>Avgångshamn</th><th>Ankomsthamn</th><th>Fartyg</th><th class="info-c">&#9432;</th>
+          </tr></thead><tbody id="tb-filter"></tbody></table>
+        </div>
+      </div>
     </div>
   </main>
 
   <aside class="sidebar">
+    <!-- Vyväljare + datumväljare -->
+    <div class="sb-kort">
+      <div class="sb-hdr">Visa lista</div>
+      <div class="sb-dat">
+        <label>Datum</label>
+        <input type="date" id="dat-pick-sb" class="dat-pick" style="width:100%">
+      </div>
+      <button class="vy-knapp aktiv" data-vy="alla" onclick="byttVy(this)">Alla avgångar</button>
+      <button class="vy-knapp" data-vy="mot" onclick="byttVy(this)">&#8617; Avgångar mot Sverige</button>
+      <button class="vy-knapp" data-vy="ankomst" onclick="byttVy(this)">&#x26F4; Ankomster till Sverige</button>
+      <button class="vy-knapp" data-vy="fran" onclick="byttVy(this)">&#8618; Avgår från Sverige</button>
+    </div>
+
+    <!-- Övriga linjer -->
     <div class="sb-kort">
       <div class="sb-hdr">Övriga linjer — länkvisare</div>
       <div class="sb-linje">
         <span class="sb-namn">Color Line</span>
         <span class="sb-rutt">Strömstad &#8596; Sandefjord</span>
-        <span class="sb-info">Dagliga avgångar, se tidtabell hos colorline.se</span>
-        <a class="sb-lnk" href="https://www.colorline.se/tidtabeller" target="_blank" rel="noopener">&#8594; colorline.se/tidtabeller</a>
+        <span class="sb-info">Dagliga avgångar</span>
+        <a class="sb-lnk" href="https://www.colorline.se/tidtabeller" target="_blank" rel="noopener">&#8594; colorline.se</a>
       </div>
       <div class="sb-linje">
-        <span class="sb-namn">Bornholmslinjen / Molslinjen</span>
+        <span class="sb-namn">Bornholmslinjen</span>
         <span class="sb-rutt">Ystad &#8596; Rønne</span>
-        <span class="sb-info">4–8 avg/dag, varierar med säsong</span>
+        <span class="sb-info">4–8 avg/dag, varierar säsong</span>
         <a class="sb-lnk" href="https://www.bornholmslinjen.se" target="_blank" rel="noopener">&#8594; bornholmslinjen.se</a>
       </div>
       <div class="sb-linje">
-        <span class="sb-namn">Öresundslinjen (HH Ferries)</span>
+        <span class="sb-namn">HH Ferries / ForSea</span>
         <span class="sb-rutt">Helsingborg &#8596; Helsingör</span>
-        <span class="sb-info">Avgångar ca var 15–20 min dygnet runt</span>
+        <span class="sb-info">Avgångar var 15–20 min dygnet runt</span>
         <a class="sb-lnk" href="https://www.hh-ferries.se" target="_blank" rel="noopener">&#8594; hh-ferries.se</a>
-      </div>
-      <div class="sb-linje">
-        <span class="sb-namn">Sundbusserne (ForSea)</span>
-        <span class="sb-rutt">Helsingborg &#8596; Helsingör</span>
-        <span class="sb-info">Täta avgångar, elektriska färjor</span>
         <a class="sb-lnk" href="https://www.forsea.se" target="_blank" rel="noopener">&#8594; forsea.se</a>
       </div>
     </div>
+
+    <!-- Direktlänkar tidtabeller -->
     <div class="sb-kort">
       <div class="sb-hdr">Direktlänkar tidtabeller</div>
+      <div class="sb-sek-hdr">Rederier</div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.sales.vikingline.com/find-trip/timetable/traffic-bulletin/" target="_blank">Viking Line &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.tallink.com/sv/tidtabeller" target="_blank">Tallink &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.finnlines.com/freight/schedules/" target="_blank">Finnlines &#8594;</a></div>
@@ -187,27 +223,34 @@
       <div class="sb-linje"><a class="sb-lnk" href="https://www.polsca.com/schedule" target="_blank">POLSCA &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.wasaline.com/tidtabell/" target="_blank">Wasaline &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.eckerolinjen.se/turlista" target="_blank">Eckerö Linjen &#8594;</a></div>
+      <div class="sb-sek-hdr">Live AIS-spårning</div>
+      <div class="sb-linje"><a class="sb-lnk" href="https://www.marinetraffic.com/en/ais/home/centerx:18/centery:59/zoom:7" target="_blank" rel="noopener">MarineTraffic — Östersjön &#8594;</a></div>
+      <div class="sb-linje"><a class="sb-lnk" href="https://www.marinetraffic.com/en/ais/home/centerx:11.97/centery:57.7/zoom:10" target="_blank" rel="noopener">MarineTraffic — Göteborg &#8594;</a></div>
+      <div class="sb-linje"><a class="sb-lnk" href="https://www.marinetraffic.com/en/ais/home/centerx:13.15/centery:55.55/zoom:10" target="_blank" rel="noopener">MarineTraffic — Trelleborg/Ystad &#8594;</div>
+      <div class="sb-linje"><a class="sb-lnk" href="https://www.vesseltracker.com/en/Ships.html" target="_blank" rel="noopener">VesselFinder — Östersjön &#8594;</a></div>
+      <div class="sb-sek-hdr">Hamnar — liveinformation</div>
+      <div class="sb-linje"><a class="sb-lnk" href="https://www.stockholmshamnar.se/hamnar/vartahamnen/om-vartahamnen/" target="_blank" rel="noopener">Stockholms Hamnar &#8594;</a></div>
+      <div class="sb-linje"><a class="sb-lnk" href="https://www.portofgothenburg.com/shipping-services/arrivals-and-departures/" target="_blank" rel="noopener">Port of Gothenburg &#8594;</a></div>
+      <div class="sb-linje"><a class="sb-lnk" href="https://www.trelleborgshamn.se/" target="_blank" rel="noopener">Trelleborgs Hamn &#8594;</a></div>
     </div>
+
     <div class="sb-kort">
       <div class="sb-hdr">Om sidan</div>
       <div class="sb-liten">
-        Data hämtas från respektive rederis API och uppdateras automatiskt.
-        Fartygsnamn visas där data finns tillgänglig.
-        <br><br>
+        Fartygsnamn för Viking Line hämtas live via deras booking-API. Övriga rederier uppdateras var 14:e dag via schemalagda skript.<br><br>
         <em>Alla tider är lokala. "+1" = ankomst nästkommande dag.</em>
       </div>
     </div>
   </aside>
 </div>
-
-<footer>Färjor Sverige · Data hämtas från respektive rederi · Uppdateras automatiskt</footer>
+<footer>Färjor Sverige · Källdata: respektive rederis API · Uppdateras var 14:e dag</footer>
 
 <script>
-// Veckodagar, index = JS getDay() (0=Sön,1=Mån...6=Lör)
-const VD  = ['Sön','Mån','Tis','Ons','Tor','Fre','Lör'];
+'use strict';
+// ── Konstanter ──
+const VD  = ['Sön','Mån','Tis','Ons','Tor','Fre','Lör']; // index=getDay()
 const VDL = ['Söndag','Måndag','Tisdag','Onsdag','Torsdag','Fredag','Lördag'];
-// Visningsordning: börjar måndag (getDay 1,2,3,4,5,6,0)
-const VISA_ORD = [1,2,3,4,5,6,0];
+const VISA_ORD = [1,2,3,4,5,6,0]; // visningsordning: Mån→Sön
 
 const LANK = {
   'Viking Line':'https://www.sales.vikingline.com/find-trip/timetable/traffic-bulletin/',
@@ -221,12 +264,10 @@ const LANK = {
   'Wasaline':'https://www.wasaline.com/tidtabell/',
   'Eckerö Linjen':'https://www.eckerolinjen.se/turlista',
 };
-// Statiska fartygsnamn (ett fartyg per rederi)
 const STATFARTYG = {
   'Wasaline':'Aurora Botnia',
   'Eckerö Linjen':'M/S Eckerö',
 };
-// Koder för Polsca och Viking Line
 const FKODER = {
   'GAL':'Gryf','MAZ':'Mazovia','COP':'Copernicus','JAN':'Jan Śniadecki',
   'WAW':'Wawel','POL':'Polonia','SKA':'Skania','VAR':'Varlberga','EPS':'EPS',
@@ -235,44 +276,97 @@ const FKODER = {
 };
 const UTESLUT = new Set(['CLdN / Cobelfret','Wagenborg','Wallenius SOL','SCA Logistics']);
 const POLSCA  = new Set(['Polferries (POLSCA)']);
-// Svenska destinationshamnar (för filtrering av mot-Sverige-avgångar)
 const SVENSKA_HAMNAR = new Set([
   'Stockholm','Nynäshamn','Kapellskär','Grisslehamn',
   'Göteborg','Trelleborg','Ystad','Malmö','Helsingborg',
-  'Karlskrona','Karlshamn','Oxelösund','Umeå','Gävle','Varberg','Västervik',
+  'Karlskrona','Karlshamn','Oxelösund','Umeå','Gävle','Varberg',
 ]);
+// Viking Line port codes (portnamn → VL-kod)
+const VL_PORTER = {
+  'Stockholm':'STO','Helsingfors':'HEL','Åbo':'TKU',
+  'Kapellskär':'KAP','Mariehamn':'MAR',
+};
+const VL_RUTTER = [
+  ['STO','HEL'],['HEL','STO'],['STO','TKU'],['TKU','STO'],
+  ['KAP','HEL'],['HEL','KAP'],['KAP','TKU'],['TKU','KAP'],
+];
+// DFDS port codes (portnamn → DFDS 5-char-kod)
+const DFDS_PORTER = {
+  'Paldiski':'EEPLN','Kapellskär':'SEKPS',
+  'Klaipėda':'LTKLJ','Karlshamn':'SEKAN','Trelleborg':'SETRG',
+  'Göteborg':'SEGOT','Gent':'BEGNE','Immingham':'GBIMM',
+};
 
-function fixR(r){ return r === 'DFDS (tidigare Tallink Silja)' ? 'DFDS' : r; }
-function getLnk(r){ return LANK[r] || ''; }
+// ── State ──
+let DATA = null;
+let valdDat = new Date();
+let valdVd  = '';
+let viewMode = 'alla'; // 'alla' | 'mot' | 'ankomst' | 'fran'
+let visadeRader = [];  // för Excel-export
 
-function getFar(rad){
-  // 1. Direkt fartygskod (Polsca-format)
-  if(rad.fartyg && rad.fartyg !== 'N/A'){
-    return FKODER[rad.fartyg] || rad.fartyg;
-  }
-  // 2. Statisk per-rederi
-  const r = fixR(rad.rederi || '');
-  if(STATFARTYG[r]) return STATFARTYG[r];
-  // 3. Extrahera från anmärkning (t.ex. "Viking Cinderella. Kontrollera...")
-  const anm = rad.anmarkning || '';
-  if(anm){
-    const dot = anm.indexOf('.');
-    if(dot > 0 && dot < 36){
-      const cand = anm.slice(0, dot).trim();
-      if(cand && !cand.includes(',') && cand.split(' ').length <= 4) return cand;
-    }
+// ── Ship-caches (live API) ──
+let vlCache = {};  // key: 'STO→HEL:16:00' → fartygsnamn
+let vlHämtadDatum = '';
+let dfdsCache = {}; // key: 'EEPLN→SEKPS:2026-05-20:19:00' → fartygsnamn
+let dfdsFetchedDate = '';
+
+// ── Helpers ──
+function fixR(r){ return r==='DFDS (tidigare Tallink Silja)'?'DFDS':r; }
+function getLnk(r){ return LANK[r]||''; }
+function dStr(d){ return d.toISOString().slice(0,10); }
+function fmtDat(d){ return d.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
+function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// Extrahera fartygsnamn från anmärkning (mönster: "Fartygsnamn. Övrig text")
+function namnetFrånAnm(anm){
+  if(!anm) return '';
+  const dot = anm.indexOf('.');
+  if(dot > 0 && dot < 36){
+    const c = anm.slice(0,dot).trim();
+    if(c && !c.includes(',') && c.split(' ').length <= 4) return c;
   }
   return '';
 }
 
+function getFar(rad){
+  // 1. Polsca-koder
+  if(rad.fartyg && rad.fartyg !== 'N/A') return FKODER[rad.fartyg] || rad.fartyg;
+  // 2. Statisk (Wasaline, Eckerö)
+  const r = fixR(rad.rederi||'');
+  if(STATFARTYG[r]) return STATFARTYG[r];
+  // 3. Viking Line: live cache
+  if(r === 'Viking Line'){
+    const dep = VL_PORTER[rad.avghamn];
+    const arr = VL_PORTER[rad.ankhamn];
+    const avgt = rad.avgtid_raw || rad.avgtid || '';
+    if(dep && arr){
+      const vl = vlCache[`${dep}→${arr}:${avgt}`];
+      if(vl) return vl;
+    }
+    // fallback: anmärkning
+    return namnetFrånAnm(rad.anmarkning||'');
+  }
+  // 4. DFDS: live cache
+  if(r === 'DFDS'){
+    const dep = DFDS_PORTER[rad.avghamn];
+    const arr = DFDS_PORTER[rad.ankhamn];
+    const ds  = dStr(valdDat);
+    const avgt = rad.avgtid_raw || rad.avgtid || '';
+    if(dep && arr){
+      const dk = dfdsCache[`${dep}→${arr}:${ds}:${avgt}`];
+      if(dk) return dk;
+    }
+  }
+  // 5. Anmärkning som fallback
+  return namnetFrånAnm(rad.anmarkning||'');
+}
+
 function getKat(rad){
-  const k = (rad.kategori || '').toLowerCase();
-  if(k.includes('passag') || k.includes('pax')) return 'pass';
+  const k = (rad.kategori||'').toLowerCase();
   if(k.includes('frakt')) return 'frakt';
-  const r = (rad.rederi || '').toLowerCase();
-  if(r.includes('viking') || r.includes('tallink') || r.includes('wasaline') || r.includes('eckerö')) return 'pass';
-  if(r.includes('finnlines') || r.includes('dfds')) return 'frakt';
-  return 'roro';
+  const r = (rad.rederi||'').toLowerCase();
+  if(r.includes('finnlines')||r.includes('dfds')) return 'frakt';
+  return 'combined'; // pass + roro → combined
 }
 
 function matchar(vdag, mal){
@@ -284,82 +378,153 @@ function matchar(vdag, mal){
   if(v.includes('–')){
     const p = v.split('–');
     const f = ord.indexOf(p[0].trim()), t = ord.indexOf(p[1].trim());
-    if(f !== -1 && t !== -1) return f <= t ? (mi >= f && mi <= t) : (mi >= f || mi <= t);
+    if(f !== -1 && t !== -1) return f<=t ? (mi>=f && mi<=t) : (mi>=f || mi<=t);
   }
-  return v.split(',').map(s => s.trim()).includes(mal);
+  return v.split(',').map(s=>s.trim()).includes(mal);
 }
 
-function trunkAnm(s){
-  if(!s) return '';
-  // Ta bort fartygsreferens i inledningen om den matchar getFar-mönstret
-  const dot = s.indexOf('.');
-  let r = s;
+// Anmärkning för info-tooltip: ta bort fartygsnamn från inledningen
+function rensaAnm(anm){
+  if(!anm) return '';
+  let s = anm;
+  const dot = anm.indexOf('.');
   if(dot > 0 && dot < 36){
-    const cand = s.slice(0,dot).trim();
-    if(cand && !cand.includes(',') && cand.split(' ').length <= 4){
-      r = s.slice(dot+1).trim();
-    }
+    const c = anm.slice(0,dot).trim();
+    if(c && !c.includes(',') && c.split(' ').length <= 4) s = anm.slice(dot+1).trim();
   }
-  r = r.replace(/\[.*?\]/g,'').replace(/\s+/g,' ').trim();
-  return r.length > 70 ? r.slice(0,67)+'…' : r;
+  return s.replace(/\[.*?\]/g,'').replace(/\s+/g,' ').trim();
 }
 
-function dStr(d){ return d.toISOString().slice(0,10); }
-function fmtDat(d){ return d.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
-function fmtDatKort(d){ return d.toLocaleDateString('sv-SE',{day:'numeric',month:'long',year:'numeric'}); }
-function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+// ── Viking Line live-hämtning ──
+async function hämtaVLFartyg(dateStr){
+  if(vlHämtadDatum === dateStr) return;
+  vlCache = {};
+  vlHämtadDatum = dateStr;
+  const BASE = 'https://www.sales.vikingline.com/protheus-api/v1/ferry/eng/en/search-ferry/day/';
+  for(const [dep,arr] of VL_RUTTER){
+    try{
+      const p = {searchDate:dateStr,departurePort:dep,arrivalPort:arr,numberOfAdults:1,childrenAges:[],vehicle:{code:'NONE',quantity:1},club:'NONE'};
+      const enc = btoa(JSON.stringify(p));
+      const r = await fetch(BASE+enc, {headers:{Accept:'application/json'}});
+      if(!r.ok) continue;
+      const data = await r.json();
+      for(const dh of data.result?.dateHits||[]){
+        for(const hit of dh.hits||[]){
+          const oj = hit.booking?.outwardJourney;
+          if(!oj) continue;
+          const avgt = oj.departureDate?.localTime||'';
+          const key  = `${dep}→${arr}:${avgt}`;
+          vlCache[key] = FKODER[oj.ship]||oj.ship||'';
+        }
+      }
+    }catch(e){ /* CORS/nät-fel: fortsätt tyst */ }
+  }
+}
 
-let DATA = null, valdVd = '', valdDat = new Date();
+// ── DFDS live-hämtning ──
+async function hämtaDFDSFartyg(dateStr){
+  if(dfdsFetchedDate === dateStr) return;
+  dfdsCache = {};
+  dfdsFetchedDate = dateStr;
+  // Rutter mot/från Sverige
+  const DFDS_RUTTER = [
+    ['EEPLN','SEKPS'],['SEKPS','EEPLN'], // Paldiski↔Kapellskär
+    ['LTKLJ','SEKAN'],['SEKAN','LTKLJ'], // Klaipeda↔Karlshamn
+    ['LTKLJ','SETRG'],['SETRG','LTKLJ'], // Klaipeda↔Trelleborg
+  ];
+  const dFran = new Date(dateStr+'T00:00:00Z').toISOString();
+  const dTill = new Date(dateStr+'T23:59:59Z').toISOString();
+  for(const [pol,pod] of DFDS_RUTTER){
+    try{
+      const url = `https://www.dfds.com/api/timetable?portOfLoading=${pol}&portOfDischarge=${pod}&dateFrom=${dFran}&dateTo=${dTill}`;
+      const r = await fetch(url, {headers:{Accept:'application/json'}});
+      if(!r.ok) continue;
+      const arr = await r.json();
+      if(!Array.isArray(arr)) continue;
+      for(const avg of arr){
+        if(!avg.scheduledDeparture) continue;
+        const avgt = avg.scheduledDeparture.slice(11,16); // "HH:MM" lokal tid
+        const key  = `${pol}→${pod}:${dateStr}:${avgt}`;
+        dfdsCache[key] = avg.vehicleName||'';
+      }
+    }catch(e){ /* CORS/nät-fel */ }
+  }
+}
 
+// ── Initiering ──
 async function init(){
   try{
-    const r = await fetch('farjor_data.json');
-    if(!r.ok) throw new Error('HTTP ' + r.status);
-    DATA = await r.json();
+    const resp = await fetch('farjor_data.json');
+    if(!resp.ok) throw new Error('HTTP ' + resp.status);
+    DATA = await resp.json();
   }catch(e){
-    document.getElementById('laddare').innerHTML = '<p style="color:#dc2626">Kunde inte läsa farjor_data.json: ' + esc(e.message) + '</p>';
+    document.getElementById('laddare').innerHTML='<p style="color:#dc2626">Kunde inte läsa farjor_data.json: '+esc(e.message)+'</p>';
     return;
   }
-  // Visa uppdateringstid (datum från meta + aktuell sidladdningstid)
+  // Uppdateringstid
   const nu = new Date();
-  const tidStr = nu.toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'});
-  let datStr = '';
-  if(DATA.meta && DATA.meta.uppdaterad) datStr = DATA.meta.uppdaterad + '  ·  ';
-  document.getElementById('upd').textContent = datStr + 'Laddad ' + tidStr;
+  const tid = nu.toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'});
+  const upd = DATA.meta?.uppdaterad||'';
+  document.getElementById('upd').textContent = (upd?'Data: '+upd+'  ·  ':'')+' Laddad '+tid;
 
   byggNav();
   valdDat = nu; valdVd = VD[nu.getDay()];
+  sättDatum(nu);
   aktivera(nu.getDay());
-  // Sätt datumväljaren
-  document.getElementById('dat-picker').value = dStr(nu);
-  // Lyssnare datumväljare
-  document.getElementById('dat-picker').addEventListener('change', e => {
+  document.getElementById('laddare').style.display='none';
+  document.getElementById('view-alla').style.display='';
+
+  // Datum-lyssnare (huvud)
+  document.getElementById('dat-pick-main').addEventListener('change', e=>{
     if(!e.target.value) return;
-    const [y,m,d] = e.target.value.split('-').map(Number);
-    const nd = new Date(y, m-1, d);
-    valdDat = nd; valdVd = VD[nd.getDay()];
-    aktivera(nd.getDay());
-    rendera();
+    const nd = parseDate(e.target.value);
+    sättDatum(nd); aktivera(nd.getDay()); rendera();
   });
+  // Datum-lyssnare (sidebar)
+  document.getElementById('dat-pick-sb').addEventListener('change', e=>{
+    if(!e.target.value) return;
+    const nd = parseDate(e.target.value);
+    sättDatum(nd); aktivera(nd.getDay()); rendera();
+  });
+
+  await hämtaFartyg(dStr(nu));
   rendera();
-  document.getElementById('laddare').style.display = 'none';
 }
 
+function parseDate(s){
+  const [y,m,d] = s.split('-').map(Number);
+  return new Date(y,m-1,d);
+}
+
+function sättDatum(d){
+  valdDat = d; valdVd = VD[d.getDay()];
+  const s = dStr(d);
+  document.getElementById('dat-pick-main').value = s;
+  document.getElementById('dat-pick-sb').value   = s;
+}
+
+async function hämtaFartyg(dateStr){
+  await Promise.all([
+    hämtaVLFartyg(dateStr),
+    hämtaDFDSFartyg(dateStr),
+  ]);
+}
+
+// ── Dagnavigation ──
 function byggNav(){
   const c = document.getElementById('dag-tabs');
   const idagGD = new Date().getDay();
-  VISA_ORD.forEach(gd => {
+  VISA_ORD.forEach(gd=>{
     const b = document.createElement('button');
-    b.className = 'dag-tab' + (gd === idagGD ? ' idag' : '');
+    b.className = 'dag-tab'+(gd===idagGD?' idag':'');
     b.textContent = VD[gd];
-    b.dataset.gd = gd;
-    b.addEventListener('click', () => {
+    b.dataset.gd  = gd;
+    b.addEventListener('click', async ()=>{
       const nu2 = new Date();
       const off = (gd - nu2.getDay() + 7) % 7;
-      const nd = new Date(nu2); nd.setDate(nu2.getDate() + off);
-      valdDat = nd; valdVd = VD[gd];
-      aktivera(gd);
-      document.getElementById('dat-picker').value = dStr(nd);
+      const nd  = new Date(nu2); nd.setDate(nu2.getDate()+off);
+      sättDatum(nd); aktivera(gd);
+      await hämtaFartyg(dStr(nd));
       rendera();
     });
     c.appendChild(b);
@@ -367,55 +532,100 @@ function byggNav(){
 }
 
 function aktivera(gd){
-  document.querySelectorAll('.dag-tab').forEach(b => b.classList.toggle('active', parseInt(b.dataset.gd) === gd));
+  document.querySelectorAll('.dag-tab').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.gd)===gd));
   document.getElementById('dag-info').textContent = fmtDat(valdDat);
 }
 
+// ── Vyväljare ──
+function byttVy(btn){
+  document.querySelectorAll('.vy-knapp').forEach(b=>b.classList.remove('aktiv'));
+  btn.classList.add('aktiv');
+  viewMode = btn.dataset.vy;
+  const alla    = document.getElementById('view-alla');
+  const filter  = document.getElementById('view-filter');
+  alla.style.display   = viewMode==='alla' ? '' : 'none';
+  filter.style.display = viewMode==='alla' ? 'none' : '';
+  const titlar = {
+    mot:'Avgångar mot Sverige — sorterat på avgångstid',
+    ankomst:'Ankomster till Sverige — sorterat på ankomsttid',
+    fran:'Avgår från Sverige — sorterat på avgångstid',
+  };
+  if(viewMode!=='alla') document.getElementById('filter-rubrik').textContent = titlar[viewMode]||'';
+  rendera();
+}
+
+// ── Rendering ──
 function rendera(){
   if(!DATA) return;
-  const combined = [], frakt = [], motSverige = [];
+  const combined=[], frakt=[], motSv=[];
   const ds = dStr(valdDat);
+  const avVdag = VD[valdDat.getDay()];
+  const anVdag = (rad) => VD[(valdDat.getDay()+(rad.ndag?1:0))%7];
 
-  // Polsca: datum-specifika rader (inkl. fartygsnamn)
-  ((DATA.polsca_datum || {})[ds] || []).forEach(rad => {
-    const r = fixR(rad.rederi || '');
-    const o = {
-      rederi:r, avgtid:rad.avgtid_raw||rad.avgtid||'', anktid:rad.anktid||'',
-      avghamn:rad.avghamn||'', ankhamn:rad.ankhamn||'',
-      fartyg:getFar(rad), anm:'',
-      länk:'https://www.polsca.com/schedule',
-      ndag:rad.nasta_dag||false, grå:!!(rad.grå),
-    };
+  // Polsca (datum-specifika)
+  ((DATA.polsca_datum||{})[ds]||[]).forEach(rad=>{
+    const r = fixR(rad.rederi||'');
+    const o = bygRad(rad, r, 'https://www.polsca.com/schedule', avVdag, anVdag(rad));
     combined.push(o);
-    if(SVENSKA_HAMNAR.has(rad.ankhamn)) motSverige.push(o);
+    if(SVENSKA_HAMNAR.has(rad.ankhamn)) motSv.push({...o,_sortAnk:rad.anktid||''});
   });
 
-  // Veckoschemat (alla rederier utom POLSCA och uteslutna)
-  (DATA.schema || []).forEach(rad => {
-    const or = rad.rederi || '';
-    if(UTESLUT.has(or) || POLSCA.has(or)) return;
-    if(!matchar(rad.veckodag, valdVd)) return;
+  // Veckoschemat
+  (DATA.schema||[]).forEach(rad=>{
+    const or = rad.rederi||'';
+    if(UTESLUT.has(or)||POLSCA.has(or)) return;
+    if(!matchar(rad.veckodag,valdVd)) return;
     const r = fixR(or);
-    const o = {
-      rederi:r, avgtid:rad.avgtid_raw||rad.avgtid||'', anktid:rad.anktid||'',
-      avghamn:rad.avghamn||'', ankhamn:rad.ankhamn||'',
-      fartyg:getFar(rad), anm:trunkAnm(rad.anmarkning||''),
-      länk:getLnk(r), ndag:rad.nasta_dag||false, grå:!!(rad.grå),
-    };
+    const o = bygRad(rad, r, getLnk(r), avVdag, anVdag(rad));
     const k = getKat(rad);
-    if(k === 'frakt') frakt.push(o);
-    else combined.push(o);
-    // Mot Sverige: använd fältet om det finns, annars kolla ankhamn
-    const motSv = rad.mot_sverige === true || SVENSKA_HAMNAR.has(rad.ankhamn);
-    if(motSv) motSverige.push(o);
+    if(k==='frakt') frakt.push(o);
+    else            combined.push(o);
+    const motSverige = rad.mot_sverige===true  || SVENSKA_HAMNAR.has(rad.ankhamn);
+    const frånSverige = rad.fran_sverige===true || SVENSKA_HAMNAR.has(rad.avghamn);
+    if(motSverige)  motSv.push({...o,_sortAnk:rad.anktid||''});
   });
 
-  const srt = a => a.sort((x,y) => x.avgtid.localeCompare(y.avgtid));
-  srt(combined); srt(frakt); srt(motSverige);
+  // Sortering
+  const srtAvg = a => a.sort((x,y)=>(x.avgtid||'').localeCompare(y.avgtid||''));
+  const srtAnk = a => a.sort((x,y)=>(x._sortAnk||x.anktid||'').localeCompare(y._sortAnk||y.anktid||''));
+  const srtFrån = a => { // fran: avgår från Sverige
+    const fr = [...combined, ...frakt].filter(o=>SVENSKA_HAMNAR.has(o.avghamn));
+    return fr.sort((x,y)=>(x.avgtid||'').localeCompare(y.avgtid||''));
+  };
 
-  fyll('tb-combined', combined, 'sek-combined', 'cnt-combined');
-  fyll('tb-frakt', frakt, 'sek-frakt', 'cnt-frakt');
-  fyll('tb-sverige', motSverige, 'sek-sverige', 'cnt-sverige');
+  srtAvg(combined); srtAvg(frakt);
+
+  if(viewMode==='alla'){
+    fyll('tb-combined',combined,'sek-combined','cnt-combined');
+    fyll('tb-frakt',frakt,'sek-frakt','cnt-frakt');
+    visadeRader = [...combined,...frakt];
+  } else if(viewMode==='mot'){
+    srtAvg(motSv);
+    fyllFilter(motSv); visadeRader=motSv;
+  } else if(viewMode==='ankomst'){
+    srtAnk(motSv);
+    fyllFilter(motSv); visadeRader=motSv;
+  } else if(viewMode==='fran'){
+    const fr = srtFrån();
+    fyllFilter(fr); visadeRader=fr;
+  }
+}
+
+function bygRad(rad, r, länk, avVdag, ankVdag){
+  return {
+    rederi:r,
+    avgtid:rad.avgtid_raw||rad.avgtid||'',
+    anktid:rad.anktid||'',
+    avghamn:rad.avghamn||'',
+    ankhamn:rad.ankhamn||'',
+    fartyg:getFar(rad),
+    länk, ndag:rad.nasta_dag||false,
+    grå:!!(rad.grå), avVdag, ankVdag,
+    källa:rad.kalla||länk||'',
+    verifiering:rad.verifiering||'',
+    anm:rensaAnm(rad.anmarkning||''),
+    _sortAnk:rad.anktid||'',
+  };
 }
 
 function fyll(tbId, rader, sekId, cntId){
@@ -423,38 +633,92 @@ function fyll(tbId, rader, sekId, cntId){
   const sek = document.getElementById(sekId);
   document.getElementById(cntId).textContent = rader.length;
   tb.innerHTML = '';
-  if(!rader.length){ sek.style.display = 'none'; return; }
-  sek.style.display = '';
-  rader.forEach(rad => {
-    const tr = document.createElement('tr');
-    if(rad.grå) tr.classList.add('grå');
-    const akt = rad.ndag
-      ? `<span class="tid">${esc(rad.anktid)}<span class="ndag">+1</span></span>`
-      : `<span class="tid">${esc(rad.anktid)}</span>`;
-    const fh  = rad.fartyg
-      ? `<span class="fartyg">${esc(rad.fartyg)}</span>`
-      : `<span class="fartyg tom">—</span>`;
-    const lh  = rad.länk ? `<a class="tlnk" href="${esc(rad.länk)}" target="_blank" rel="noopener" title="${esc(rad.rederi)}">&#8599;</a>` : '';
-    const rh  = rad.länk ? `<a class="rl" href="${esc(rad.länk)}" target="_blank" rel="noopener">${esc(rad.rederi)}</a>` : `<strong>${esc(rad.rederi)}</strong>`;
-    tr.innerHTML = `
-      <td class="lnk-c">${lh}</td>
-      <td>${rh}</td>
-      <td class="tid">${esc(rad.avgtid)}</td>
-      <td>${akt}</td>
-      <td>${esc(rad.avghamn)}</td>
-      <td>${esc(rad.ankhamn)}</td>
-      <td>${fh}</td>
-      <td class="anm">${esc(rad.anm)}</td>
-    `;
-    tb.appendChild(tr);
-  });
+  if(!rader.length){ sek.style.display='none'; return; }
+  sek.style.display='';
+  rader.forEach(rad=>tb.appendChild(bygTr(rad)));
 }
 
-function skrivUtPDF(){
-  // Sätt utskriftsdatum i dold rubrik som visas vid utskrift
-  document.getElementById('print-datum').textContent =
-    'Avgångar ' + fmtDat(valdDat);
-  window.print();
+function fyllFilter(rader){
+  const tb = document.getElementById('tb-filter');
+  document.getElementById('cnt-filter').textContent = rader.length;
+  tb.innerHTML='';
+  rader.forEach(rad=>tb.appendChild(bygTr(rad)));
+}
+
+function bygTr(rad){
+  const tr = document.createElement('tr');
+  if(rad.grå) tr.classList.add('grå');
+
+  // Tider med veckodag
+  const avTid = `<div class="tid-cell"><span class="tid">${esc(rad.avgtid)}</span><span class="vtid-dag">${esc(rad.avVdag)}</span></div>`;
+  const ankSuff = rad.ndag ? `<span class="ndag">+1</span>` : '';
+  const anTid = `<div class="tid-cell"><span class="tid">${esc(rad.anktid)}${ankSuff}</span><span class="vtid-dag">${esc(rad.ankVdag)}</span></div>`;
+
+  // Fartyg
+  const fh = rad.fartyg
+    ? `<span class="fartyg">${esc(rad.fartyg)}</span>`
+    : `<span class="fartyg tom">—</span>`;
+
+  // Länk-ikon
+  const lh = rad.länk ? `<a class="tlnk" href="${esc(rad.länk)}" target="_blank" rel="noopener" title="${esc(rad.rederi)}">&#8599;</a>` : '';
+  // Rederi
+  const rh = rad.länk ? `<a class="rl" href="${esc(rad.länk)}" target="_blank" rel="noopener">${esc(rad.rederi)}</a>` : `<strong>${esc(rad.rederi)}</strong>`;
+
+  // Info-tooltip
+  const verTxt = rad.verifiering ? `<strong>Verifiering:</strong> ${esc(rad.verifiering)}<br>` : '';
+  const anmTxt = rad.anm ? `${esc(rad.anm)}<br>` : '';
+  const källaHtml = rad.källa
+    ? `<strong>Källa:</strong> <a href="${esc(rad.källa)}" target="_blank" rel="noopener">${esc(rad.källa)}</a>`
+    : '';
+  const ih = (verTxt||anmTxt||källaHtml)
+    ? `<span class="info-knapp" tabindex="0">i<span class="info-pop">${verTxt}${anmTxt}${källaHtml}</span></span>`
+    : '';
+
+  tr.innerHTML = `
+    <td class="lnk-c">${lh}</td>
+    <td>${rh}</td>
+    <td>${avTid}</td>
+    <td>${anTid}</td>
+    <td>${esc(rad.avghamn)}</td>
+    <td>${esc(rad.ankhamn)}</td>
+    <td>${fh}</td>
+    <td class="info-c">${ih}</td>
+  `;
+  return tr;
+}
+
+// ── Excel-export ──
+function exportExcel(){
+  const huvud = ['REDERI','AVG TID','ANK TID','AVGÅNGSHAMN','ANKOMSTHAMN','FARTYG'];
+  const rader = visadeRader.map(r=>[
+    r.rederi, r.avgtid, r.anktid, r.avghamn, r.ankhamn, r.fartyg||''
+  ]);
+
+  const vyNamn = {
+    'alla':'Alla avgångar',
+    'mot':'Avgångar mot Sverige',
+    'ankomst':'Ankomster till Sverige',
+    'fran':'Avgår från Sverige',
+  };
+  const arktitel = vyNamn[viewMode]||'Lista';
+  const ws = XLSX.utils.aoa_to_sheet([huvud, ...rader]);
+
+  // Kolumnbredder
+  ws['!cols'] = [{wch:22},{wch:10},{wch:10},{wch:20},{wch:20},{wch:22}];
+  // Fet rubrik
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for(let c=range.s.c; c<=range.e.c; c++){
+    const cell = XLSX.utils.encode_cell({r:0,c});
+    if(!ws[cell]) continue;
+    ws[cell].s = {font:{bold:true},fill:{fgColor:{rgb:'DBEAFE'}}};
+  }
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, arktitel.slice(0,31));
+
+  const datum = dStr(valdDat);
+  const filnamn = `farjor_${datum}_${viewMode}.xlsx`;
+  XLSX.writeFile(wb, filnamn);
 }
 
 init();
