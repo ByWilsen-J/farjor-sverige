@@ -8,6 +8,10 @@ Pågående men klart förbättrad. Sidan renderar nu en renare tabellvy där all
 
 ## Senaste ändringar
 
+- 2026-05-20: Rättade passerad-logik och lade till kommandefilter i `index.html`.
+  - Inkommande rader markeras nu som passerade först när svensk ankomsttid har passerat, inte när utländsk avgångstid har passerat.
+  - Utgående rader markeras fortsatt utifrån svensk avgångstid, så samma regel används konsekvent i blandad vy och i respektive riktning.
+  - Lade till två knappar i sidpanelen: `Visa bara kommande` och `Visa alla`, så färdiga turer kan döljas utan att ändra datum eller rederifilter.
 - 2026-05-20: Teknisk QA och datumlogik-fix i `index.html`.
   - Rättade `passerad`-logiken så att tidigare avgångar bedöms mot radens faktiska avgångsdatum, inte bara valt visningsdatum.
   - Rättade ankomstdatum för exakt importerade datumrader så att nattankomster grupperas på verkligt ankomstdygn även när källmetadatan anger samma datum som avgången.

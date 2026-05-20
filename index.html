@@ -112,6 +112,12 @@
     .sb-filter label,.sb-export label,.sb-apply label{font-size:.72rem;color:var(--dim);display:block;margin-bottom:7px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
     .sb-filter,.sb-export{padding:12px 16px;border-bottom:1px solid var(--kant)}
     .sb-select{width:100%;border:1px solid var(--kant);border-radius:8px;padding:8px 10px;font-size:.92rem;color:var(--text);background:var(--vit)}
+    .sb-status{padding:12px 16px;border-bottom:1px solid var(--kant)}
+    .sb-status label{font-size:.72rem;color:var(--dim);display:block;margin-bottom:7px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+    .status-rad{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .status-btn{padding:9px 10px;border-radius:8px;border:1px solid var(--kant-stark);background:var(--vit);color:var(--text-mjuk);font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s}
+    .status-btn:hover{border-color:var(--blå-ljus);color:var(--blå)}
+    .status-btn.aktiv{background:#dbeafe;border-color:var(--blå);color:var(--blå-mörk)}
     .vy-grupp{display:flex;flex-direction:column;border-bottom:1px solid var(--kant)}
     .vy-grupp-titel{font-size:.70rem;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:10px 16px 6px;background:var(--grå-ljus)}
     .vy-knapp{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:11px 16px;border:none;border-top:1px solid var(--kant);background:var(--vit);cursor:pointer;font-size:.90rem;color:var(--text-mjuk);transition:all .12s;font-weight:500}
@@ -215,6 +221,13 @@
       <div class="sb-filter">
         <label>Filtrera på rederi</label>
         <select id="rederi-filter" class="sb-select"></select>
+      </div>
+      <div class="sb-status">
+        <label>Visa i listan</label>
+        <div class="status-rad">
+          <button type="button" class="status-btn aktiv" id="show-all-btn">Visa alla</button>
+          <button type="button" class="status-btn" id="show-upcoming-btn">Visa bara kommande</button>
+        </div>
       </div>
       <div class="sb-apply">
         <label>Uppdatera visning</label>
@@ -543,6 +556,7 @@ let valtRederi = 'alla';
 let pendingViewMode = 'ankomst';
 let pendingDateStr = '';
 let pendingRederi = 'alla';
+let visaEndastKommande = false;
 let visadeRader = [];  // för Excel-export
 let DYNAMIC_ROUTE_FLEETS = {};
 
@@ -853,13 +867,34 @@ function normaliseraAnkomsttid(raw, depInfo, depVdag, arrPort){
     || byggFrånDirektaTider(raw, depInfo, arrPort)
     || byggFallbackAnkomst(raw);
 }
-function ärPasseradAvgång(depInfo, depDatumBas = valdDat){
-  if(!Number.isFinite(depInfo.absSw)) return false;
+function ärPasseradTidpunkt(dayOffset, minutes, datumBas = valdDat){
+  if(!Number.isFinite(dayOffset) || !Number.isFinite(minutes)) return false;
   const nu = stockholmNu();
-  const depDatum = isoEfterOffset(depDatumBas, depInfo.dayOffset);
-  if(depDatum < nu.datum) return true;
-  if(depDatum > nu.datum) return false;
-  return depInfo.minutes <= nu.minuter;
+  const datum = isoEfterOffset(datumBas, dayOffset);
+  if(datum < nu.datum) return true;
+  if(datum > nu.datum) return false;
+  return minutes <= nu.minuter;
+}
+function svenskTidpunktFörRad(depInfo, ankInfo, motSverige, franSverige){
+  if(motSverige && !franSverige && Number.isFinite(ankInfo.sortAbs)){
+    return {
+      typ:'ankomst',
+      dayOffset:ankInfo.dayOffset,
+      minutes:mod(ankInfo.sortAbs, 1440),
+    };
+  }
+  if(franSverige && Number.isFinite(depInfo.absSw)){
+    return {
+      typ:'avgång',
+      dayOffset:depInfo.dayOffset,
+      minutes:depInfo.minutes,
+    };
+  }
+  return {
+    typ:'okänd',
+    dayOffset:null,
+    minutes:null,
+  };
 }
 function ruttNyckel(rederi, avghamn, ankhamn){
   return `${normRederi(rederi||'')}|${avghamn||''}|${ankhamn||''}`;
@@ -1197,7 +1232,10 @@ async function init(){
     pendingRederi = e.target.value || 'alla';
     uppdateraPendingInfo();
   });
+  document.getElementById('show-all-btn').addEventListener('click', ()=>sättKommandeFilter(false));
+  document.getElementById('show-upcoming-btn').addEventListener('click', ()=>sättKommandeFilter(true));
   document.getElementById('apply-controls').addEventListener('click', tillämpaVal);
+  synkaKommandeKnappar();
 
   await hämtaFartyg(dStr(nu));
   rendera();
@@ -1232,6 +1270,15 @@ function synkaVyKnappar(){
     btn.classList.toggle('aktiv', btn.dataset.vy === viewMode);
   });
 }
+function synkaKommandeKnappar(){
+  document.getElementById('show-all-btn').classList.toggle('aktiv', !visaEndastKommande);
+  document.getElementById('show-upcoming-btn').classList.toggle('aktiv', visaEndastKommande);
+}
+function sättKommandeFilter(endastKommande){
+  visaEndastKommande = !!endastKommande;
+  synkaKommandeKnappar();
+  if(DATA) rendera();
+}
 function uppdateraPendingInfo(){
   const d = parseDate(pendingDateStr || dStr(valdDat));
   const rederiTxt = pendingRederi === 'alla' ? 'alla rederier' : pendingRederi;
@@ -1252,6 +1299,10 @@ function uppdateraRederiFilter(rader){
 function filtreraPåRederi(rader){
   if(valtRederi === 'alla') return rader.slice();
   return rader.filter(r=>r.rederi === valtRederi);
+}
+function filtreraPåAktualitet(rader){
+  if(!visaEndastKommande) return rader.slice();
+  return rader.filter(r=>!r.passerad);
 }
 
 function läggTillÖversiktspost(map, rederi, avghamn, ankhamn, fartyg){
@@ -1399,21 +1450,24 @@ function rendera(){
     märk(ankTillSverige, 'inkommande');
     const allaHändelser = [...ankTillSverige, ...frånSverige]
       .sort((a,b)=>(a._sortSvenskHändelse??Number.MAX_SAFE_INTEGER) - (b._sortSvenskHändelse??Number.MAX_SAFE_INTEGER));
-    const allaFiltrerade = filtreraPåRederi(allaHändelser);
+    const allaFiltrerade = filtreraPåAktualitet(filtreraPåRederi(allaHändelser));
     fyll('tb-alla', allaFiltrerade, 'sek-alla', 'cnt-alla');
     visadeRader = allaFiltrerade;
   } else if(viewMode==='mot'){
     märk(motFiltrerade, 'motsverige');
-    fyllFilter(motFiltrerade);
-    visadeRader = motFiltrerade;
+    const rader = filtreraPåAktualitet(motFiltrerade);
+    fyllFilter(rader);
+    visadeRader = rader;
   } else if(viewMode==='ankomst'){
     märk(ankFiltrerade, 'inkommande');
-    fyllFilter(ankFiltrerade);
-    visadeRader = ankFiltrerade;
+    const rader = filtreraPåAktualitet(ankFiltrerade);
+    fyllFilter(rader);
+    visadeRader = rader;
   } else {
     märk(franFiltrerade, 'utgaende');
-    fyllFilter(franFiltrerade);
-    visadeRader = franFiltrerade;
+    const rader = filtreraPåAktualitet(franFiltrerade);
+    fyllFilter(rader);
+    visadeRader = rader;
   }
 }
 
@@ -1423,11 +1477,12 @@ function bygRad(rad, r, länk, depDatum = valdDat){
   const avgMeta = hämtaAvgangsMeta(rad, depDatum);
   const ankInfo = byggExaktAnkomst(avgMeta, depInfo, depDatum, rad.ankhamn||'')
     || normaliseraAnkomsttid(rad.anktid||'', depInfo, depVd, rad.ankhamn||'');
-  const passerad = ärPasseradAvgång(depInfo, depDatum);
   const depDate = isoEfterOffset(depDatum, depInfo.dayOffset);
   const arrDate = isoEfterOffset(depDatum, ankInfo.dayOffset);
   const motSverige = rad.mot_sverige===true || SVENSKA_HAMNAR.has(rad.ankhamn);
   const franSverige = rad.fran_sverige===true || SVENSKA_HAMNAR.has(rad.avghamn);
+  const svenskTidpunkt = svenskTidpunktFörRad(depInfo, ankInfo, motSverige, franSverige);
+  const passerad = ärPasseradTidpunkt(svenskTidpunkt.dayOffset, svenskTidpunkt.minutes, depDatum);
   const fetKolumn = (motSverige && !franSverige) ? 'ank' : 'avg';
   return {
     rederi:r,
@@ -1450,6 +1505,7 @@ function bygRad(rad, r, länk, depDatum = valdDat){
     _arrDate:arrDate,
     _motSverige:motSverige,
     _franSverige:franSverige,
+    _svenskHändelseTyp:svenskTidpunkt.typ,
     _sortAvg:depInfo.absSw,
     _sortAnk:ankInfo.sortAbs,
     _sortAvgDag:Number.isFinite(depInfo.absSw) ? mod(depInfo.absSw, 1440) : Number.MAX_SAFE_INTEGER,
@@ -1549,11 +1605,12 @@ function exportExcel(){
   const vyTxt = VIEW_LABELS[viewMode] || 'Lista';
   const vdagTxt = VDL[valdDat.getDay()];
   const rederiTxt = valtRederi === 'alla' ? 'Alla rederier' : valtRederi;
+  const statusTxt = visaEndastKommande ? 'Bara kommande' : 'Alla turer';
   const uppdaterad = DATA?.meta?.uppdaterad || '';
 
   // Två-rads förklarings-header (slås ihop) + tom rad + tabellrubriker + data
   const titel = `Färjor Sverige — ${vyTxt}`;
-  const subtitel = `${vdagTxt} ${datum} · Filter: ${rederiTxt} · Antal rader: ${visadeRader.length}${uppdaterad?`  ·  Källdata uppdaterad: ${uppdaterad}`:''}`;
+  const subtitel = `${vdagTxt} ${datum} · Filter: ${rederiTxt} · Status: ${statusTxt} · Antal rader: ${visadeRader.length}${uppdaterad?`  ·  Källdata uppdaterad: ${uppdaterad}`:''}`;
 
   const huvud = [
     'RIKTNING','REDERI','AVG TID (SE)','AVG DAG','ANK TID (SE)','ANK DAG',
