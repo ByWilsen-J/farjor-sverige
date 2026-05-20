@@ -425,6 +425,17 @@ const FKODER = {
   'CI':'Viking Cinderella','GA':'Gabriella','GR':'Viking Grace',
   'GL':'Viking Glory','XP':'Viking XPRS','AB':'Amorella',
 };
+const TT_LINE_NAMN_TILL_KOD = {
+  'Tom Sawyer':'TS',
+  'Nils Holgersson':'NH',
+  'Huckleberry Finn':'HF',
+  'Peter Pan':'PP',
+  'Marco Polo':'MP',
+  'Nils Dacke':'ND',
+  'Tinker Bell':'TB',
+  'Robin Hood':'RH',
+  'Thomas Becket':'TB',
+};
 const KANDA_FARTYG = [
   'Aurora Botnia','M/S Eckerö',
   'Viking Glory','Viking Cinderella','Birka Gotland','Gabriella','Viking Grace','Viking XPRS',
@@ -960,12 +971,46 @@ function normaliseraAvgangsMeta(meta){
     kalla: meta.kalla || '',
   };
 }
+function ttLineKodFörNamn(namn){
+  return TT_LINE_NAMN_TILL_KOD[String(namn||'').trim()] || String(namn||'').trim();
+}
+function komprimeraTtLineFallback(fartyg){
+  const delar = splitFartygLista(fartyg).map(ttLineKodFörNamn).filter(Boolean);
+  if(!delar.length) return '';
+  return [...new Set(delar)].join(' / ');
+}
+function hämtaTtLineMetaMedTolerans(rad, depDate, måltid){
+  const targetMin = tidTillMinuter(måltid);
+  if(targetMin == null) return null;
+  const poster = (DATA.avgangar_datum||{})[dStr(depDate)] || {};
+  const prefix = `TT-Line:${rad.avghamn}→${rad.ankhamn}:`;
+  const kandidater = Object.entries(poster)
+    .filter(([nyckel])=>nyckel.startsWith(prefix))
+    .map(([nyckel, meta])=>{
+      const avgTid = nyckel.slice(-5);
+      const avgMin = tidTillMinuter(avgTid);
+      return {
+        avgTid,
+        avgMin,
+        diff: avgMin == null ? Number.MAX_SAFE_INTEGER : Math.abs(avgMin - targetMin),
+        meta: normaliseraAvgangsMeta(meta),
+      };
+    })
+    .filter(k=>k.avgMin != null && k.diff <= 60)
+    .sort((a,b)=>a.diff - b.diff);
+  if(!kandidater.length) return null;
+  if(kandidater[1] && kandidater[1].diff === kandidater[0].diff) return null;
+  return kandidater[0].meta;
+}
 function hämtaAvgangsMeta(rad, depDate = valdDat){
   const avgt = rad.avgtid_raw || rad.avgtid || '';
   const ds = dStr(depDate);
   const rederi = normRederi(rad.rederi || '');
   const key = `${rederi}:${rad.avghamn}→${rad.ankhamn}:${avgt}`;
-  return normaliseraAvgangsMeta((DATA.avgangar_datum||{})[ds]?.[key]);
+  const exakt = normaliseraAvgangsMeta((DATA.avgangar_datum||{})[ds]?.[key]);
+  if(exakt?.fartyg || exakt?.anktid || exakt?.ankomstdatum) return exakt;
+  if(rederi === 'TT-Line') return hämtaTtLineMetaMedTolerans(rad, depDate, avgt);
+  return exakt;
 }
 function byggExaktAnkomst(meta, depInfo, depDate, arrPort){
   if(!meta?.anktid) return null;
@@ -1097,6 +1142,9 @@ function getFar(rad, depDate = valdDat){
   if(r==='DFDS'){
     const dep=DFDS_PORTER[rad.avghamn],arr=DFDS_PORTER[rad.ankhamn];
     if(dep&&arr){const dk=dfdsCache[`${dep}→${arr}:${ds}:${avgt}`];if(dk) return dk;}
+  }
+  if(r==='TT-Line'){
+    return komprimeraTtLineFallback(namnetFrånAnm(rad.anmarkning||'') || routeFleetFallback(rad, r));
   }
   // 6. Anmärkning
   return namnetFrånAnm(rad.anmarkning||'') || routeFleetFallback(rad, r);

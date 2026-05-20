@@ -35,7 +35,7 @@ SHIP_CODES = {
     "PP": "Peter Pan",
     "MP": "Marco Polo",
     "ND": "Nils Dacke",
-    "TB": "Thomas Becket",
+    "TB": "Tinker Bell",
     "RH": "Robin Hood",
 }
 

@@ -8,6 +8,11 @@ Pågående men klart förbättrad. Sidan renderar nu en renare tabellvy där all
 
 ## Senaste ändringar
 
+- 2026-05-20: Förbättrade TT-Line-fartygslogiken i `index.html`.
+  - TT-Line använder nu same-day-matchning med tolerans mot `avgangar_datum` på exakt samma rutt när dagsvyn och veckoschemat skiljer sig något i avgångstid.
+  - Det gör att aktuellt fartyg från TT-Lines dagsvy kan användas i fler rader i stället för att falla tillbaka till stora rotationslistor.
+  - När exakt eller tolerant dagsmatchning ändå saknas visas TT-Lines fallback som kompakta fartygskoder, t.ex. `HF`, `ND`, `PP`, i stället för långa namnlistor.
+  - Synkade också TT-Lines `TB`-kod mellan frontend och scraper så att både nuvarande och äldre värden komprimeras till samma kortformat.
 - 2026-05-20: Rättade passerad-logik och lade till kommandefilter i `index.html`.
   - Inkommande rader markeras nu som passerade först när svensk ankomsttid har passerat, inte när utländsk avgångstid har passerat.
   - Utgående rader markeras fortsatt utifrån svensk avgångstid, så samma regel används konsekvent i blandad vy och i respektive riktning.
