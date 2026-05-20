@@ -4,10 +4,21 @@ GitHub-sida/statisk webbsida för färjetidtabeller till och från Sverige. Huvu
 
 ## Aktuell status
 
-Pågående men klart förbättrad. Sidan renderar nu en renare tabellvy där alla valbara kontroller ligger i högerpanelen, med rederifilter, rederiöversikt och färgkodade rederinamn. `index.html` och `farjor.html` är åter synkade. Stena Line `Göteborg ↔ Frederikshavn` finns nu i `farjor_data.json` och ska visas i tidtabellen. Fartygskolumnen hämtar serverförberedda fartygsnamn där möjligt och visar tydlig rotationsfallback när exakt tur-fartyg saknas.
+Pågående men klart förbättrad. Sidan renderar nu en renare tabellvy där alla valbara kontroller ligger i högerpanelen, med rederifilter, rederiöversikt och färgkodade rederinamn. `index.html` och `farjor.html` är åter synkade. Standardvyn är nu `Ankomster till Sverige` för dagens datum, och `Alla ankomster / avgångar` visas i en enda gemensam tabell utan separat pax-/fraktuppdelning. Fartygskolumnen hämtar serverförberedda fartygsnamn där möjligt och visar nu bredare ruttfallback även när exakt tur-fartyg saknas.
 
 ## Senaste ändringar
 
+- 2026-05-20: Gjorde om visningslogiken, standardvyn och ruttkomplettering i `index.html`, `farjor.html` och `farjor_data.json`.
+  - Tog bort dagfliksknapparna helt och införde i stället en tydlig knappstyrd tillämpning av datum/listval/rederifilter i sidpanelen.
+  - Sidan startar nu i `Ankomster till Sverige` för dagens datum.
+  - `Alla ankomster / avgångar` ligger nu i en enda tabell och sorteras efter svensk hamnhändelse, dvs ankomsttid till svensk hamn respektive avgångstid från svensk hamn.
+  - `Ankomster till Sverige` bygger nu på ankomstdatum till svensk hamn, inklusive turer som avgått föregående dygn.
+  - Flyttade kolumnen `Överfart` till efter `Fartyg` och högerställde `Avg.hamn`.
+  - List-/sektionstitlar visar nu också valt datum och veckodag direkt i rubriken.
+  - Lade till bredare dynamiska ruttfallbacks från `fartyg_datum` så att färjenamnskolumnen fylls även när exakta avgångstider inte matchar veckoschemat.
+  - Lät datumrader från `fartyg_datum` komplettera saknade/underrapporterade TT-Line- och DFDS-rutter till/från Sverige i UI:t.
+  - Lade in Finnlines `Malmö ↔ Świnoujście` i `farjor_data.json` med officiella tider från Finnlines ruttsida.
+  - Verifierade att Unity Line-/POLSCA-trafiken `Świnoujście ↔ Trelleborg` kommer med i kandidatunderlaget via datumdatan och nu syns i logiken för ankomster/avgångar.
 - 2026-05-20: Lade in Stena Line `Göteborg ↔ Frederikshavn` i datalagret.
   - Hämtade officiella veckotider från Stena Line Freight route `GOFR` och skrev in rutten i `farjor_data.json`.
   - Lade till `Frederikshavn` i hamnlistan och `FRH` som UI-kod.
@@ -57,6 +68,10 @@ Pågående men klart förbättrad. Sidan renderar nu en renare tabellvy där all
 
 ## Beslut och motiveringar
 
+- `Alla ankomster / avgångar` ska vara en enda kronologisk tabell, inte delas upp efter färjetyp. Användarbehovet är att se svenska hamnhändelser i tidsordning oavsett om turen är pax, RoRo eller frakt.
+- Datum, listval och rederifilter ska inte auto-uppdatera vid varje klick/ändring. De ska först väljas och sedan tillämpas med en knapp för att ge förutsägbar styrning.
+- För `Ankomster till Sverige` måste urvalet baseras på ankomstdatum i svensk hamn, inte bara avgångsdatum från utrikeshamn. Därför tittar frontend nu bakåt flera dygn i källdatat.
+- När officiella eller semiofficiella datumrader redan finns i `fartyg_datum` används de som komplement för att få in rutter som saknas eller är underrepresenterade i veckoschemat.
 - Fartygsnamn ska bara visas när datan faktiskt ser ut som fartygsdata. Verifierings-/källtext ska ligga kvar i info-tooltip, inte i fartygskolumnen.
 - För rader där bara en rotationslista finns i källdatan visas rotationslistan, eftersom exakt avgångsfartyg saknas i nuvarande JSON.
 - `Polferries`, `POLSCA` och `Unity Line` visas gemensamt som `Polsca` i UI för att matcha nuvarande användarbehov och den sammanslagna POLSCA-brandingen från 2026-03-30.
@@ -68,7 +83,7 @@ Pågående men klart förbättrad. Sidan renderar nu en renare tabellvy där all
 
 ## Pågående arbete
 
-- Fartygskolumnen är stabilare i UI, men datatäckningen är inte komplett.
+- Fartygskolumnen är stabilare i UI, men datatäckningen är inte komplett för alla rutter utan serverförberedd dagsdata.
 - Rederiöversikten och rederifiltret fungerar i UI, men bygger fortfarande på nuvarande JSON + fallback snarare än fullständig route-import för alla rederier.
 - POLSCA-rader använder fortfarande gemensam datakälla utan separat Unity-import.
 - Projektroten innehåller flera rapport- och testfiler som bör sorteras in i `docs/` eller `archive/` vid separat städpass.
@@ -78,16 +93,18 @@ Pågående men klart förbättrad. Sidan renderar nu en renare tabellvy där all
 - Vissa rader saknar fortfarande fartygsnamn när API:ets avgångstid avviker från det normaliserade veckoschemat, t.ex. försenade/ändrade avgångar.
 - Viking Lines server-side API-anrop ger 403 Forbidden i `update_fartyg.py`. Frontend/anmarkningsfallback ger fortfarande vissa Viking-namn, men API-flödet behöver återupptäckas.
 - Unity Line finns inte som egen datumkälla i nuvarande JSON, så full separering eller exakt avgångsimport kräver ny importkedja.
-- Officiellt bekräftade rutter saknas fortfarande i `farjor_data.json`, särskilt:
-  - TT-Line `Travemünde → Trelleborg`, `Świnoujście → Trelleborg` och `Klaipėda ↔ Karlshamn` i veckoschemat
+- Officiellt bekräftade rutter saknas fortfarande helt eller delvis i själva veckoschemat `farjor_data.json`, även om flera nu kompletteras i UI från datumdata:
+  - TT-Line `Travemünde → Trelleborg`, `Świnoujście → Trelleborg` och delar av `Klaipėda ↔ Trelleborg`
+  - Unity Line/POLSCA `Świnoujście ↔ Trelleborg` utanför nuvarande datumperiod
   - Eventuell framtida POLSCA `Gdańsk ↔ Karlshamn` när den faktiskt öppnar
 - Flera filer i arbetskopian verkar ha namn-/normaliseringsdiffar i git, så större filflyttar bör göras försiktigt.
 
 ## Nästa steg
 
 - Bygg eller hitta en riktig importkälla för Unity Line/POLSCA-datum så `Świnoujście ↔ Ystad` och `Świnoujście ↔ Trelleborg` inte behöver förlita sig på blandade schema-/fallbackkällor.
-- Lägg till officiellt verifierade men saknade rutter i `farjor_data.json`, med prioritet:
-  - TT-Line kompletta Sverigekopplade riktningar och Karlshamn-rutter
+- Lägg till officiellt verifierade men saknade rutter direkt i veckoschemat `farjor_data.json`, med prioritet:
+  - TT-Line kompletta Sverigekopplade riktningar och Klaipėda-/Trelleborg-rutter
+  - Finnlines `Malmö ↔ Świnoujście` i framtida genereringskedja, inte bara manuellt i JSON
 - Återupptäck Viking Lines aktuella API eller lägg till en robust server-side fallback.
 - Överväg fuzzy matching/tolerans för avgångstider som ändrats av rederiets live-API men ännu inte finns i veckoschemat.
 - Städa projektroten genom att flytta analysrapporter till `docs/` och test-/låsfiler till `archive/`.
@@ -104,6 +121,10 @@ Pågående men klart förbättrad. Sidan renderar nu en renare tabellvy där all
 - [ ] Tidsmatchning med tolerans/fallback för live-ändrade avgångar.
 - [ ] Unity Line / POLSCA som egen datumimport i JSON, inte bara UI-normalisering.
 - [x] Lägg till Stena Line `Göteborg ↔ Frederikshavn` i datalagret med verifierad tidtabell.
+- [x] Frontend: en enda gemensam tabell för `Alla ankomster / avgångar`.
+- [x] Frontend: knappstyrd tillämpning av datum/listval/rederifilter.
+- [x] Frontend: `Ankomster till Sverige` baseras på verkligt ankomstdatum till svensk hamn.
+- [x] Lägg till Finnlines `Malmö ↔ Świnoujście` i datalagret.
 - [ ] Lägg till saknade TT-Line-riktningar/rutter i datalagret med verifierad tidtabell.
 - [ ] Projektstruktur: skapa/uppdatera `docs/`, `archive/`, `temp/`, `exports/`.
 - [ ] Kontrollera GitHub Actions efter att fler skrapare kopplats in.
