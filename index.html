@@ -853,10 +853,10 @@ function normaliseraAnkomsttid(raw, depInfo, depVdag, arrPort){
     || byggFrånDirektaTider(raw, depInfo, arrPort)
     || byggFallbackAnkomst(raw);
 }
-function ärPasseradAvgång(depInfo){
+function ärPasseradAvgång(depInfo, depDatumBas = valdDat){
   if(!Number.isFinite(depInfo.absSw)) return false;
   const nu = stockholmNu();
-  const depDatum = isoEfterOffset(valdDat, depInfo.dayOffset);
+  const depDatum = isoEfterOffset(depDatumBas, depInfo.dayOffset);
   if(depDatum < nu.datum) return true;
   if(depDatum > nu.datum) return false;
   return depInfo.minutes <= nu.minuter;
@@ -1423,9 +1423,9 @@ function bygRad(rad, r, länk, depDatum = valdDat){
   const avgMeta = hämtaAvgangsMeta(rad, depDatum);
   const ankInfo = byggExaktAnkomst(avgMeta, depInfo, depDatum, rad.ankhamn||'')
     || normaliseraAnkomsttid(rad.anktid||'', depInfo, depVd, rad.ankhamn||'');
-  const passerad = ärPasseradAvgång(depInfo);
+  const passerad = ärPasseradAvgång(depInfo, depDatum);
   const depDate = isoEfterOffset(depDatum, depInfo.dayOffset);
-  const arrDate = avgMeta?.ankomstdatum || isoEfterOffset(depDatum, ankInfo.dayOffset);
+  const arrDate = isoEfterOffset(depDatum, ankInfo.dayOffset);
   const motSverige = rad.mot_sverige===true || SVENSKA_HAMNAR.has(rad.ankhamn);
   const franSverige = rad.fran_sverige===true || SVENSKA_HAMNAR.has(rad.avghamn);
   const fetKolumn = (motSverige && !franSverige) ? 'ank' : 'avg';
@@ -1538,6 +1538,13 @@ function riktningsText(rad){
   return '';
 }
 function exportExcel(){
+  if(typeof XLSX === 'undefined' || !XLSX?.utils || !XLSX?.writeFile){
+    const msg = 'Excel-export kunde inte starta eftersom exportbiblioteket inte laddades. Ladda om sidan och prova igen.';
+    console.error(msg);
+    if(typeof window !== 'undefined' && typeof window.alert === 'function') window.alert(msg);
+    return;
+  }
+
   const datum = dStr(valdDat);
   const vyTxt = VIEW_LABELS[viewMode] || 'Lista';
   const vdagTxt = VDL[valdDat.getDay()];

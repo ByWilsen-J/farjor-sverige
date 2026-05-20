@@ -4,10 +4,14 @@ GitHub-sida/statisk webbsida för färjetidtabeller till och från Sverige. Huvu
 
 ## Aktuell status
 
-Pågående men klart förbättrad. Sidan renderar nu en renare tabellvy där alla valbara kontroller ligger i högerpanelen, med rederifilter, rederiöversikt och färgkodade rederinamn. `index.html` och `farjor.html` är åter synkade. Standardvyn är nu `Ankomster till Sverige` för dagens datum, och `Alla ankomster / avgångar` visas i en enda gemensam tabell utan separat pax-/fraktuppdelning. Fartygskolumnen hämtar serverförberedda fartygsnamn där möjligt och visar nu bredare ruttfallback även när exakt tur-fartyg saknas.
+Pågående men klart förbättrad. Sidan renderar nu en renare tabellvy där alla valbara kontroller ligger i högerpanelen, med rederifilter, rederiöversikt och färgkodade rederinamn. `index.html` är huvudvyn och `farjor.html` är nu en redirect till startsidan. Standardvyn är nu `Ankomster till Sverige` för dagens datum, och `Alla ankomster / avgångar` visas i en enda gemensam tabell utan separat pax-/fraktuppdelning. Fartygskolumnen hämtar serverförberedda fartygsnamn där möjligt och visar nu bredare ruttfallback även när exakt tur-fartyg saknas.
 
 ## Senaste ändringar
 
+- 2026-05-20: Teknisk QA och datumlogik-fix i `index.html`.
+  - Rättade `passerad`-logiken så att tidigare avgångar bedöms mot radens faktiska avgångsdatum, inte bara valt visningsdatum.
+  - Rättade ankomstdatum för exakt importerade datumrader så att nattankomster grupperas på verkligt ankomstdygn även när källmetadatan anger samma datum som avgången.
+  - Lade till defensiv felhantering i Excel-exporten så sidan inte kraschar om `XLSX`-biblioteket från CDN inte har laddats.
 - 2026-05-20: Gjorde om visningslogiken, standardvyn och ruttkomplettering i `index.html`, `farjor.html` och `farjor_data.json`.
   - Tog bort dagfliksknapparna helt och införde i stället en tydlig knappstyrd tillämpning av datum/listval/rederifilter i sidpanelen.
   - Sidan startar nu i `Ankomster till Sverige` för dagens datum.
