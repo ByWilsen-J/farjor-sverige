@@ -137,6 +137,8 @@ def fetch_all(date_from: date = None, date_to: date = None) -> list[dict]:
         for sailing in data:
             ds = sailing.get("departureDate", "")
             avgtid = (sailing.get("departureTime", "") or "")[:5]
+            ankdatum = sailing.get("arrivalDate", "") or ""
+            anktid = (sailing.get("arrivalTime", "") or "")[:5]
             if not ds or not avgtid:
                 continue
             fartyg = normalize_ship(sailing.get("shipName", ""), sailing.get("shipCode", ""))
@@ -145,6 +147,8 @@ def fetch_all(date_from: date = None, date_to: date = None) -> list[dict]:
                 "avghamn": PORT_NAMES.get(dep, dep),
                 "ankhamn": PORT_NAMES.get(arr, arr),
                 "avgtid": avgtid,
+                "ankomstdatum": ankdatum,
+                "anktid": anktid,
                 "fartyg": fartyg,
                 "rederi": "Finnlines",
             })

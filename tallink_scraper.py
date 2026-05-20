@@ -123,7 +123,10 @@ def extract_sailings(data: dict, dep: str, arr: str) -> list[dict]:
     for ds, trips in data["trips"].items():
         for sail in trips.get("outwards", []):
             dep_dt = sail.get("departureIsoDate", "")   # "2026-05-20T16:00"
+            arr_dt = sail.get("arrivalIsoDate", "")
             avgtid = dep_dt[11:16] if len(dep_dt) >= 16 else ""
+            ankdatum = arr_dt[:10] if len(arr_dt) >= 10 else ""
+            anktid = arr_dt[11:16] if len(arr_dt) >= 16 else ""
             if not avgtid:
                 continue
             fartyg = resolve_fartyg(sail.get("shipCode", ""))
@@ -132,6 +135,8 @@ def extract_sailings(data: dict, dep: str, arr: str) -> list[dict]:
                 "avghamn":  PORT_NAMES.get(dep, dep),
                 "ankhamn":  PORT_NAMES.get(arr, arr),
                 "avgtid":   avgtid,
+                "ankomstdatum": ankdatum,
+                "anktid": anktid,
                 "fartyg":   fartyg,
                 "rederi":   rederi,
             })

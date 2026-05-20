@@ -152,6 +152,11 @@ def parse_date_label(label: str) -> str:
     return m.group(1) if m else ""
 
 
+def parse_time_only(text: str) -> str:
+    m = re.search(r"\b(\d{1,2}:\d{2})\b", text or "")
+    return m.group(1).zfill(5) if m else ""
+
+
 def get_nonce() -> Optional[str]:
     try:
         resp = requests.get(TIMETABLE_URL, headers=HEADERS, timeout=20)
@@ -214,11 +219,14 @@ def fetch_all(date_from: date = None, date_to: date = None) -> list[dict]:
             avghamn, ankhamn = split_direction(row.get("direction", ""))
             if not ds or not avghamn or not ankhamn or not row.get("dep"):
                 continue
+            anktid = parse_time_only(row.get("arr", ""))
             all_sailings.append({
                 "date": ds,
                 "avghamn": avghamn,
                 "ankhamn": ankhamn,
                 "avgtid": row["dep"],
+                "ankomstdatum": ds,
+                "anktid": anktid,
                 "fartyg": normalize_ship(row.get("vessel", "")),
                 "rederi": "Stena Line",
             })

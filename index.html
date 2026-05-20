@@ -50,7 +50,8 @@
     tbody td{padding:6px 8px;vertical-align:middle}
     tbody td:first-child{padding-left:14px}
     .tid-cell{display:flex;flex-direction:column;gap:1px}
-    .tid{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+    .tid{font-variant-numeric:tabular-nums;font-weight:400;white-space:nowrap}
+    .tid.fet{font-weight:700}
     .vtid-dag{font-size:.68rem;color:var(--dim);font-weight:500;letter-spacing:.02em}
     .overfart{white-space:nowrap;color:var(--dim);font-variant-numeric:tabular-nums}
     .hamn-kod{font-variant-numeric:tabular-nums;font-weight:600;letter-spacing:.04em}
@@ -64,10 +65,6 @@
     .lnk-c{width:36px;text-align:center}
     .tlnk{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:5px;background:var(--grå-ljus);border:1px solid var(--kant);color:var(--blå);text-decoration:none;font-size:.72rem;transition:all .15s}
     .tlnk:hover{background:var(--blå);color:var(--vit);border-color:var(--blå)}
-    tr.grå{background:#f8fafc}
-    tr.grå td,.grå .tid,.grå .vtid-dag,.grå .rl{color:#9ca3af!important}
-    tr.grå .fartyg,.grå .overfart{color:#c0c6d1}
-    tr.grå:hover{background:#eef2f7}
     /* ── Info-tooltip ── */
     .info-c{width:28px;text-align:center}
     .info-knapp{position:relative;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:none;border:1px solid #d1d5db;color:#9ca3af;font-size:.7rem;cursor:pointer;font-style:italic;font-weight:700;font-family:Georgia,serif;vertical-align:middle;transition:all .15s;user-select:none}
@@ -249,7 +246,7 @@
       <div class="sb-hdr">Om sidan</div>
       <div class="sb-liten">
         Fartygsnamn hämtas live när rederiet erbjuder det, annars från schemalagda uppdateringar i datalagret var 14:e dag eller som tydlig ruttrotation när exakt tur-fartyg saknas.<br><br>
-        Alla tider visas i svensk tid. Passerade avgångar markeras visuellt i tabellen utan extra tidstext.
+        Alla tider visas i svensk tid.
       </div>
       <div class="sb-meta" id="upd"></div>
     </div>
@@ -510,6 +507,11 @@ function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 function pad2(n){ return String(n).padStart(2,'0'); }
 function mod(n,m){ return ((n % m) + m) % m; }
 function floorDiv(n,d){ return Math.floor(n / d); }
+function dagarMellanIso(startIso, endIso){
+  const start = parseDate(startIso);
+  const end = parseDate(endIso);
+  return Math.round((end - start) / 86400000);
+}
 function tidTillMinuter(tid){
   const m = String(tid||'').match(/(\d{2}):(\d{2})/);
   return m ? (parseInt(m[1],10) * 60) + parseInt(m[2],10) : null;
@@ -825,6 +827,13 @@ function byggDynamiskaRuttFallbacks(){
     });
   };
 
+  Object.entries(DATA.avgangar_datum||{}).forEach(([, poster])=>{
+    Object.entries(poster||{}).forEach(([nyckel, meta])=>{
+      const m = nyckel.match(/^([^:]+):(.+?)→(.+?):\d{2}:\d{2}$/);
+      if(!m) return;
+      läggTill(m[1], m[2], m[3], normaliseraAvgangsMeta(meta)?.fartyg || '');
+    });
+  });
   Object.entries(DATA.fartyg_datum||{}).forEach(([, poster])=>{
     Object.entries(poster||{}).forEach(([nyckel, fartyg])=>{
       const m = nyckel.match(/^([^:]+):(.+?)→(.+?):\d{2}:\d{2}$/);
@@ -841,6 +850,40 @@ function byggDynamiskaRuttFallbacks(){
 }
 function allaRuttFallbacks(){
   return {...DYNAMIC_ROUTE_FLEETS, ...ROUTE_FLEETS};
+}
+function normaliseraAvgangsMeta(meta){
+  if(!meta) return null;
+  if(typeof meta === 'string') return { fartyg: meta, anktid: '', ankomstdatum: '' };
+  return {
+    fartyg: meta.fartyg || '',
+    anktid: meta.anktid || '',
+    ankomstdatum: meta.ankomstdatum || '',
+    kalla: meta.kalla || '',
+  };
+}
+function hämtaAvgangsMeta(rad, depDate = valdDat){
+  const avgt = rad.avgtid_raw || rad.avgtid || '';
+  const ds = dStr(depDate);
+  const rederi = normRederi(rad.rederi || '');
+  const key = `${rederi}:${rad.avghamn}→${rad.ankhamn}:${avgt}`;
+  return normaliseraAvgangsMeta((DATA.avgangar_datum||{})[ds]?.[key]);
+}
+function byggExaktAnkomst(meta, depInfo, depDate, arrPort){
+  if(!meta?.anktid) return null;
+  const arrMinutes = tidTillMinuter(meta.anktid);
+  if(arrMinutes == null) return null;
+  const depIso = dStr(depDate);
+  const arrIso = meta.ankomstdatum || depIso;
+  let localDayOffset = dagarMellanIso(depIso, arrIso);
+  let abs = absolutSvenskMin(localDayOffset, arrMinutes, hamnTz(arrPort));
+  while((abs - depInfo.absSw) <= 0) abs += 1440;
+  const info = infoFrånAbsolut(abs);
+  return {
+    text: info.tid,
+    dayOffset: info.dayOffset,
+    sortAbs: abs,
+    duration: formatVaraktighet(abs - depInfo.absSw),
+  };
 }
 function byggExtraRadFrånFartygDatum(nyckel, fartyg){
   const m = nyckel.match(/^([^:]+):(.+?)→(.+?):(\d{2}:\d{2})$/);
@@ -864,6 +907,31 @@ function byggExtraRadFrånFartygDatum(nyckel, fartyg){
     verifiering:info.verifiering,
     kalla:info.kalla,
     fartyg,
+  };
+}
+function byggRadFrånAvgangsMeta(nyckel, meta){
+  const m = nyckel.match(/^([^:]+):(.+?)→(.+?):(\d{2}:\d{2})$/);
+  if(!m) return null;
+  const routeKey = ruttNyckel(m[1], m[2], m[3]);
+  const info = EXTRA_ROUTE_INFO[routeKey] || {};
+  const normaliserad = normaliseraAvgangsMeta(meta);
+  return {
+    kategori: info.kategori || (/^(DFDS|Finnlines)$/i.test(m[1]) ? 'RORO' : 'Passagerare'),
+    rederi: m[1],
+    rutt: `${m[2]}–${m[3]}`,
+    avghamn: m[2],
+    ankhamn: m[3],
+    avgtid: m[4],
+    avgtid_raw: m[4],
+    anktid: normaliserad?.anktid || info.anktid || '',
+    nasta_dag: !!(normaliserad?.ankomstdatum),
+    mot_sverige: SVENSKA_HAMNAR.has(m[3]),
+    fran_sverige: SVENSKA_HAMNAR.has(m[2]),
+    anmarkning: normaliserad?.fartyg ? `${normaliserad.fartyg}. Exakt datumrad från rederiets tidtabell.` : 'Exakt datumrad från rederiets tidtabell.',
+    verifiering: info.verifiering || 'Verifierad via datumimport.',
+    kalla: normaliserad?.kalla || info.kalla || getLnk(normRederi(m[1])),
+    fartyg: normaliserad?.fartyg || '',
+    ankomstdatum: normaliserad?.ankomstdatum || '',
   };
 }
 
@@ -908,8 +976,10 @@ function routeFleetFallback(rad, rederi){
 
 function getFar(rad, depDate = valdDat){
   const avgt=rad.avgtid_raw||rad.avgtid||'';
+  const meta = hämtaAvgangsMeta(rad, depDate);
   // 1. Polsca-koder
   if(rad.fartyg&&rad.fartyg!=='N/A') return FKODER[rad.fartyg]||rad.fartyg;
+  if(meta?.fartyg) return FKODER[meta.fartyg] || meta.fartyg;
   // 2. Statisk (Wasaline, Eckerö)
   const r=normRederi(rad.rederi||'');
   if(STATFARTYG[r]) return STATFARTYG[r];
@@ -1185,7 +1255,7 @@ function kandidaterFörValtDatum(){
   const läggTill = (rad, depDatum, prioritet) => {
     const r = normRederi(rad.rederi||'');
     const o = bygRad(rad, r, getLnk(r), depDatum);
-    const key = `${o.rederi}|${o._depDate}|${o.avghamn}|${o.ankhamn}|${rad.avgtid_raw||rad.avgtid||''}|${rad.anktid||''}`;
+    const key = `${o.rederi}|${o._depDate}|${o.avghamn}|${o.ankhamn}|${rad.avgtid_raw||rad.avgtid||''}`;
     const bef = map.get(key);
     if(!bef || prioritet >= bef.prioritet) map.set(key, {prioritet, rad:o});
   };
@@ -1205,6 +1275,10 @@ function kandidaterFörValtDatum(){
       läggTill(rad, depDatum, 1);
     });
 
+    Object.entries((DATA.avgangar_datum||{})[depDs]||{}).forEach(([nyckel, meta])=>{
+      const extraRad = byggRadFrånAvgangsMeta(nyckel, meta);
+      if(extraRad) läggTill(extraRad, depDatum, 4);
+    });
     Object.entries((DATA.fartyg_datum||{})[depDs]||{}).forEach(([nyckel, fartyg])=>{
       const extraRad = byggExtraRadFrånFartygDatum(nyckel, fartyg);
       if(extraRad) läggTill(extraRad, depDatum, 2);
@@ -1260,12 +1334,15 @@ function rendera(){
 function bygRad(rad, r, länk, depDatum = valdDat){
   const depVd = VD[depDatum.getDay()];
   const depInfo = normaliseraAvgangstid(rad.avgtid_raw||rad.avgtid||'', rad.avghamn||'');
-  const ankInfo = normaliseraAnkomsttid(rad.anktid||'', depInfo, depVd, rad.ankhamn||'');
+  const avgMeta = hämtaAvgangsMeta(rad, depDatum);
+  const ankInfo = byggExaktAnkomst(avgMeta, depInfo, depDatum, rad.ankhamn||'')
+    || normaliseraAnkomsttid(rad.anktid||'', depInfo, depVd, rad.ankhamn||'');
   const passerad = ärPasseradAvgång(depInfo);
   const depDate = isoEfterOffset(depDatum, depInfo.dayOffset);
-  const arrDate = isoEfterOffset(depDatum, ankInfo.dayOffset);
+  const arrDate = avgMeta?.ankomstdatum || isoEfterOffset(depDatum, ankInfo.dayOffset);
   const motSverige = rad.mot_sverige===true || SVENSKA_HAMNAR.has(rad.ankhamn);
   const franSverige = rad.fran_sverige===true || SVENSKA_HAMNAR.has(rad.avghamn);
+  const fetKolumn = (motSverige && !franSverige) ? 'ank' : 'avg';
   return {
     rederi:r,
     avgtid:depInfo.text||'—',
@@ -1275,13 +1352,14 @@ function bygRad(rad, r, länk, depDatum = valdDat){
     ankhamn:rad.ankhamn||'',
     fartyg:getFar(rad, depDatum),
     länk,
-    grå:!!(rad.grå) || passerad,
+    grå:false,
     passerad,
     avVdag:veckodagEfterOffset(depDatum, depInfo.dayOffset),
     ankVdag:veckodagEfterOffset(depDatum, ankInfo.dayOffset),
-    källa:rad.kalla||länk||'',
+    källa:avgMeta?.kalla || rad.kalla||länk||'',
     verifiering:rad.verifiering||'',
     anm:rensaAnm(rad.anmarkning||''),
+    _fetKolumn:fetKolumn,
     _depDate:depDate,
     _arrDate:arrDate,
     _motSverige:motSverige,
@@ -1318,8 +1396,10 @@ function bygTr(rad){
   if(rad.grå) tr.classList.add('grå');
 
   // Tider med veckodag
-  const avTid = `<div class="tid-cell"><span class="tid">${esc(rad.avgtid)}</span><span class="vtid-dag">${esc(rad.avVdag)}</span></div>`;
-  const anTid = `<div class="tid-cell"><span class="tid">${esc(rad.anktid)}</span><span class="vtid-dag">${esc(rad.ankVdag)}</span></div>`;
+  const avKlass = rad._fetKolumn === 'avg' ? 'tid fet' : 'tid';
+  const anKlass = rad._fetKolumn === 'ank' ? 'tid fet' : 'tid';
+  const avTid = `<div class="tid-cell"><span class="${avKlass}">${esc(rad.avgtid)}</span><span class="vtid-dag">${esc(rad.avVdag)}</span></div>`;
+  const anTid = `<div class="tid-cell"><span class="${anKlass}">${esc(rad.anktid)}</span><span class="vtid-dag">${esc(rad.ankVdag)}</span></div>`;
   const öfTid = `<span class="overfart">${esc(rad.överfart||'—')}</span>`;
 
   // Fartyg

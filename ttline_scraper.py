@@ -154,7 +154,7 @@ def extract_token(session: requests.Session) -> Optional[str]:
         return None
 
 
-def parse_departure_cell(text: str, fallback_year: int) -> tuple[str, str]:
+def parse_date_time_cell(text: str, fallback_year: int) -> tuple[str, str]:
     text = " ".join((text or "").replace(",", " ").split())
     time_match = re.search(r"\b(\d{1,2}:\d{2})\b", text)
     date_match = re.search(r"\b(\d{1,2})\s+([A-Za-zÅÄÖåäöüÜ]+)", text)
@@ -168,6 +168,18 @@ def parse_departure_cell(text: str, fallback_year: int) -> tuple[str, str]:
     if not month:
         return "", time_match.group(1).zfill(5)
     return date(fallback_year, month, day).isoformat(), time_match.group(1).zfill(5)
+
+
+def infer_arrival_date(dep_date: str, dep_time: str, arr_date: str, arr_time: str) -> str:
+    if arr_date:
+        return arr_date
+    if not dep_date:
+        return ""
+    if not dep_time or not arr_time:
+        return dep_date
+    if arr_time >= dep_time:
+        return dep_date
+    return (date.fromisoformat(dep_date) + timedelta(days=1)).isoformat()
 
 
 def fetch_route(session: requests.Session, token: str, route: str, day: date) -> Optional[str]:
@@ -198,15 +210,19 @@ def parse_table(html_text: str, fallback_year: int) -> list[dict]:
     for cells in parser.rows:
         if len(cells) < 4:
             continue
-        ds, avgtid = parse_departure_cell(cells[0], fallback_year)
+        ds, avgtid = parse_date_time_cell(cells[0], fallback_year)
+        ankdatum_raw, anktid = parse_date_time_cell(cells[1], fallback_year)
         avghamn, ankhamn = split_route(cells[3])
         if not ds or not avgtid or not avghamn or not ankhamn:
             continue
+        ankdatum = infer_arrival_date(ds, avgtid, ankdatum_raw, anktid)
         rows.append({
             "date": ds,
             "avghamn": avghamn,
             "ankhamn": ankhamn,
             "avgtid": avgtid,
+            "ankomstdatum": ankdatum,
+            "anktid": anktid,
             "fartyg": resolve_ship(cells[2]),
             "rederi": "TT-Line",
         })

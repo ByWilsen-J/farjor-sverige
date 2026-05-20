@@ -19,6 +19,8 @@ Pågående men klart förbättrad. Sidan renderar nu en renare tabellvy där all
   - Lät datumrader från `fartyg_datum` komplettera saknade/underrapporterade TT-Line- och DFDS-rutter till/från Sverige i UI:t.
   - Lade in Finnlines `Malmö ↔ Świnoujście` i `farjor_data.json` med officiella tider från Finnlines ruttsida.
   - Verifierade att Unity Line-/POLSCA-trafiken `Świnoujście ↔ Trelleborg` kommer med i kandidatunderlaget via datumdatan och nu syns i logiken för ankomster/avgångar.
+- 2026-05-20: Tog bort gråmarkeringen av passerade turer i `index.html` och `farjor.html`.
+  - Passerade turer markeras inte längre visuellt, eftersom markeringen blev missvisande när man bytte lista eller datum.
 - 2026-05-20: Lade in Stena Line `Göteborg ↔ Frederikshavn` i datalagret.
   - Hämtade officiella veckotider från Stena Line Freight route `GOFR` och skrev in rutten i `farjor_data.json`.
   - Lade till `Frederikshavn` i hamnlistan och `FRH` som UI-kod.

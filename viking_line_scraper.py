@@ -163,6 +163,7 @@ def extract_sailings(data: dict, dep: str, arr: str) -> list:
                 "pod":            PORT_NAMES.get(oj["arrivalPort"], oj["arrivalPort"]),
                 "departure_time": oj["departureDate"]["localTime"],
                 "departure_tz":   oj["departureDate"]["timeZoneInfo"],
+                "arrival_date":   oj["arrivalDate"]["localDateTime"][:10],
                 "arrival_time":   oj["arrivalDate"]["localTime"],
                 "arrival_tz":     oj["arrivalDate"]["timeZoneInfo"],
                 "ship_code":      ship_code,

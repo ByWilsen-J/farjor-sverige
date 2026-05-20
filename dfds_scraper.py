@@ -103,7 +103,9 @@ def fetch_all(date_from: date = None, date_to: date = None) -> list[dict]:
             continue
         for avg in data:
             dep_str = avg.get("scheduledDeparture","")
+            arr_str = avg.get("scheduledArrival","") or avg.get("estimatedArrival","")
             ds, avgtid = parse_local_time(dep_str)
+            ankdatum, anktid = parse_local_time(arr_str)
             if not ds or not avgtid:
                 continue
             fartyg = avg.get("vehicleName","") or ""
@@ -112,6 +114,8 @@ def fetch_all(date_from: date = None, date_to: date = None) -> list[dict]:
                 "avghamn": PORT_NAMES.get(pol, pol),
                 "ankhamn": PORT_NAMES.get(pod, pod),
                 "avgtid":  avgtid,
+                "ankomstdatum": ankdatum,
+                "anktid": anktid,
                 "fartyg":  fartyg,
                 "rederi":  "DFDS",
             })

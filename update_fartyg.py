@@ -9,6 +9,7 @@ Kan även köras manuellt: python3 update_fartyg.py [YYYY-MM-DD]
 
 Källdataformat i farjor_data.json:
   fartyg_datum → { "YYYY-MM-DD" → { "Rederi:Avghamn→Ankhamn:HH:MM" → "Fartygsnamn" } }
+  avgangar_datum → { "YYYY-MM-DD" → { "Rederi:Avghamn→Ankhamn:HH:MM" → { fartyg, anktid, ankomstdatum } } }
 """
 
 import json
@@ -49,6 +50,7 @@ def main():
         data = json.load(f)
 
     fartyg_datum: dict = data.get("fartyg_datum", {})
+    avgangar_datum: dict = data.get("avgangar_datum", {})
 
     # Rensa datum äldre än igår
     cutoff = (from_date - timedelta(days=1)).isoformat()
@@ -56,6 +58,10 @@ def main():
         if d < cutoff:
             del fartyg_datum[d]
             log.debug("Rensade gammalt datum: %s", d)
+    for d in list(avgangar_datum.keys()):
+        if d < cutoff:
+            del avgangar_datum[d]
+            log.debug("Rensade gamla avgångsmeta: %s", d)
 
     def lägg_till(sailings: list[dict]):
         for s in sailings:
@@ -67,12 +73,23 @@ def main():
             ankhamn = s.get("ankhamn","")
             avgtid  = s.get("avgtid","") or s.get("departure_time","")
             fartyg  = s.get("fartyg","") or s.get("ship_name","")
+            anktid = s.get("anktid","") or s.get("arrival_time","")
+            ankomstdatum = s.get("ankomstdatum","") or s.get("arrival_date","") or ds
+            kalla = s.get("kalla","") or s.get("source","")
             if not (ds and rederi and avgtid and fartyg):
                 continue
             if ds not in fartyg_datum:
                 fartyg_datum[ds] = {}
+            if ds not in avgangar_datum:
+                avgangar_datum[ds] = {}
             key = bygg_nyckel(rederi, avghamn, ankhamn, avgtid)
             fartyg_datum[ds][key] = fartyg
+            avgangar_datum[ds][key] = {
+                "fartyg": fartyg,
+                "anktid": anktid,
+                "ankomstdatum": ankomstdatum,
+                "kalla": kalla,
+            }
 
     # ── Viking Line ──
     log.info("=== Viking Line ===")
@@ -88,6 +105,8 @@ def main():
                     "avghamn": s["pol"],
                     "ankhamn": s["pod"],
                     "avgtid":  s["departure_time"],
+                    "anktid": s.get("arrival_time", ""),
+                    "ankomstdatum": s.get("arrival_date", s["date"]),
                     "fartyg":  s["ship_name"],
                     "rederi":  "Viking Line",
                 })
@@ -120,6 +139,7 @@ def main():
 
     # Spara tillbaka
     data["fartyg_datum"] = fartyg_datum
+    data["avgangar_datum"] = avgangar_datum
     data["meta"]["uppdaterad"] = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
 
     # Räkna
