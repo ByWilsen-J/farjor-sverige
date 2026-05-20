@@ -1261,7 +1261,7 @@ function getFar(rad, depDate = valdDat){
   if(r==='Viking Line'){
     const dep=VL_PORTER[rad.avghamn],arr=VL_PORTER[rad.ankhamn];
     if(dep&&arr){const vl=vlCache[`${dep}→${arr}:${avgt}`];if(vl) return vl;}
-    return namnetFrånAnm(rad.anmarkning||'');
+    return namnetFrånAnm(rad.anmarkning||'') || routeFleetFallback(rad, r);
   }
   // 5. DFDS live browser-cache (fallback)
   if(r==='DFDS'){
@@ -1295,6 +1295,29 @@ function matchar(vdag, mal){
     if(f !== -1 && t !== -1) return f<=t ? (mi>=f && mi<=t) : (mi>=f || mi<=t);
   }
   return v.split(',').map(s=>s.trim()).includes(mal);
+}
+function isoInomIntervall(iso, startIso, endIso){
+  return iso >= startIso && iso <= endIso;
+}
+function specialIntervallFörSchemaRad(rad){
+  const note = String(rad.anmarkning || '');
+  if(/avvikande tidtabell 4–9 mars 2026/i.test(note)){
+    return {start:'2026-03-04', end:'2026-03-09'};
+  }
+  if(
+    normRederi(rad.rederi || '') === 'Viking Line' &&
+    rad.avghamn === 'Helsingfors' &&
+    rad.ankhamn === 'Stockholm' &&
+    (rad.avgtid_raw || rad.avgtid || '') === '18:10'
+  ){
+    return {start:'2026-03-04', end:'2026-03-09'};
+  }
+  return null;
+}
+function schemaRadÄrAktivFörDatum(rad, depDatum){
+  const intervall = specialIntervallFörSchemaRad(rad);
+  if(!intervall) return true;
+  return isoInomIntervall(dStr(depDatum), intervall.start, intervall.end);
 }
 
 // Anmärkning för info-tooltip: ta bort fartygsnamn från inledningen
@@ -1581,6 +1604,7 @@ function kandidaterFörValtDatum(){
       const or = rad.rederi||'';
       if(UTESLUT.has(or)) return;
       if(!matchar(rad.veckodag, depVd)) return;
+      if(!schemaRadÄrAktivFörDatum(rad, depDatum)) return;
       läggTill(rad, depDatum, 1);
     });
 

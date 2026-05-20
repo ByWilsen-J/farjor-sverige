@@ -10,6 +10,11 @@ Senaste UI-iteration: tabellen visar nu irrelevanta tidskolumner i ljusgrått pe
 
 ## Senaste ändringar
 
+- 2026-05-20: Filtrerade bort felaktig Viking-specialtid i `index.html`.
+  - Hittade att en avvikande Viking Line-rad för `Helsingfors → Stockholm` låg kvar som om den vore normal veckotrafik, vilket skapade en extra inkommande 10:00-rad i majvyn.
+  - Lade till datumstyrd filtrering för den avvikande Viking-tiden så den bara visas inom sitt marsintervall i stället för året runt.
+  - Resultatet är att den extra tredje 10:00-ankomsten från Helsingfors försvinner, medan Tallinks verifierade 10:00-rad lämnas kvar.
+  - Lade också till Viking-fallback i fartygskolumnen så `Viking Cinderella / Gabriella` visas när live-/datumdata saknas, i stället för tomt streck.
 - 2026-05-20: Rättade riktningstolkning i `index.html` efter regressionsfel i tabellrader.
   - Flyttade beslut om `passerad`-status och vilken tidskolumn som ska vara visuellt primär från ruttbygget till den faktiska radlabeln (`Inkommande`, `Utgående`, `Mot Sverige`).
   - Det gör att samma resa nu kan visas korrekt i olika vyer utan att återanvända fel status eller fel fetmarkerad tid från en annan riktning.
@@ -120,6 +125,7 @@ Senaste UI-iteration: tabellen visar nu irrelevanta tidskolumner i ljusgrått pe
 
 ## Problem / blockerare
 
+- Vissa schemaundantag ligger fortfarande som veckorader med anmärkning i datalagret. Den här omgången säkrade Viking-specialtiden, men fler undantag kan på sikt behöva samma typ av datumstyrning.
 - Senaste regressionsfelet kom från att riktning/specifik radlabel sattes senare än passerad-/betoningslogiken. Den delen är nu korrigerad i frontend.
 - Vissa rader saknar fortfarande fartygsnamn när API:ets avgångstid avviker från det normaliserade veckoschemat, t.ex. försenade/ändrade avgångar.
 - Viking Lines server-side API-anrop ger 403 Forbidden i `update_fartyg.py`. Frontend/anmarkningsfallback ger fortfarande vissa Viking-namn, men API-flödet behöver återupptäckas.
@@ -163,6 +169,7 @@ Senaste UI-iteration: tabellen visar nu irrelevanta tidskolumner i ljusgrått pe
 
 ## Historik
 
+- 2026-05-20 18:12 CEST: Viking-specialtid för Helsingfors → Stockholm begränsades till rätt datumintervall.
 - 2026-05-20 18:07 CEST: Regressionsfix för label-baserad tidslogik dokumenterad i projektloggen.
 - 2026-05-20 16:29 CEST: UI-justering för riktningstider och användarpanel dokumenterad i projektloggen.
 - 2026-05-20: Projektlogg skapad efter felsökning av saknade/felaktiga fartygsnamn i listvyn.
