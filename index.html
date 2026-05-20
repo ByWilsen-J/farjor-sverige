@@ -329,35 +329,29 @@ function namnetFrånAnm(anm){
 }
 
 function getFar(rad){
+  const avgt=rad.avgtid_raw||rad.avgtid||'';
   // 1. Polsca-koder
-  if(rad.fartyg && rad.fartyg !== 'N/A') return FKODER[rad.fartyg] || rad.fartyg;
+  if(rad.fartyg&&rad.fartyg!=='N/A') return FKODER[rad.fartyg]||rad.fartyg;
   // 2. Statisk (Wasaline, Eckerö)
-  const r = fixR(rad.rederi||'');
+  const r=fixR(rad.rederi||'');
   if(STATFARTYG[r]) return STATFARTYG[r];
-  // 3. Viking Line: live cache
-  if(r === 'Viking Line'){
-    const dep = VL_PORTER[rad.avghamn];
-    const arr = VL_PORTER[rad.ankhamn];
-    const avgt = rad.avgtid_raw || rad.avgtid || '';
-    if(dep && arr){
-      const vl = vlCache[`${dep}→${arr}:${avgt}`];
-      if(vl) return vl;
-    }
-    // fallback: anmärkning
+  // 3. fartyg_datum — server-side förhämtat (Viking Line, Tallink, DFDS m.fl.)
+  const ds=dStr(valdDat);
+  const fdKey=`${r}:${rad.avghamn}→${rad.ankhamn}:${avgt}`;
+  const fromFD=DATA.fartyg_datum?.[ds]?.[fdKey];
+  if(fromFD) return fromFD;
+  // 4. Viking Line live browser-cache (fallback)
+  if(r==='Viking Line'){
+    const dep=VL_PORTER[rad.avghamn],arr=VL_PORTER[rad.ankhamn];
+    if(dep&&arr){const vl=vlCache[`${dep}→${arr}:${avgt}`];if(vl) return vl;}
     return namnetFrånAnm(rad.anmarkning||'');
   }
-  // 4. DFDS: live cache
-  if(r === 'DFDS'){
-    const dep = DFDS_PORTER[rad.avghamn];
-    const arr = DFDS_PORTER[rad.ankhamn];
-    const ds  = dStr(valdDat);
-    const avgt = rad.avgtid_raw || rad.avgtid || '';
-    if(dep && arr){
-      const dk = dfdsCache[`${dep}→${arr}:${ds}:${avgt}`];
-      if(dk) return dk;
-    }
+  // 5. DFDS live browser-cache (fallback)
+  if(r==='DFDS'){
+    const dep=DFDS_PORTER[rad.avghamn],arr=DFDS_PORTER[rad.ankhamn];
+    if(dep&&arr){const dk=dfdsCache[`${dep}→${arr}:${ds}:${avgt}`];if(dk) return dk;}
   }
-  // 5. Anmärkning som fallback
+  // 6. Anmärkning
   return namnetFrånAnm(rad.anmarkning||'');
 }
 

@@ -1,0 +1,53 @@
+name: Uppdatera fartygsnamn (var 14:e dag)
+
+on:
+  schedule:
+    # Kör 04:00 UTC den 1:a och 15:e varje månad (~var 14:e dag)
+    - cron: '0 4 1,15 * *'
+  workflow_dispatch:
+    inputs:
+      from_date:
+        description: 'Startdatum (YYYY-MM-DD). Tom = dagens datum.'
+        required: false
+        default: ''
+
+jobs:
+  update:
+    name: Hämta fartygsnamn & uppdatera JSON
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checka ut kod
+        uses: actions/checkout@v4
+
+      - name: Sätt upp Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installera beroenden
+        run: pip install requests
+
+      - name: Kör update_fartyg.py
+        run: |
+          FROM="${{ github.event.inputs.from_date }}"
+          if [ -z "$FROM" ]; then
+            python3 update_fartyg.py
+          else
+            python3 update_fartyg.py "$FROM"
+          fi
+
+      - name: Commit och push om farjor_data.json ändrats
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add farjor_data.json
+          if git diff --staged --quiet; then
+            echo "Inga ändringar – inget commit behövs."
+          else
+            DATUM=$(date +%Y-%m-%d)
+            git commit -m "Auto: fartygsnamn uppdaterade $DATUM [skip ci]"
+            git push
+          fi
