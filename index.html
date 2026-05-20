@@ -6,154 +6,274 @@
   <title>Färjor Sverige — Tidtabeller</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
+    /* ============================================================
+       Färjor Sverige — Premium Operational UI
+       Designprinciper: lugn, tydlig, exklusiv, minimalistisk
+       Färgnycklar: neutral slate + djup navy accent + diskret guld
+       ============================================================ */
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      /* Modern palett — lugnare bottenton, tydligare accentfärger */
-      --blå:#1e3a5f;--blå-ljus:#3b82c4;--blå-mörk:#13294a;
-      --gul:#f5b840;
-      --grå:#64748b;--grå-ljus:#f1f5f9;--grå-mid:#e2e8f0;
-      --kant:#e2e8f0;--kant-stark:#cbd5e1;
-      --text:#0f172a;--text-mjuk:#334155;--dim:#64748b;--vit:#ffffff;
-      --bg:#f8fafc;
-      /* Riktningsfärger */
-      --in:#0d8a4f;--in-ljus:#dcfce7;--in-mörk:#0a6b3e;
-      --ut:#1e63b8;--ut-ljus:#dbeafe;--ut-mörk:#1d4ed8;
-      --mot:#b85a00;--mot-ljus:#ffedd5;--mot-mörk:#92400e;
-      --varning:#dc2626;
-      --skugga:0 1px 2px rgba(15,23,42,.04),0 1px 3px rgba(15,23,42,.08);
-      --skugga-hover:0 4px 12px rgba(15,23,42,.08);
+      /* ── Bakgrundsytor ── */
+      --bg:#f5f6f8;
+      --vit:#ffffff;
+      --yta-svag:#fafbfc;
+      --yta-dämpad:#f1f3f6;
+
+      /* ── Linjer (mjukare än #e2e8f0) ── */
+      --linje-mjuk:rgba(15,23,42,.05);
+      --linje:rgba(15,23,42,.08);
+      --linje-stark:rgba(15,23,42,.14);
+
+      /* ── Text (djupare ink för premium-känsla) ── */
+      --text:#0b1220;
+      --text-mjuk:#3f4a5c;
+      --dim:#697587;
+      --tertiär:#94a3b8;
+
+      /* ── Primär accent (deep navy, ingen gradient) ── */
+      --blå:#1f3a5f;
+      --blå-ljus:#2f527e;
+      --blå-mörk:#142640;
+      --blå-soft:#eef2f7;
+      --blå-ring:rgba(31,58,95,.16);
+
+      /* ── Diskret guldackord (sjöfartsreferens, ej dekoration) ── */
+      --gul:#b8893e;
+
+      /* ── Riktningsfärger (lugnade, men kvarstår läsbara) ── */
+      --in:#1a7a4b;        --in-ljus:#ecfdf5; --in-mörk:#14633b; --in-kant:rgba(26,122,75,.22);
+      --ut:#1e4faa;        --ut-ljus:#eff4fb; --ut-mörk:#1a4290; --ut-kant:rgba(30,79,170,.22);
+      --mot:#9a4014;       --mot-ljus:#fdf3ec; --mot-mörk:#7c3210; --mot-kant:rgba(154,64,20,.22);
+      --varning:#b91c1c;
+
+      /* ── Alias för bakåtkompatibilitet (refereras i HTML/JS) ── */
+      --grå:var(--dim);
+      --grå-ljus:var(--yta-dämpad);
+      --grå-mid:var(--linje-stark);
+      --kant:var(--linje);
+      --kant-stark:var(--linje-stark);
+
+      /* ── Skuggor (subtilare, "raised paper" istället för "card") ── */
+      --skugga:0 1px 0 rgba(15,23,42,.03), 0 1px 2px rgba(15,23,42,.04);
+      --skugga-hover:0 8px 24px -10px rgba(15,23,42,.16);
+      --skugga-lyft:0 12px 32px -14px rgba(15,23,42,.22);
+
+      /* ── Radius (standardiserat) ── */
+      --r-xs:4px;
+      --r-sm:6px;
+      --r:8px;
+      --r-md:10px;
+      --r-lg:12px;
+      --r-pill:999px;
+
+      /* ── Typografi ── */
+      --font:-apple-system,BlinkMacSystemFont,"Inter","SF Pro Text","Segoe UI",Roboto,Arial,sans-serif;
+      --font-num:"SF Mono",ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;
     }
-    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:15px;line-height:1.5;color:var(--text);background:var(--bg);min-height:100vh}
-    header{background:linear-gradient(135deg,var(--blå-mörk),var(--blå));color:var(--vit);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;border-bottom:3px solid var(--gul);box-shadow:var(--skugga)}
-    .hdr-grupp{display:flex;flex-direction:column;gap:2px}
-    .hdr-label{font-size:.70rem;opacity:.74;text-transform:uppercase;letter-spacing:.10em;font-weight:600}
-    .hdr-datum{font-size:1.24rem;font-weight:700;letter-spacing:-.01em}
-    .hdr-vecka{font-size:.96rem;opacity:.94;font-weight:500}
-    .layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;max-width:1420px;margin:0 auto;padding:18px 16px;align-items:start}
-    @media(max-width:920px){.layout{grid-template-columns:1fr;padding:12px}}
+
+    html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+    body{font-family:var(--font);font-size:14.5px;line-height:1.55;color:var(--text);background:var(--bg);min-height:100vh;font-feature-settings:"ss01","cv11"}
+
+    /* ──────────────────────────────────────────────
+       Header — lugn solid yta, hårfin guldlinje
+       ────────────────────────────────────────────── */
+    header{background:#0e1d35;color:var(--vit);padding:18px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.06);box-shadow:0 1px 0 var(--gul), 0 1px 0 rgba(15,23,42,.04)}
+    .hdr-grupp{display:flex;flex-direction:column;gap:3px}
+    .hdr-label{font-size:.68rem;opacity:.62;text-transform:uppercase;letter-spacing:.14em;font-weight:500}
+    .hdr-datum{font-size:1.18rem;font-weight:600;letter-spacing:-.012em;color:#f8fafc}
+    .hdr-vecka{font-size:.92rem;opacity:.82;font-weight:400}
+
+    /* ──────────────────────────────────────────────
+       Layout — mer luft, harmoniska marginaler
+       ────────────────────────────────────────────── */
+    .layout{display:grid;grid-template-columns:minmax(0,1fr) 308px;gap:24px;max-width:1440px;margin:0 auto;padding:24px 20px 32px;align-items:start}
+    @media(max-width:920px){.layout{grid-template-columns:1fr;padding:16px;gap:16px}}
     main{min-width:0}
-    .dat-pick{border:1px solid var(--kant);border-radius:8px;padding:8px 10px;font-size:.92rem;color:var(--text);background:var(--vit);cursor:pointer;font-weight:500}
-    .dat-pick:focus{outline:2px solid var(--blå-ljus);outline-offset:1px}
-    .xl-knapp{width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--blå);background:var(--vit);color:var(--blå);font-size:.85rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
-    .xl-knapp:hover{background:var(--blå);color:var(--vit);box-shadow:var(--skugga-hover)}
-    .apply-btn{width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--blå);background:var(--blå);color:var(--vit);font-size:.90rem;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.01em}
-    .apply-btn:hover{background:var(--blå-ljus);border-color:var(--blå-ljus);box-shadow:var(--skugga-hover)}
-    /* ── Spinner ── */
-    #laddare{text-align:center;padding:60px 20px;color:var(--dim);font-size:.94rem}
-    .spinner{width:36px;height:36px;border:3px solid var(--kant);border-top-color:var(--blå);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px}
+
+    /* ──────────────────────────────────────────────
+       Datum-input (header)
+       ────────────────────────────────────────────── */
+    .dat-pick{border:1px solid var(--linje);border-radius:var(--r);padding:8px 12px;font-size:.88rem;color:var(--text);background:var(--vit);cursor:pointer;font-weight:500;font-family:inherit;transition:border-color .15s,box-shadow .15s}
+    .dat-pick:hover{border-color:var(--linje-stark)}
+    .dat-pick:focus{outline:none;border-color:var(--blå);box-shadow:0 0 0 3px var(--blå-ring)}
+
+    /* ──────────────────────────────────────────────
+       Knappar — solid, ingen gradient
+       ────────────────────────────────────────────── */
+    .xl-knapp{width:100%;padding:10px 14px;border-radius:var(--r);border:1px solid var(--linje-stark);background:var(--vit);color:var(--text);font-size:.84rem;font-weight:500;cursor:pointer;white-space:nowrap;font-family:inherit;transition:background .15s,border-color .15s,color .15s,box-shadow .15s;letter-spacing:.005em}
+    .xl-knapp:hover{background:var(--blå);color:var(--vit);border-color:var(--blå)}
+    .xl-knapp:focus-visible{outline:none;box-shadow:0 0 0 3px var(--blå-ring)}
+
+    .apply-btn{width:100%;padding:11px 16px;border-radius:var(--r);border:1px solid var(--blå);background:var(--blå);color:var(--vit);font-size:.88rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s,box-shadow .15s;letter-spacing:.005em}
+    .apply-btn:hover{background:var(--blå-ljus);border-color:var(--blå-ljus)}
+    .apply-btn:focus-visible{outline:none;box-shadow:0 0 0 3px var(--blå-ring)}
+    .apply-btn:active{transform:translateY(0.5px)}
+
+    /* ──────────────────────────────────────────────
+       Spinner / laddare
+       ────────────────────────────────────────────── */
+    #laddare{text-align:center;padding:72px 20px;color:var(--dim);font-size:.92rem;font-weight:400}
+    .spinner{width:34px;height:34px;border:2.5px solid var(--linje);border-top-color:var(--blå);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 18px}
     @keyframes spin{to{transform:rotate(360deg)}}
-    /* ── Sektioner ── */
-    .sektion{background:var(--vit);border:1px solid var(--kant);border-radius:12px;margin-bottom:16px;overflow:hidden;box-shadow:var(--skugga)}
-    .sek-hdr{padding:14px 20px;background:var(--vit);border-bottom:1px solid var(--kant);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-    .sek-hdr h2{font-size:1.02rem;font-weight:700;color:var(--text);letter-spacing:-.005em}
-    .sek-hdr .cnt{background:var(--blå);color:var(--vit);border-radius:999px;padding:3px 11px;font-size:.74rem;font-weight:700;font-variant-numeric:tabular-nums;min-width:32px;text-align:center}
-    .sek-hdr .sub{margin-left:auto;font-size:.80rem;color:var(--dim);font-weight:500}
-    /* Sektionsfärgning beroende på vy */
-    .sek-in{border-top:3px solid var(--in)}
-    .sek-in .cnt{background:var(--in)}
-    .sek-ut{border-top:3px solid var(--ut)}
-    .sek-ut .cnt{background:var(--ut)}
-    .sek-mot{border-top:3px solid var(--mot)}
-    .sek-mot .cnt{background:var(--mot)}
-    .sek-blandad{border-top:3px solid var(--blå-ljus)}
-    /* ── Riktnings-badge på rad ── */
-    .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:.66rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;line-height:1.5;white-space:nowrap;font-variant-numeric:tabular-nums}
-    .badge-in{background:var(--in-ljus);color:var(--in-mörk);border:1px solid #bbf7d0}
-    .badge-ut{background:var(--ut-ljus);color:var(--ut-mörk);border:1px solid #bfdbfe}
-    .badge-mot{background:var(--mot-ljus);color:var(--mot-mörk);border:1px solid #fed7aa}
-    .rikt-c{width:128px;padding-right:6px}
-    /* ── Tabell ── */
+
+    /* ──────────────────────────────────────────────
+       Sektioner (huvudkort)
+       ────────────────────────────────────────────── */
+    .sektion{background:var(--vit);border:1px solid var(--linje);border-radius:var(--r-lg);margin-bottom:20px;overflow:hidden;box-shadow:var(--skugga)}
+    .sek-hdr{padding:16px 22px 14px;background:var(--vit);border-bottom:1px solid var(--linje-mjuk);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .sek-hdr h2{font-size:1rem;font-weight:600;color:var(--text);letter-spacing:-.005em;line-height:1.3}
+    .sek-hdr .cnt{background:var(--yta-dämpad);color:var(--text-mjuk);border:1px solid var(--linje);border-radius:var(--r-pill);padding:2px 10px;font-size:.72rem;font-weight:600;font-variant-numeric:tabular-nums;min-width:30px;text-align:center;line-height:1.5}
+    .sek-hdr .sub{margin-left:auto;font-size:.78rem;color:var(--dim);font-weight:400;letter-spacing:.005em}
+
+    /* Sektionsrand per vy — hårfin 2px topplinje */
+    .sek-in{box-shadow:inset 0 2px 0 var(--in), var(--skugga)}
+    .sek-in .cnt{background:var(--in-ljus);color:var(--in-mörk);border-color:var(--in-kant)}
+    .sek-ut{box-shadow:inset 0 2px 0 var(--ut), var(--skugga)}
+    .sek-ut .cnt{background:var(--ut-ljus);color:var(--ut-mörk);border-color:var(--ut-kant)}
+    .sek-mot{box-shadow:inset 0 2px 0 var(--mot), var(--skugga)}
+    .sek-mot .cnt{background:var(--mot-ljus);color:var(--mot-mörk);border-color:var(--mot-kant)}
+    .sek-blandad{box-shadow:inset 0 2px 0 var(--blå-ljus), var(--skugga)}
+
+    /* ──────────────────────────────────────────────
+       Riktnings-badge (rad)
+       ────────────────────────────────────────────── */
+    .badge{display:inline-flex;align-items:center;gap:5px;padding:2.5px 9px;border-radius:var(--r-pill);font-size:.66rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;line-height:1.5;white-space:nowrap;font-variant-numeric:tabular-nums}
+    .badge-in{background:var(--in-ljus);color:var(--in-mörk);border:1px solid var(--in-kant)}
+    .badge-ut{background:var(--ut-ljus);color:var(--ut-mörk);border:1px solid var(--ut-kant)}
+    .badge-mot{background:var(--mot-ljus);color:var(--mot-mörk);border:1px solid var(--mot-kant)}
+    .rikt-c{width:126px;padding-right:6px}
+
+    /* ──────────────────────────────────────────────
+       Tabell — högre informationsdensitet, lugn rytm
+       ────────────────────────────────────────────── */
     .tbl-wrap{overflow-x:auto}
-    table{width:100%;border-collapse:collapse;font-size:.92rem}
-    thead th{padding:11px 12px;text-align:left;font-weight:600;font-size:.74rem;color:var(--text-mjuk);text-transform:uppercase;letter-spacing:.06em;background:var(--grå-ljus);border-bottom:1px solid var(--kant-stark);white-space:nowrap}
+    table{width:100%;border-collapse:collapse;font-size:.875rem}
+    thead th{padding:10px 12px;text-align:left;font-weight:600;font-size:.685rem;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;background:var(--yta-svag);border-bottom:1px solid var(--linje);white-space:nowrap;font-variant-numeric:tabular-nums}
     thead th.sort-aktiv{color:var(--blå);font-weight:700}
-    thead th.sort-aktiv::after{content:' ▼';font-size:.65rem;opacity:.6}
-    thead th:first-child{padding-left:20px}
-    thead th:last-child{padding-right:20px}
-    tbody tr{border-bottom:1px solid var(--kant)}
+    thead th.sort-aktiv::after{content:' ▾';font-size:.7rem;opacity:.65;margin-left:1px}
+    thead th:first-child{padding-left:22px}
+    thead th:last-child{padding-right:22px}
+    tbody tr{border-bottom:1px solid var(--linje-mjuk);transition:background-color .12s}
     tbody tr:last-child{border-bottom:none}
-    tbody tr:hover{background:#f8fafc}
-    tbody td{padding:12px 12px;vertical-align:middle}
-    tbody td:first-child{padding-left:20px}
-    tbody td:last-child{padding-right:20px}
-    .tid-cell{display:flex;flex-direction:column;gap:2px;min-width:62px}
-    .tid{font-variant-numeric:tabular-nums;font-weight:500;font-size:.98rem;white-space:nowrap;letter-spacing:-.005em}
-    .tid.fet{font-weight:700;color:var(--text)}
-    .tid.dämpad{color:#94a3b8}
+    tbody tr:hover{background:var(--yta-svag)}
+    tbody td{padding:9px 12px;vertical-align:middle}
+    tbody td:first-child{padding-left:22px}
+    tbody td:last-child{padding-right:22px}
+
+    .tid-cell{display:flex;flex-direction:column;gap:1px;min-width:60px}
+    .tid{font-variant-numeric:tabular-nums;font-weight:500;font-size:.95rem;white-space:nowrap;letter-spacing:-.005em;color:var(--text)}
+    .tid.fet{font-weight:600;color:var(--text)}
+    .tid.dämpad{color:var(--tertiär);font-weight:400}
     .tid-cell.dämpad .vtid-dag{color:#cbd5e1}
     .tid-cell.passerad-aktiv .tid,
-    .tid-cell.passerad-aktiv .vtid-dag{opacity:.5}
-    .vtid-dag{font-size:.70rem;color:var(--dim);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
-    .overfart{white-space:nowrap;color:var(--text-mjuk);font-variant-numeric:tabular-nums;font-size:.88rem}
-    .hamn-kod{font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:.04em;color:var(--text);font-size:.92rem}
+    .tid-cell.passerad-aktiv .vtid-dag{opacity:.42}
+    .vtid-dag{font-size:.66rem;color:var(--dim);font-weight:500;letter-spacing:.07em;text-transform:uppercase;font-variant-numeric:tabular-nums}
+
+    .overfart{white-space:nowrap;color:var(--text-mjuk);font-variant-numeric:tabular-nums;font-size:.83rem;font-weight:400}
+    .hamn-kod{font-variant-numeric:tabular-nums;font-weight:600;letter-spacing:.04em;color:var(--text);font-size:.88rem}
     .hamn-avg{text-align:right}
-    .rutt-sep-c{width:22px;text-align:center;color:var(--kant-stark)}
-    .rutt-sep{display:inline-block;min-width:12px;text-align:center;color:var(--kant-stark);font-weight:700}
-    .rl{color:var(--blå);text-decoration:none;font-weight:700;font-size:.93rem}
-    .rl:hover{text-decoration:underline}
-    .fartyg{color:var(--text-mjuk);font-style:italic;font-size:.86rem}
-    .fartyg.tom{color:var(--kant-stark);font-style:normal}
-    .lnk-c{width:42px;text-align:center}
-    .tlnk{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:6px;background:var(--grå-ljus);border:1px solid var(--kant);color:var(--blå);text-decoration:none;font-size:.78rem;transition:all .15s;font-weight:700}
+    .rutt-sep-c{width:20px;text-align:center;color:var(--tertiär)}
+    .rutt-sep{display:inline-block;min-width:10px;text-align:center;color:var(--linje-stark);font-weight:500}
+    .rl{color:var(--text);text-decoration:none;font-weight:600;font-size:.89rem;letter-spacing:-.003em}
+    .rl:hover{color:var(--blå);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+    .fartyg{color:var(--text-mjuk);font-style:italic;font-size:.83rem;font-weight:400}
+    .fartyg.tom{color:var(--tertiär);font-style:normal}
+
+    /* Länk-ikon i tabell */
+    .lnk-c{width:40px;text-align:center}
+    .tlnk{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:var(--r-sm);background:var(--vit);border:1px solid var(--linje);color:var(--dim);text-decoration:none;font-size:.78rem;transition:all .15s;font-weight:600}
     .tlnk:hover{background:var(--blå);color:var(--vit);border-color:var(--blå)}
-    /* ── Info-tooltip ── */
-    .info-c{width:32px;text-align:center}
-    .info-knapp{position:relative;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:none;border:1px solid var(--kant-stark);color:var(--dim);font-size:.72rem;cursor:pointer;font-style:italic;font-weight:700;font-family:Georgia,serif;vertical-align:middle;transition:all .15s;user-select:none}
+
+    /* ──────────────────────────────────────────────
+       Info-tooltip
+       ────────────────────────────────────────────── */
+    .info-c{width:30px;text-align:center}
+    .info-knapp{position:relative;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:transparent;border:1px solid var(--linje);color:var(--dim);font-size:.72rem;cursor:pointer;font-style:italic;font-weight:600;font-family:Georgia,"Times New Roman",serif;vertical-align:middle;transition:all .15s;user-select:none}
     .info-knapp:hover,.info-knapp:focus{background:var(--blå);color:var(--vit);border-color:var(--blå);outline:none}
-    .info-pop{display:none;position:absolute;right:28px;top:50%;transform:translateY(-50%);background:#fff;border:1px solid var(--kant);border-radius:8px;padding:11px 13px;min-width:240px;max-width:300px;box-shadow:0 6px 16px rgba(15,23,42,.14);font-size:.78rem;line-height:1.55;color:var(--text);z-index:100;text-align:left;font-style:normal;font-weight:400;letter-spacing:0;text-transform:none}
-    .info-pop a{color:var(--blå-ljus);text-decoration:none;word-break:break-all}
-    .info-pop a:hover{text-decoration:underline}
-    .info-pop strong{color:var(--text)}
+    .info-pop{display:none;position:absolute;right:30px;top:50%;transform:translateY(-50%);background:var(--vit);border:1px solid var(--linje);border-radius:var(--r-md);padding:12px 14px;min-width:240px;max-width:300px;box-shadow:0 12px 32px -12px rgba(15,23,42,.20),0 0 0 1px rgba(15,23,42,.03);font-size:.78rem;line-height:1.6;color:var(--text);z-index:100;text-align:left;font-style:normal;font-weight:400;letter-spacing:0;text-transform:none}
+    .info-pop a{color:var(--blå);text-decoration:none;word-break:break-all;font-weight:500}
+    .info-pop a:hover{text-decoration:underline;text-underline-offset:2px}
+    .info-pop strong{color:var(--text);font-weight:600}
     .info-knapp:hover .info-pop,.info-knapp:focus .info-pop{display:block}
-    /* ── Sidebar ── */
-    .sidebar{position:sticky;top:14px;display:flex;flex-direction:column;gap:14px}
-    .sb-kort{background:var(--vit);border:1px solid var(--kant);border-radius:12px;overflow:hidden;box-shadow:var(--skugga)}
-    .sb-hdr{padding:11px 16px;background:linear-gradient(135deg,#0f4662,#15607f);color:var(--vit);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
-    .sb-block{padding:14px 16px;border-bottom:1px solid var(--kant)}
+
+    /* ──────────────────────────────────────────────
+       Sidebar
+       ────────────────────────────────────────────── */
+    .sidebar{position:sticky;top:20px;display:flex;flex-direction:column;gap:18px}
+    .sb-kort{background:var(--vit);border:1px solid var(--linje);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--skugga)}
+    .sb-hdr{padding:13px 18px;background:var(--yta-svag);color:var(--text);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.10em;border-bottom:1px solid var(--linje-mjuk)}
+    .sb-block{padding:16px 18px;border-bottom:1px solid var(--linje-mjuk)}
     .sb-block:last-child{border-bottom:none}
-    .sb-label{font-size:.72rem;color:var(--dim);display:block;margin-bottom:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
-    .sb-field{width:100%;border:1px solid #cfe0f0;border-radius:14px;padding:12px 14px;font-size:1rem;color:var(--text);background:linear-gradient(180deg,#fff,#f8fbff);box-shadow:inset 0 1px 0 rgba(255,255,255,.65)}
-    .sb-field:focus{outline:2px solid #8bc5ee;outline-offset:2px;border-color:#8bc5ee}
-    .sb-select{appearance:auto}
-    .chip-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .chip-btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:10px 12px;border-radius:999px;border:2px solid transparent;background:#fff;color:var(--text-mjuk);font-size:.82rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:all .15s;box-shadow:0 1px 2px rgba(15,23,42,.06)}
-    .chip-btn:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(15,23,42,.08)}
-    .chip-btn .chip-ico{font-size:1rem;line-height:1}
-    .chip-btn[data-vy="mot"]{background:#fff4e8;border-color:#fdba74;color:var(--mot-mörk)}
-    .chip-btn[data-vy="fran"]{background:#e9f1ff;border-color:#bfdbfe;color:#1d4ed8}
-    .chip-btn[data-vy="ankomst"]{background:#e9fff0;border-color:#bbf7d0;color:var(--in-mörk)}
-    .chip-btn[data-vy="alla"]{border-radius:12px;background:linear-gradient(180deg,#c2cedb,#aab8c7);border-color:#2d6d9c;color:#0f172a}
-    .chip-btn.vald{box-shadow:inset 0 0 0 2px rgba(255,255,255,.65),0 0 0 3px rgba(30,58,95,.16)}
-    .chip-btn.aktiv{box-shadow:inset 0 0 0 2px rgba(255,255,255,.85),0 0 0 3px rgba(21,96,127,.26)}
-    .status-rad{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .status-btn{min-height:50px;padding:12px 14px;border:none;border-radius:0;background:linear-gradient(180deg,#2aa6dd,#2296cd);color:var(--vit);font-size:.84rem;font-weight:800;cursor:pointer;transition:all .15s;box-shadow:inset 0 -1px 0 rgba(0,0,0,.08)}
-    .status-btn:hover{filter:brightness(1.03);box-shadow:0 5px 14px rgba(34,150,205,.18)}
-    .status-btn.aktiv{background:linear-gradient(180deg,#1479ad,#116a97)}
-    .sb-apply{padding:14px 16px;background:linear-gradient(180deg,#f8fbfe,#eef6fb)}
-    .sb-pending{font-size:.78rem;color:var(--text-mjuk);line-height:1.5;margin-top:10px;padding:10px 12px;background:#fff;border:1px solid #d7e4ef;border-radius:10px}
-    .sb-linje{padding:10px 16px;border-bottom:1px solid var(--kant);display:flex;flex-direction:column;gap:3px}
+    .sb-label{font-size:.68rem;color:var(--dim);display:block;margin-bottom:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+
+    .sb-field{width:100%;border:1px solid var(--linje);border-radius:var(--r);padding:10px 12px;font-size:.92rem;color:var(--text);background:var(--vit);font-family:inherit;transition:border-color .15s,box-shadow .15s}
+    .sb-field:hover{border-color:var(--linje-stark)}
+    .sb-field:focus{outline:none;border-color:var(--blå);box-shadow:0 0 0 3px var(--blå-ring)}
+    .sb-select{appearance:auto;cursor:pointer}
+
+    /* Filter-chips — lugna, vita som standard, dämpad accent när aktiv */
+    .chip-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .chip-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:8px 10px;border-radius:var(--r);border:1px solid var(--linje);background:var(--vit);color:var(--text-mjuk);font-size:.80rem;font-weight:500;letter-spacing:0;text-transform:none;cursor:pointer;transition:background .15s,border-color .15s,color .15s,box-shadow .15s;font-family:inherit}
+    .chip-btn:hover{background:var(--yta-svag);border-color:var(--linje-stark);color:var(--text)}
+    .chip-btn .chip-ico{font-size:.95rem;line-height:1;font-weight:600}
+    .chip-btn[data-vy="mot"].vald,.chip-btn[data-vy="mot"].aktiv{background:var(--mot-ljus);border-color:var(--mot-kant);color:var(--mot-mörk)}
+    .chip-btn[data-vy="fran"].vald,.chip-btn[data-vy="fran"].aktiv{background:var(--ut-ljus);border-color:var(--ut-kant);color:var(--ut-mörk)}
+    .chip-btn[data-vy="ankomst"].vald,.chip-btn[data-vy="ankomst"].aktiv{background:var(--in-ljus);border-color:var(--in-kant);color:var(--in-mörk)}
+    .chip-btn[data-vy="alla"].vald,.chip-btn[data-vy="alla"].aktiv{background:var(--blå-soft);border-color:var(--blå-ring);color:var(--blå)}
+    .chip-btn.aktiv{box-shadow:0 0 0 3px var(--blå-ring), inset 0 0 0 1px rgba(255,255,255,.4)}
+    .chip-btn:focus-visible{outline:none;box-shadow:0 0 0 3px var(--blå-ring)}
+
+    /* Segmented control: Hela dygnet / Endast aktuella */
+    .status-rad{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:3px;background:var(--yta-dämpad);border:1px solid var(--linje);border-radius:var(--r-md)}
+    .status-btn{min-height:36px;padding:8px 12px;border:none;border-radius:var(--r-sm);background:transparent;color:var(--text-mjuk);font-size:.82rem;font-weight:500;cursor:pointer;transition:background .15s,color .15s,box-shadow .15s;font-family:inherit;letter-spacing:0}
+    .status-btn:hover{color:var(--text)}
+    .status-btn.aktiv{background:var(--vit);color:var(--text);font-weight:600;box-shadow:0 1px 2px rgba(15,23,42,.06),0 0 0 1px var(--linje)}
+    .status-btn:focus-visible{outline:none;box-shadow:0 0 0 2px var(--blå-ring)}
+
+    /* Apply-block */
+    .sb-apply{padding:16px 18px;background:var(--yta-svag);border-top:1px solid var(--linje-mjuk)}
+    .sb-pending{font-size:.78rem;color:var(--text-mjuk);line-height:1.55;margin-top:10px;padding:10px 12px;background:var(--vit);border:1px solid var(--linje);border-radius:var(--r);font-weight:400}
+
+    /* Linje-rader i sidopanelen */
+    .sb-linje{padding:11px 18px;border-bottom:1px solid var(--linje-mjuk);display:flex;flex-direction:column;gap:3px}
     .sb-linje:last-child{border-bottom:none}
-    .sb-namn{font-weight:600;font-size:.86rem;color:var(--text)}
-    .sb-rutt{font-size:.78rem;color:var(--text-mjuk)}
-    .sb-info{font-size:.74rem;color:var(--dim);font-style:italic}
-    .sb-lnk{font-size:.78rem;color:var(--blå-ljus);text-decoration:none;font-weight:500}
-    .sb-lnk:hover{text-decoration:underline}
-    .sb-liten{font-size:.78rem;color:var(--text-mjuk);padding:12px 16px;line-height:1.6}
-    .sb-meta{font-size:.74rem;color:var(--dim);padding:0 16px 12px;line-height:1.55}
-    .sb-sek-hdr{padding:8px 16px;background:var(--grå-ljus);border-bottom:1px solid var(--kant);font-size:.70rem;font-weight:700;color:var(--text-mjuk);text-transform:uppercase;letter-spacing:.06em}
-    footer{text-align:center;padding:20px;font-size:.76rem;color:var(--dim);border-top:1px solid var(--kant);margin-top:10px;background:var(--vit)}
-    /* ── Print / PDF ── */
+    .sb-namn{font-weight:600;font-size:.86rem;color:var(--text);letter-spacing:-.005em}
+    .sb-rutt{font-size:.78rem;color:var(--text-mjuk);font-weight:400}
+    .sb-info{font-size:.73rem;color:var(--dim);font-style:italic;font-weight:400}
+    .sb-lnk{font-size:.78rem;color:var(--blå);text-decoration:none;font-weight:500;transition:color .15s}
+    .sb-lnk:hover{color:var(--blå-ljus);text-decoration:underline;text-underline-offset:2px}
+    .sb-liten{font-size:.78rem;color:var(--text-mjuk);padding:14px 18px;line-height:1.62;font-weight:400}
+    .sb-meta{font-size:.72rem;color:var(--dim);padding:0 18px 14px;line-height:1.55;font-variant-numeric:tabular-nums}
+    .sb-sek-hdr{padding:9px 18px;background:var(--yta-dämpad);border-top:1px solid var(--linje-mjuk);border-bottom:1px solid var(--linje-mjuk);font-size:.66rem;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.10em}
+
+    /* ──────────────────────────────────────────────
+       Footer
+       ────────────────────────────────────────────── */
+    footer{text-align:center;padding:22px 16px;font-size:.74rem;color:var(--dim);border-top:1px solid var(--linje);margin-top:14px;background:var(--vit);font-weight:400;letter-spacing:.005em}
+
+    /* ──────────────────────────────────────────────
+       Tillgänglighet — diskret fokus-ring överallt
+       ────────────────────────────────────────────── */
+    a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:none}
+    *::selection{background:var(--blå-ring);color:var(--text)}
+
+    /* ──────────────────────────────────────────────
+       Print / PDF
+       ────────────────────────────────────────────── */
     @media print{
-      body{background:#fff;font-size:10px}
-      header{background:#fff!important;color:#000!important;border-bottom:2px solid #000;padding:6px 0}
-      .layout{display:block;padding:0;max-width:none}
+      body{background:#fff;font-size:10px;color:#000}
+      header{background:#fff!important;color:#000!important;border-bottom:1.5px solid #000;padding:8px 0;box-shadow:none}
+      .hdr-label{color:#444!important;opacity:1}
+      .hdr-datum,.hdr-vecka{color:#000!important}
+      .layout{display:block;padding:0;max-width:none;gap:0}
       .sidebar,footer,.info-knapp,.lnk-c,.info-c{display:none!important}
-      .sektion{border:1px solid #aaa;page-break-inside:avoid;margin-bottom:10px;box-shadow:none;border-radius:0}
-      .sek-hdr{background:#eee!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:6px 10px}
+      .sektion{border:1px solid #aaa;page-break-inside:avoid;margin-bottom:10px;box-shadow:none!important;border-radius:0}
+      .sek-hdr{background:#f4f4f4!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:6px 10px;border-bottom:1px solid #ccc}
       .sek-hdr h2{color:#000!important;font-size:11px}
+      .sek-hdr .cnt{background:#fff!important;color:#000!important;border:1px solid #999}
       tbody tr:hover{background:none}
       .tlnk,.rl{color:#000;text-decoration:none}
-      thead th{padding:5px 7px;font-size:9px}
+      thead th{padding:5px 7px;font-size:9px;background:#f8f8f8!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#333!important}
       tbody td{padding:5px 7px}
       .badge{border:1px solid #888;background:#fff!important;color:#000!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
     }

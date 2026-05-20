@@ -20,3 +20,6 @@ pdf_export_macro.bas
 # Övrigt
 *.md
 *.bas
+
+# Backuper
+*.bak
