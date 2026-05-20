@@ -6,8 +6,16 @@ GitHub-sida/statisk webbsida för färjetidtabeller till och från Sverige. Huvu
 
 Pågående men klart förbättrad. Sidan renderar nu en renare tabellvy där alla valbara kontroller ligger i högerpanelen, med rederifilter, rederiöversikt och färgkodade rederinamn. `index.html` är huvudvyn och `farjor.html` är nu en redirect till startsidan. Standardvyn är nu `Ankomster till Sverige` för dagens datum, och `Alla ankomster / avgångar` visas i en enda gemensam tabell utan separat pax-/fraktuppdelning. Fartygskolumnen hämtar serverförberedda fartygsnamn där möjligt och visar nu bredare ruttfallback även när exakt tur-fartyg saknas.
 
+Senaste UI-iteration: tabellen visar nu irrelevanta tidskolumner i ljusgrått per riktning (`Inkommande`, `Utgående`, `Mot Sverige`) i stället för att tona ned hela raden. Högerpanelen har samtidigt gjorts om till ett tydligare block- och chipbaserat kontrollkort för datum, rederi, listtyp, aktualitet och export.
+
 ## Senaste ändringar
 
+- 2026-05-20: Justerade riktningstider och byggde om användarpanelen i `index.html`.
+  - `Inkommande`: avgångstiden tonas nu ned i ljusgrått eftersom svensk ankomst är den relevanta händelsen.
+  - `Utgående`: ankomsttiden tonas nu ned i ljusgrått eftersom svensk avgång är den relevanta händelsen.
+  - `Mot Sverige`: ankomsttiden tonas ned i ljusgrått i UI, men raden räknas som passerad först när både avgångstid och ankomsttid/-datum har passerat.
+  - Tog bort generell nedtoning av hela passerade rader och flyttade i stället passerad-markeringen till den tidskolumn som faktiskt är operativt relevant.
+  - Gjorde om högerpanelen till en mer kompakt blocklayout med tydligare sektioner, pillknappar för listtyp och större knappar för `Hela dygnet` respektive `Endast aktuella`.
 - 2026-05-20: Förbättrade TT-Line-fartygslogiken i `index.html`.
   - TT-Line använder nu same-day-matchning med tolerans mot `avgangar_datum` på exakt samma rutt när dagsvyn och veckoschemat skiljer sig något i avgångstid.
   - Det gör att aktuellt fartyg från TT-Lines dagsvy kan användas i fler rader i stället för att falla tillbaka till stora rotationslistor.
@@ -83,6 +91,8 @@ Pågående men klart förbättrad. Sidan renderar nu en renare tabellvy där all
 
 ## Beslut och motiveringar
 
+- Visuell nedtoning ska ske på den irrelevanta tidskolumnen, inte på hela raden. Det gör att operatören fortfarande direkt ser den tidpunkt som är viktig för respektive listtyp.
+- `Mot Sverige` ska fortsätta ses som aktuell tills både avgång och ankomst har passerat. Motiveringen är att färjan fortfarande är operativt relevant efter avgång så länge den ännu inte nått Sverige.
 - `Alla ankomster / avgångar` ska vara en enda kronologisk tabell, inte delas upp efter färjetyp. Användarbehovet är att se svenska hamnhändelser i tidsordning oavsett om turen är pax, RoRo eller frakt.
 - Datum, listval och rederifilter ska inte auto-uppdatera vid varje klick/ändring. De ska först väljas och sedan tillämpas med en knapp för att ge förutsägbar styrning.
 - För `Ankomster till Sverige` måste urvalet baseras på ankomstdatum i svensk hamn, inte bara avgångsdatum från utrikeshamn. Därför tittar frontend nu bakåt flera dygn i källdatat.
@@ -100,6 +110,7 @@ Pågående men klart förbättrad. Sidan renderar nu en renare tabellvy där all
 
 - Fartygskolumnen är stabilare i UI, men datatäckningen är inte komplett för alla rutter utan serverförberedd dagsdata.
 - Rederiöversikten och rederifiltret fungerar i UI, men bygger fortfarande på nuvarande JSON + fallback snarare än fullständig route-import för alla rederier.
+- Den nya paneldesignen är införd i kod men bör gärna visuell-QA:as i riktig browser igen när lokal förhandsvisning är tillgänglig i miljön.
 - POLSCA-rader använder fortfarande gemensam datakälla utan separat Unity-import.
 - Projektroten innehåller flera rapport- och testfiler som bör sorteras in i `docs/` eller `archive/` vid separat städpass.
 
@@ -116,6 +127,7 @@ Pågående men klart förbättrad. Sidan renderar nu en renare tabellvy där all
 
 ## Nästa steg
 
+- Kör visuell browser-QA av den nya panelen och de kolumnspecifika tidsgråtoningarna för att finjustera spacing/kontrast vid behov.
 - Bygg eller hitta en riktig importkälla för Unity Line/POLSCA-datum så `Świnoujście ↔ Ystad` och `Świnoujście ↔ Trelleborg` inte behöver förlita sig på blandade schema-/fallbackkällor.
 - Lägg till officiellt verifierade men saknade rutter direkt i veckoschemat `farjor_data.json`, med prioritet:
   - TT-Line kompletta Sverigekopplade riktningar och Klaipėda-/Trelleborg-rutter
@@ -146,4 +158,5 @@ Pågående men klart förbättrad. Sidan renderar nu en renare tabellvy där all
 
 ## Historik
 
+- 2026-05-20 16:29 CEST: UI-justering för riktningstider och användarpanel dokumenterad i projektloggen.
 - 2026-05-20: Projektlogg skapad efter felsökning av saknade/felaktiga fartygsnamn i listvyn.

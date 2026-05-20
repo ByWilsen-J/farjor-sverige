@@ -76,10 +76,13 @@
     tbody td{padding:12px 12px;vertical-align:middle}
     tbody td:first-child{padding-left:20px}
     tbody td:last-child{padding-right:20px}
-    tbody tr.passerad td{opacity:.52}
     .tid-cell{display:flex;flex-direction:column;gap:2px;min-width:62px}
     .tid{font-variant-numeric:tabular-nums;font-weight:500;font-size:.98rem;white-space:nowrap;letter-spacing:-.005em}
     .tid.fet{font-weight:700;color:var(--text)}
+    .tid.dämpad{color:#94a3b8}
+    .tid-cell.dämpad .vtid-dag{color:#cbd5e1}
+    .tid-cell.passerad-aktiv .tid,
+    .tid-cell.passerad-aktiv .vtid-dag{opacity:.5}
     .vtid-dag{font-size:.70rem;color:var(--dim);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
     .overfart{white-space:nowrap;color:var(--text-mjuk);font-variant-numeric:tabular-nums;font-size:.88rem}
     .hamn-kod{font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:.04em;color:var(--text);font-size:.92rem}
@@ -105,33 +108,29 @@
     /* ── Sidebar ── */
     .sidebar{position:sticky;top:14px;display:flex;flex-direction:column;gap:14px}
     .sb-kort{background:var(--vit);border:1px solid var(--kant);border-radius:12px;overflow:hidden;box-shadow:var(--skugga)}
-    .sb-hdr{padding:11px 16px;background:linear-gradient(135deg,var(--blå-mörk),var(--blå));color:var(--vit);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
-    .sb-dat{padding:12px 16px;border-bottom:1px solid var(--kant)}
-    .sb-dat label{font-size:.72rem;color:var(--dim);display:block;margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
-    .sb-dat input[type=date]{width:100%;border:1px solid var(--kant);border-radius:8px;padding:8px 10px;font-size:.92rem;color:var(--text)}
-    .sb-filter label,.sb-export label,.sb-apply label{font-size:.72rem;color:var(--dim);display:block;margin-bottom:7px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
-    .sb-filter,.sb-export{padding:12px 16px;border-bottom:1px solid var(--kant)}
-    .sb-select{width:100%;border:1px solid var(--kant);border-radius:8px;padding:8px 10px;font-size:.92rem;color:var(--text);background:var(--vit)}
-    .sb-status{padding:12px 16px;border-bottom:1px solid var(--kant)}
-    .sb-status label{font-size:.72rem;color:var(--dim);display:block;margin-bottom:7px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
-    .status-rad{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .status-btn{padding:9px 10px;border-radius:8px;border:1px solid var(--kant-stark);background:var(--vit);color:var(--text-mjuk);font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s}
-    .status-btn:hover{border-color:var(--blå-ljus);color:var(--blå)}
-    .status-btn.aktiv{background:#dbeafe;border-color:var(--blå);color:var(--blå-mörk)}
-    .vy-grupp{display:flex;flex-direction:column;border-bottom:1px solid var(--kant)}
-    .vy-grupp-titel{font-size:.70rem;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:10px 16px 6px;background:var(--grå-ljus)}
-    .vy-knapp{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:11px 16px;border:none;border-top:1px solid var(--kant);background:var(--vit);cursor:pointer;font-size:.90rem;color:var(--text-mjuk);transition:all .12s;font-weight:500}
-    .vy-knapp:first-of-type{border-top:none}
-    .vy-knapp:hover{background:var(--grå-ljus);color:var(--text)}
-    .vy-knapp .vy-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--kant-stark);flex-shrink:0}
-    .vy-knapp[data-vy="ankomst"] .vy-dot{background:var(--in)}
-    .vy-knapp[data-vy="mot"] .vy-dot{background:var(--mot)}
-    .vy-knapp[data-vy="fran"] .vy-dot{background:var(--ut)}
-    .vy-knapp[data-vy="alla"] .vy-dot{background:var(--blå-ljus)}
-    .vy-knapp.vald{background:#eff6ff;color:var(--blå);font-weight:700}
-    .vy-knapp.aktiv{background:#dbeafe;color:var(--blå-mörk);font-weight:700;border-left:4px solid var(--blå);padding-left:12px}
-    .sb-apply{padding:12px 16px;border-bottom:1px solid var(--kant)}
-    .sb-pending{font-size:.78rem;color:var(--text-mjuk);line-height:1.5;margin-top:10px;padding:8px 10px;background:var(--grå-ljus);border-radius:6px}
+    .sb-hdr{padding:11px 16px;background:linear-gradient(135deg,#0f4662,#15607f);color:var(--vit);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+    .sb-block{padding:14px 16px;border-bottom:1px solid var(--kant)}
+    .sb-block:last-child{border-bottom:none}
+    .sb-label{font-size:.72rem;color:var(--dim);display:block;margin-bottom:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+    .sb-field{width:100%;border:1px solid #cfe0f0;border-radius:14px;padding:12px 14px;font-size:1rem;color:var(--text);background:linear-gradient(180deg,#fff,#f8fbff);box-shadow:inset 0 1px 0 rgba(255,255,255,.65)}
+    .sb-field:focus{outline:2px solid #8bc5ee;outline-offset:2px;border-color:#8bc5ee}
+    .sb-select{appearance:auto}
+    .chip-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .chip-btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:10px 12px;border-radius:999px;border:2px solid transparent;background:#fff;color:var(--text-mjuk);font-size:.82rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:all .15s;box-shadow:0 1px 2px rgba(15,23,42,.06)}
+    .chip-btn:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(15,23,42,.08)}
+    .chip-btn .chip-ico{font-size:1rem;line-height:1}
+    .chip-btn[data-vy="mot"]{background:#fff4e8;border-color:#fdba74;color:var(--mot-mörk)}
+    .chip-btn[data-vy="fran"]{background:#e9f1ff;border-color:#bfdbfe;color:#1d4ed8}
+    .chip-btn[data-vy="ankomst"]{background:#e9fff0;border-color:#bbf7d0;color:var(--in-mörk)}
+    .chip-btn[data-vy="alla"]{border-radius:12px;background:linear-gradient(180deg,#c2cedb,#aab8c7);border-color:#2d6d9c;color:#0f172a}
+    .chip-btn.vald{box-shadow:inset 0 0 0 2px rgba(255,255,255,.65),0 0 0 3px rgba(30,58,95,.16)}
+    .chip-btn.aktiv{box-shadow:inset 0 0 0 2px rgba(255,255,255,.85),0 0 0 3px rgba(21,96,127,.26)}
+    .status-rad{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .status-btn{min-height:50px;padding:12px 14px;border:none;border-radius:0;background:linear-gradient(180deg,#2aa6dd,#2296cd);color:var(--vit);font-size:.84rem;font-weight:800;cursor:pointer;transition:all .15s;box-shadow:inset 0 -1px 0 rgba(0,0,0,.08)}
+    .status-btn:hover{filter:brightness(1.03);box-shadow:0 5px 14px rgba(34,150,205,.18)}
+    .status-btn.aktiv{background:linear-gradient(180deg,#1479ad,#116a97)}
+    .sb-apply{padding:14px 16px;background:linear-gradient(180deg,#f8fbfe,#eef6fb)}
+    .sb-pending{font-size:.78rem;color:var(--text-mjuk);line-height:1.5;margin-top:10px;padding:10px 12px;background:#fff;border:1px solid #d7e4ef;border-radius:10px}
     .sb-linje{padding:10px 16px;border-bottom:1px solid var(--kant);display:flex;flex-direction:column;gap:3px}
     .sb-linje:last-child{border-bottom:none}
     .sb-namn{font-weight:600;font-size:.86rem;color:var(--text)}
@@ -207,35 +206,39 @@
 
   <aside class="sidebar">
     <div class="sb-kort">
-      <div class="sb-hdr">Välj vy</div>
-      <div class="vy-grupp-titel">Operativ vy</div>
-      <button class="vy-knapp aktiv vald" data-vy="ankomst" onclick="väljVy(this)"><span class="vy-dot"></span>Ankomster till Sverige</button>
-      <button class="vy-knapp" data-vy="mot" onclick="väljVy(this)"><span class="vy-dot"></span>Avgångar mot Sverige</button>
-      <button class="vy-knapp" data-vy="fran" onclick="väljVy(this)"><span class="vy-dot"></span>Avgår från Sverige</button>
-      <div class="vy-grupp-titel" style="border-top:1px solid var(--kant)">Översikt</div>
-      <button class="vy-knapp" data-vy="alla" onclick="väljVy(this)"><span class="vy-dot"></span>Alla ankomster + avgångar</button>
-      <div class="sb-dat">
-        <label>Datum</label>
-        <input type="date" id="dat-pick-sb" class="dat-pick" style="width:100%">
+      <div class="sb-hdr">Visningsval</div>
+      <div class="sb-block">
+        <label class="sb-label">Datum</label>
+        <input type="date" id="dat-pick-sb" class="sb-field">
       </div>
-      <div class="sb-filter">
-        <label>Filtrera på rederi</label>
-        <select id="rederi-filter" class="sb-select"></select>
+      <div class="sb-block">
+        <label class="sb-label">Rederi</label>
+        <select id="rederi-filter" class="sb-field sb-select"></select>
       </div>
-      <div class="sb-status">
-        <label>Visa i listan</label>
+      <div class="sb-hdr">Typ av lista</div>
+      <div class="sb-block">
+        <div class="chip-grid">
+          <button class="chip-btn aktiv vald" data-vy="ankomst" onclick="väljVy(this)"><span class="chip-ico">↓</span>Inkommande</button>
+          <button class="chip-btn" data-vy="fran" onclick="väljVy(this)"><span class="chip-ico">↑</span>Utgående</button>
+          <button class="chip-btn" data-vy="mot" onclick="väljVy(this)"><span class="chip-ico">→</span>Mot Sverige</button>
+          <button class="chip-btn" data-vy="alla" onclick="väljVy(this)">In &amp; Ut</button>
+        </div>
+      </div>
+      <div class="sb-hdr">Visa vald lista</div>
+      <div class="sb-status sb-block">
+        <label class="sb-label">Aktualitet</label>
         <div class="status-rad">
-          <button type="button" class="status-btn aktiv" id="show-all-btn">Visa alla</button>
-          <button type="button" class="status-btn" id="show-upcoming-btn">Visa bara kommande</button>
+          <button type="button" class="status-btn aktiv" id="show-all-btn">Hela dygnet</button>
+          <button type="button" class="status-btn" id="show-upcoming-btn">Endast aktuella</button>
         </div>
       </div>
       <div class="sb-apply">
-        <label>Uppdatera visning</label>
+        <label class="sb-label">Uppdatera visning</label>
         <button class="apply-btn" id="apply-controls">Visa vald lista</button>
         <div class="sb-pending" id="pending-info">Ankomster till Sverige för dagens datum visas som standard.</div>
       </div>
-      <div class="sb-export">
-        <label>Export</label>
+      <div class="sb-hdr">Export</div>
+      <div class="sb-block">
         <button class="xl-knapp" onclick="exportExcel()">&#8659; Exportera till Excel</button>
       </div>
     </div>
@@ -886,6 +889,15 @@ function ärPasseradTidpunkt(dayOffset, minutes, datumBas = valdDat){
   if(datum > nu.datum) return false;
   return minutes <= nu.minuter;
 }
+function ärPasseradRad(depInfo, ankInfo, motSverige, franSverige, depDatum){
+  if(motSverige && !franSverige){
+    const avgPasserad = ärPasseradTidpunkt(depInfo.dayOffset, depInfo.minutes, depDatum);
+    const ankPasserad = ärPasseradTidpunkt(ankInfo.dayOffset, ankInfo.minutes, depDatum);
+    return avgPasserad && ankPasserad;
+  }
+  const svenskTidpunkt = svenskTidpunktFörRad(depInfo, ankInfo, motSverige, franSverige);
+  return ärPasseradTidpunkt(svenskTidpunkt.dayOffset, svenskTidpunkt.minutes, depDatum);
+}
 function svenskTidpunktFörRad(depInfo, ankInfo, motSverige, franSverige){
   if(motSverige && !franSverige && Number.isFinite(ankInfo.sortAbs)){
     return {
@@ -1313,7 +1325,7 @@ function uppdateraHeaderInfo(){
   document.getElementById('hdr-vdag').textContent = VDL[valdDat.getDay()];
 }
 function synkaVyKnappar(){
-  document.querySelectorAll('.vy-knapp').forEach(btn=>{
+  document.querySelectorAll('.chip-btn').forEach(btn=>{
     btn.classList.toggle('vald', btn.dataset.vy === pendingViewMode);
     btn.classList.toggle('aktiv', btn.dataset.vy === viewMode);
   });
@@ -1410,6 +1422,15 @@ function uppdateraSorteringUI(){
   document.querySelectorAll('th[data-sort]').forEach(th=>{
     th.classList.toggle('sort-aktiv', th.dataset.sort === aktiv);
   });
+}
+function tidsCellState(rad){
+  const riktning = rad._riktning || '';
+  return {
+    avgDämpad: riktning === 'inkommande',
+    ankDämpad: riktning === 'utgaende' || riktning === 'motsverige',
+    avgAktuellPasserad: rad.passerad && (riktning === 'utgaende' || riktning === 'motsverige'),
+    ankAktuellPasserad: rad.passerad && riktning === 'inkommande',
+  };
 }
 
 // ── Rendering ──
@@ -1530,7 +1551,7 @@ function bygRad(rad, r, länk, depDatum = valdDat){
   const motSverige = rad.mot_sverige===true || SVENSKA_HAMNAR.has(rad.ankhamn);
   const franSverige = rad.fran_sverige===true || SVENSKA_HAMNAR.has(rad.avghamn);
   const svenskTidpunkt = svenskTidpunktFörRad(depInfo, ankInfo, motSverige, franSverige);
-  const passerad = ärPasseradTidpunkt(svenskTidpunkt.dayOffset, svenskTidpunkt.minutes, depDatum);
+  const passerad = ärPasseradRad(depInfo, ankInfo, motSverige, franSverige, depDatum);
   const fetKolumn = (motSverige && !franSverige) ? 'ank' : 'avg';
   return {
     rederi:r,
@@ -1583,13 +1604,21 @@ function fyllFilter(rader){
 
 function bygTr(rad){
   const tr = document.createElement('tr');
-  if(rad.passerad) tr.classList.add('passerad');
+  const state = tidsCellState(rad);
 
   // Tider med veckodag
-  const avKlass = rad._fetKolumn === 'avg' ? 'tid fet' : 'tid';
-  const anKlass = rad._fetKolumn === 'ank' ? 'tid fet' : 'tid';
-  const avTid = `<div class="tid-cell"><span class="${avKlass}">${esc(rad.avgtid)}</span><span class="vtid-dag">${esc(rad.avVdag)}</span></div>`;
-  const anTid = `<div class="tid-cell"><span class="${anKlass}">${esc(rad.anktid)}</span><span class="vtid-dag">${esc(rad.ankVdag)}</span></div>`;
+  const avKlass = ['tid'];
+  const anKlass = ['tid'];
+  const avCellKlass = ['tid-cell'];
+  const anCellKlass = ['tid-cell'];
+  if(rad._fetKolumn === 'avg') avKlass.push('fet');
+  if(rad._fetKolumn === 'ank') anKlass.push('fet');
+  if(state.avgDämpad){ avKlass.push('dämpad'); avCellKlass.push('dämpad'); }
+  if(state.ankDämpad){ anKlass.push('dämpad'); anCellKlass.push('dämpad'); }
+  if(state.avgAktuellPasserad) avCellKlass.push('passerad-aktiv');
+  if(state.ankAktuellPasserad) anCellKlass.push('passerad-aktiv');
+  const avTid = `<div class="${avCellKlass.join(' ')}"><span class="${avKlass.join(' ')}">${esc(rad.avgtid)}</span><span class="vtid-dag">${esc(rad.avVdag)}</span></div>`;
+  const anTid = `<div class="${anCellKlass.join(' ')}"><span class="${anKlass.join(' ')}">${esc(rad.anktid)}</span><span class="vtid-dag">${esc(rad.ankVdag)}</span></div>`;
   const öfTid = `<span class="overfart">${esc(rad.överfart||'—')}</span>`;
 
   // Fartyg
