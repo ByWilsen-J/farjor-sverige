@@ -12,8 +12,15 @@ Automationen är nu uppdelad i faktisk driftmodell: timvis uppdatering för dyna
 
 Efter innehållsrevisionen 2026-05-21 visar UI:t tydligare skillnad mellan exakt fartyg och verifierad ruttrotation, mer konsekventa källetiketter (`Live`, `Datum`, `Veckoschema`) och renare info-rutor utan generiska `Källa`- eller revisionsrester i tooltip-text.
 
+TT-Lines tidigare fallbackluckor i grundschemat för `Travemünde ↔ Trelleborg`, `Świnoujście ↔ Trelleborg` och `Klaipėda ↔ Trelleborg` är nu kompletterade i själva genereringskedjan, så att rutterna finns i publiceringsfönstret även utanför det dynamiska 14-dagarsfönstret.
+
 ## Senaste ändringar
 
+- 2026-05-21: Lade in verifierad TT-Line-fallback i genereringskedjan.
+  - Lade till [verified_schema_overrides.py](/Users/jane/Documents/Claude/Projects/Weblänksida/verified_schema_overrides.py) som ersätter ofullständiga Excel-rader för TT-Line med verifierade officiella standardtidtabeller för `Travemünde ↔ Trelleborg`, `Świnoujście ↔ Trelleborg` och `Klaipėda ↔ Trelleborg`.
+  - Uppdaterade [generera_json.py](/Users/jane/Documents/Claude/Projects/Weblänksida/generera_json.py) så att override-lagret alltid appliceras innan `farjor_data.json` och `avgangsinstanser` byggs.
+  - Synkade nuvarande [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json) mot override-lagret och bekräftade att TT-Line-rutterna nu materialiseras som `weekly_schedule` även långt utanför det dynamiska fönstret.
+  - Normaliserade [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) så TT-Lines `Klaipėda`-rader inte får avvikande kategori mot övriga TT-Line-rader i fallback-/extraradslogiken.
 - 2026-05-21: Gjorde innehålls- och källtextrevision efter datuminstans-ombyggnaden.
   - Verifierade prioriterade rederier/rutter mot officiella källor med fokus på `Polferries (POLSCA)`, `TT-Line`, `Stena Line`, `Tallink Silja`, `DFDS`, `Finnlines` och `Viking Line`.
   - Uppdaterade [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) så fallbackfartyg med flera möjliga fartyg visas som `Rotation: ...` i stället för att se ut som exakt fartyg.
@@ -175,7 +182,6 @@ Efter innehållsrevisionen 2026-05-21 visar UI:t tydligare skillnad mellan exakt
 - Vissa schemaundantag ligger fortfarande som veckorader med anmärkning i datalagret. Den här omgången säkrade Viking-specialtiden, men fler undantag kan på sikt behöva samma typ av datumstyrning.
 - Unity Line finns inte som egen datumkälla i nuvarande JSON, så full separering eller exakt avgångsimport kräver ny importkedja.
 - Officiellt bekräftade rutter saknas fortfarande helt eller delvis i själva veckoschemat `farjor_data.json`, även om flera nu kompletteras via datuminstanser:
-  - TT-Line `Travemünde → Trelleborg`, `Świnoujście → Trelleborg` och delar av `Klaipėda ↔ Trelleborg`
   - Unity Line/POLSCA `Świnoujście ↔ Trelleborg` utanför nuvarande datumperiod
   - Eventuell framtida POLSCA `Gdańsk ↔ Karlshamn` när den faktiskt öppnar
 
@@ -216,12 +222,13 @@ Efter innehållsrevisionen 2026-05-21 visar UI:t tydligare skillnad mellan exakt
 - [x] Frontend: knappstyrd tillämpning av datum/listval/rederifilter.
 - [x] Frontend: `Ankomster till Sverige` baseras på verkligt ankomstdatum till svensk hamn.
 - [x] Lägg till Finnlines `Malmö ↔ Świnoujście` i datalagret.
-- [ ] Lägg till saknade TT-Line-riktningar/rutter i datalagret med verifierad tidtabell.
+- [x] Lägg till saknade TT-Line-riktningar/rutter i datalagret med verifierad tidtabell för `Travemünde ↔ Trelleborg`, `Świnoujście ↔ Trelleborg` och `Klaipėda ↔ Trelleborg`.
 - [x] Projektstruktur: skapa/uppdatera `docs/`, `archive/`, `temp/`, `exports/`.
 - [ ] Kontrollera GitHub Actions efter att fler skrapare kopplats in.
 
 ## Historik
 
+- 2026-05-21 21:13 CEST: TT-Line-fallbacken flyttades upp i genereringskedjan med verifierade officiella standardtidtabeller för `Travemünde ↔ Trelleborg`, `Świnoujście ↔ Trelleborg` och `Klaipėda ↔ Trelleborg`, och aktuell `farjor_data.json` synkades mot den nya override-modellen.
 - 2026-05-21 20:45 CEST: Innehållsrevision efter datuminstans-ombyggnaden genomförd; fartygsfallbacks och källtooltipar normaliserades, exakta datumrader fick komplett källmeta och flera gamla verifieringstexter/anmärkningar städades.
 - 2026-05-21 10:56 CEST: Ny datuminstans-baserad version kopplades ihop end-to-end med timvis dynamic refresh, daglig backfill, källmärkning i UI och städad projektstruktur.
 - 2026-05-21 10:46 CEST: Dokumentation för ny körmodell lades till i `docs/` och befintligt Actions-workflow kompletterades med manuella bridge-lägen för dynamisk refresh och backfill.

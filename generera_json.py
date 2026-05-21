@@ -13,6 +13,7 @@ from pathlib import Path
 from datetime import date
 
 from schedule_instances import build_base_instances
+from verified_schema_overrides import apply_verified_schema_overrides
 
 SCRIPT_DIR = Path(__file__).parent
 XLSX_PATH  = SCRIPT_DIR / "Farjor_Sverige_v2_normaliserad.xlsx"
@@ -54,6 +55,8 @@ for row in ws.iter_rows(min_row=2, values_only=True):
         "verifiering":  d.get('Verifiering') or '',
         "kalla":        d.get('Källa') or '',
     })
+
+schema = apply_verified_schema_overrides(schema)
 
 ws2 = wb['Schemaregister_Intervall']
 hdrs2 = [c.value for c in ws2[1]]
