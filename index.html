@@ -424,14 +424,14 @@
     <div class="sb-kort">
       <div class="sb-hdr">Om sidan</div>
       <div class="sb-liten">
-        Fartygsnamn hämtas live när rederiet erbjuder det, annars från schemalagda uppdateringar i datalagret var 14:e dag eller som tydlig ruttrotation när exakt tur-fartyg saknas.<br><br>
+        Fartygsnamn hämtas från rederiernas aktuella dagskällor när sådana finns. När exakt fartyg saknas visas i stället tydligt markerad ruttrotation eller verifierad standardfärja för rutten.<br><br>
         Alla tider visas i svensk tid.
       </div>
       <div class="sb-meta" id="upd"></div>
     </div>
   </aside>
 </div>
-<footer>Färjor Sverige · Källdata: respektive rederis API · Uppdateras var 14:e dag</footer>
+<footer>Färjor Sverige · Källdata: officiella rederikällor · Dynamiska källor uppdateras varje timme</footer>
 
 <script>
 'use strict';
@@ -1122,6 +1122,31 @@ function slåIhopFartygListor(...listor){
   return unika.join(' / ');
 }
 function normaliseraKallaChipInfo(källor){
+  const detaljer = byggKällaDetaljer(källor);
+  if(!detaljer.length) return null;
+  const samlad = detaljer.join(' ');
+  const labelRaw = detaljer[0] || '';
+  let klass = 'meta';
+  let badge = '';
+  if(/live|realtid|real[\s-]?time|api/i.test(samlad)){
+    klass = 'live';
+    badge = 'Live';
+  }else if(/datum|date|tidtabell|schedule|dagsdata|exakt/i.test(samlad)){
+    klass = 'datum';
+    badge = 'Datum';
+  }else if(labelRaw && labelRaw.length <= 12){
+    badge = labelRaw;
+  }else{
+    badge = 'Info';
+  }
+
+  return {
+    badge,
+    klass,
+    titel: detaljer.join(' · ') || badge,
+  };
+}
+function byggKällaDetaljer(källor){
   const labelRaw = String(förstaIckeTommaVärde(källor, [
     'kalllabel','källa_label','kalla_label','source_label','sourceLabel','label'
   ]) || '').trim();
@@ -1139,23 +1164,6 @@ function normaliseraKallaChipInfo(källor){
   };
   const typNorm = typRaw.toLowerCase();
   const typVis = internaTyper[typNorm] || typRaw;
-  if(!labelRaw && !typVis && !detaljRaw) return null;
-
-  const samlad = `${labelRaw} ${typVis} ${detaljRaw}`.trim();
-  let klass = 'meta';
-  let badge = '';
-  if(/live|realtid|real[\s-]?time|api/i.test(samlad)){
-    klass = 'live';
-    badge = 'Live';
-  }else if(/datum|date|tidtabell|schedule|dagsdata|exakt/i.test(samlad)){
-    klass = 'datum';
-    badge = 'Datum';
-  }else if(labelRaw && labelRaw.length <= 12){
-    badge = labelRaw;
-  }else{
-    badge = 'Källa';
-  }
-
   const detaljer = [];
   const sedda = new Set();
   [labelRaw, typVis === labelRaw ? '' : typVis, detaljRaw].forEach(värde=>{
@@ -1165,11 +1173,7 @@ function normaliseraKallaChipInfo(källor){
     sedda.add(key);
     detaljer.push(s);
   });
-  return {
-    badge,
-    klass,
-    titel: detaljer.join(' · ') || badge,
-  };
+  return detaljer;
 }
 function serUtSomAvgangsinstans(raw, ctx = {}){
   if(!raw || typeof raw !== 'object' || Array.isArray(raw)) return false;
@@ -1582,36 +1586,55 @@ function routeFleetFallback(rad, rederi){
   );
 }
 
-function getFar(rad, depDate = valdDat){
+function getShipInfo(rad, depDate = valdDat){
   const avgt=rad.avgtid_raw||rad.avgtid||'';
   const meta = hämtaAvgangsMeta(rad, depDate);
+  const skapa = (namn, source='exact', exact=true) => {
+    const text = String(namn||'').trim();
+    if(!text) return {text:'', source:'none', exact:false, hint:''};
+    const lista = splitFartygLista(text);
+    const ärRotation = source === 'rotation' || lista.length > 1;
+    return {
+      text: ärRotation ? `Rotation: ${lista.join(' / ')}` : text,
+      source: ärRotation ? 'rotation' : source,
+      exact: exact && !ärRotation,
+      hint: ärRotation
+        ? 'Exakt fartyg saknas i dagens källa. Visar verifierad ruttrotation.'
+        : (!exact ? 'Exakt fartyg saknas i dagens källa. Visar verifierad standardfärja för rutten.' : ''),
+    };
+  };
   // 1. Polsca-koder
-  if(rad.fartyg&&rad.fartyg!=='N/A') return FKODER[rad.fartyg]||rad.fartyg;
-  if(meta?.fartyg) return FKODER[meta.fartyg] || meta.fartyg;
+  if(rad.fartyg&&rad.fartyg!=='N/A') return skapa(FKODER[rad.fartyg]||rad.fartyg, 'exact', true);
+  if(meta?.fartyg) return skapa(FKODER[meta.fartyg] || meta.fartyg, 'exact', true);
   // 2. Statisk (Wasaline, Eckerö)
   const r=normRederi(rad.rederi||'');
-  if(STATFARTYG[r]) return STATFARTYG[r];
+  if(STATFARTYG[r]) return skapa(STATFARTYG[r], 'static', true);
   // 3. fartyg_datum — server-side förhämtat (Viking Line, Tallink, DFDS m.fl.)
   const ds=dStr(depDate);
   const fdKey=`${r}:${rad.avghamn}→${rad.ankhamn}:${avgt}`;
   const fromFD=DATA.fartyg_datum?.[ds]?.[fdKey];
-  if(fromFD) return fromFD;
+  if(fromFD) return skapa(fromFD, 'exact', true);
   // 4. Viking Line live browser-cache (fallback)
   if(r==='Viking Line'){
     const dep=VL_PORTER[rad.avghamn],arr=VL_PORTER[rad.ankhamn];
-    if(dep&&arr){const vl=vlCache[`${dep}→${arr}:${avgt}`];if(vl) return vl;}
-    return namnetFrånAnm(rad.anmarkning||'') || routeFleetFallback(rad, r);
+    if(dep&&arr){const vl=vlCache[`${dep}→${arr}:${avgt}`];if(vl) return skapa(vl, 'exact', true);}
+    const frånAnm = namnetFrånAnm(rad.anmarkning||'');
+    if(frånAnm) return skapa(frånAnm, splitFartygLista(frånAnm).length > 1 ? 'rotation' : 'expected', splitFartygLista(frånAnm).length === 1);
+    return skapa(routeFleetFallback(rad, r), 'rotation', false);
   }
   // 5. DFDS live browser-cache (fallback)
   if(r==='DFDS'){
     const dep=DFDS_PORTER[rad.avghamn],arr=DFDS_PORTER[rad.ankhamn];
-    if(dep&&arr){const dk=dfdsCache[`${dep}→${arr}:${ds}:${avgt}`];if(dk) return dk;}
+    if(dep&&arr){const dk=dfdsCache[`${dep}→${arr}:${ds}:${avgt}`];if(dk) return skapa(dk, 'exact', true);}
   }
   if(r==='TT-Line'){
-    return komprimeraTtLineFallback(namnetFrånAnm(rad.anmarkning||'') || routeFleetFallback(rad, r));
+    const fallback = komprimeraTtLineFallback(namnetFrånAnm(rad.anmarkning||'') || routeFleetFallback(rad, r));
+    return skapa(fallback, splitFartygLista(fallback).length > 1 ? 'rotation' : 'expected', splitFartygLista(fallback).length === 1);
   }
   // 6. Anmärkning
-  return namnetFrånAnm(rad.anmarkning||'') || routeFleetFallback(rad, r);
+  const frånAnm = namnetFrånAnm(rad.anmarkning||'');
+  if(frånAnm) return skapa(frånAnm, splitFartygLista(frånAnm).length > 1 ? 'rotation' : 'expected', splitFartygLista(frånAnm).length === 1);
+  return skapa(routeFleetFallback(rad, r), 'rotation', false);
 }
 
 function getKat(rad){
@@ -1689,12 +1712,56 @@ function skaHoppaÖverSchemaDublett(rad, depDatum, sedda){
 function rensaAnm(anm){
   if(!anm) return '';
   let s = anm;
-  const dot = anm.indexOf('.');
-  if(dot > 0 && dot < 36){
-    const c = anm.slice(0,dot).trim();
-    if(c && !c.includes(',') && c.split(' ').length <= 4) s = anm.slice(dot+1).trim();
+  const förstaMening = String(anm).match(/^(.{1,35}?)\.\s+(?=[A-ZÅÄÖ0-9])/);
+  if(förstaMening){
+    const c = förstaMening[1].trim();
+    if(c && !c.includes(',') && c.split(' ').length <= 4) s = anm.slice(förstaMening[0].length).trim();
   }
-  return s.replace(/\[.*?\]/g,'').replace(/\s+/g,' ').trim();
+  s = s.replace(/\[.*?\]/g,' ').replace(/\s+/g,' ').trim();
+  s = s.replace(/\bKORRIGERING:\s*/gi, '');
+  s = s.replace(/\bSTATUSÄNDRING:\s*/gi, '');
+  s = s.replace(/\bSTRUKTURÄNDRING:\s*/gi, '');
+  s = s.replace(/\bÄNDRING:\s*/gi, '');
+  s = s.replace(
+    /Tre fartyg i rotation:\s*Stena Ebba,\s*Estelle,\s*Spirit\./i,
+    'Rotation: Stena Ebba, Stena Estelle och Stena Spirit.'
+  );
+  s = s.replace(
+    /Kontrollera aktuell tidtabell hos Viking Line\./gi,
+    'Kontrollera aktuell avgångstid hos Viking Line.'
+  );
+  const efterVerifiering = s.match(/^(?:Verifierat|Per[-\s]?dag-schema)\b[\s\S]*?[.!?]\s+([A-ZÅÄÖ0-9].+)$/i);
+  if(efterVerifiering && efterVerifiering[1]) s = efterVerifiering[1].trim();
+  if(/^(Verifierat|Per[-\s]?dag-schema)\b/i.test(s)) return '';
+  if(/^(?:com|se|fi|ee|lt|lv)\b/i.test(s)) return '';
+  if(/^(?:routes-sida|route\s+[A-Z0-9]+|standardvecka|live-data|live ajax)\b/i.test(s)) return '';
+  return s.trim();
+}
+
+function byggDatakällaText(rad){
+  const detaljer = byggKällaDetaljer([
+    ...metaObjektFörRad(rad?._instansMeta),
+    ...metaObjektFörRad(rad?._avgMeta),
+    ...metaObjektFörRad(rad),
+  ]);
+  return detaljer.join(' · ').trim();
+}
+
+function normaliseraVerifieringText(värde){
+  const s = String(värde||'').trim();
+  if(!s || /^verifierad$/i.test(s) || /^verifierad via datumimport\.?$/i.test(s)) return '';
+  return s;
+}
+
+function normaliseraOperatörText(rad){
+  const operator = String(rad.operator || rad.source_operator || '').trim();
+  const display = String(rad.rederi || '').trim();
+  if(!operator || !display) return '';
+  if(operator === display) return '';
+  if(normRederi(operator) === normRederi(display)){
+    return operator;
+  }
+  return `${operator} (visas som ${display})`;
 }
 
 // ── Viking Line live-hämtning ──
@@ -2066,6 +2133,7 @@ function bygRad(rad, r, länk, depDatum = valdDat){
   const depVd = VD[depDatum.getDay()];
   const depInfo = normaliseraAvgangstid(rad.avgtid_raw||rad.avgtid||'', rad.avghamn||'', rad.avgtid||'');
   const avgMeta = hämtaAvgangsMeta(rad, depDatum);
+  const shipInfo = getShipInfo(rad, depDatum);
   const ankInfo = byggExaktAnkomst(avgMeta, depInfo, depDatum, rad.ankhamn||'')
     || normaliseraAnkomsttid(rad.anktid||'', depInfo, depVd, rad.ankhamn||'');
   const kallaChip = byggRadKallaChip(rad, avgMeta);
@@ -2083,7 +2151,7 @@ function bygRad(rad, r, länk, depDatum = valdDat){
     överfart:ankInfo.duration||'—',
     avghamn:rad.avghamn||'',
     ankhamn:rad.ankhamn||'',
-    fartyg:getFar(rad, depDatum),
+    fartyg:shipInfo.text,
     länk,
     grå:false,
     passerad:false,
@@ -2092,6 +2160,7 @@ function bygRad(rad, r, länk, depDatum = valdDat){
     källa:avgMeta?.kalla || rad.kalla||länk||'',
     verifiering:rad.verifiering||'',
     anm:rensaAnm(rad.anmarkning||''),
+    operator:String(rad.source_operator || '').trim(),
     _fetKolumn:'avg',
     _passeradAvg:passeradAvg,
     _passeradAnk:passeradAnk,
@@ -2108,6 +2177,8 @@ function bygRad(rad, r, länk, depDatum = valdDat){
       ? (Number.isFinite(depInfo.absSw) ? mod(depInfo.absSw, 1440) : Number.MAX_SAFE_INTEGER)
       : (Number.isFinite(ankInfo.sortAbs) ? mod(ankInfo.sortAbs, 1440) : Number.MAX_SAFE_INTEGER),
     _kallaChip:kallaChip,
+    _avgMeta:avgMeta,
+    _shipInfo:shipInfo,
   };
 }
 
@@ -2168,14 +2239,18 @@ function bygTr(rad){
   const bh = riktningsBadge(rad);
 
   // Info-tooltip
-  const kallTxt = rad._kallaChip ? `<strong>Datakälla:</strong> ${esc(rad._kallaChip.titel)}<br>` : '';
-  const verTxt = rad.verifiering ? `<strong>Verifiering:</strong> ${esc(rad.verifiering)}<br>` : '';
-  const anmTxt = rad.anm ? `${esc(rad.anm)}<br>` : '';
-  const källaHtml = rad.källa
-    ? `<strong>Källa:</strong> <a href="${esc(rad.källa)}" target="_blank" rel="noopener">${esc(rad.källa)}</a>`
-    : '';
-  const ih = (kallTxt||verTxt||anmTxt||källaHtml)
-    ? `<span class="info-knapp" tabindex="0">i<span class="info-pop">${kallTxt}${verTxt}${anmTxt}${källaHtml}</span></span>`
+  const tooltipRader = [];
+  const datakällaText = byggDatakällaText(rad) || rad._kallaChip?.titel || '';
+  if(datakällaText) tooltipRader.push(`<strong>Datakälla:</strong> ${esc(datakällaText)}`);
+  const operatorTxt = normaliseraOperatörText(rad);
+  if(operatorTxt) tooltipRader.push(`<strong>Operatör:</strong> ${esc(operatorTxt)}`);
+  const verTxt = normaliseraVerifieringText(rad.verifiering);
+  if(verTxt) tooltipRader.push(`<strong>Verifiering:</strong> ${esc(verTxt)}`);
+  if(rad._shipInfo?.hint) tooltipRader.push(`<strong>Fartyg:</strong> ${esc(rad._shipInfo.hint)}`);
+  if(rad.anm) tooltipRader.push(`<strong>Kommentar:</strong> ${esc(rad.anm)}`);
+  if(rad.källa) tooltipRader.push(`<strong>Källa:</strong> <a href="${esc(rad.källa)}" target="_blank" rel="noopener">${esc(rad.källa)}</a>`);
+  const ih = tooltipRader.length
+    ? `<span class="info-knapp" tabindex="0">i<span class="info-pop">${tooltipRader.join('<br>')}</span></span>`
     : '';
 
   tr.innerHTML = `

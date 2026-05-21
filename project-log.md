@@ -10,8 +10,18 @@ Sidan behåller den nya högerpanelen, rederifiltret och den gemensamma tabellvy
 
 Automationen är nu uppdelad i faktisk driftmodell: timvis uppdatering för dynamiska datumkällor och daglig backfill för hela publiceringsfönstret. Kvarvarande större luckor gäller främst separat trafikbevakning från särskilda rederi-sidor, Viking Lines blockerade server-side-källa och full separering av `Polferries`/`Unity Line` under `Polsca`.
 
+Efter innehållsrevisionen 2026-05-21 visar UI:t tydligare skillnad mellan exakt fartyg och verifierad ruttrotation, mer konsekventa källetiketter (`Live`, `Datum`, `Veckoschema`) och renare info-rutor utan generiska `Källa`- eller revisionsrester i tooltip-text.
+
 ## Senaste ändringar
 
+- 2026-05-21: Gjorde innehålls- och källtextrevision efter datuminstans-ombyggnaden.
+  - Verifierade prioriterade rederier/rutter mot officiella källor med fokus på `Polferries (POLSCA)`, `TT-Line`, `Stena Line`, `Tallink Silja`, `DFDS`, `Finnlines` och `Viking Line`.
+  - Uppdaterade [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) så fallbackfartyg med flera möjliga fartyg visas som `Rotation: ...` i stället för att se ut som exakt fartyg.
+  - Rensade info-tooltipar från generisk revisionsprosa och gamla prefix som `KORRIGERING:` / `STATUSÄNDRING:` / `STRUKTURÄNDRING:`, men bevarade riktiga användarkommentarer.
+  - Gjorde datakälltexten i tooltipen råfältsbaserad i stället för badge-baserad, så exakta rader kan visa t.ex. `Live-tidtabell · TT-Line timetable endpoint` även när chippen bara visar `Live`.
+  - Förtydligade operatörsraden i tooltipen när UI-visningsnamn skiljer sig från faktisk källa, t.ex. `Polferries (POLSCA)` bakom `Polsca`.
+  - Uppdaterade [update_fartyg.py](/Users/jane/Documents/Claude/Projects/Weblänksida/update_fartyg.py) och [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json) så exakta datumrader får komplett källmeta (`kalla`, `source_label`, `source_detail`, `source_type`) och så legacy-fälten speglas från `avgangsinstanser`.
+  - Normaliserade flera gamla anmärkningar i [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json), särskilt för `Tallink Silja`, `DFDS (tidigare Tallink Silja)`, `Stena Line`, `Polferries (POLSCA)` och Viking/Birka-rader där äldre text blivit missvisande efter ombyggnaden.
 - 2026-05-21: Slutförde första produktionsversionen av den nya datuminstans-modellen.
   - Lade till [schedule_instances.py](/Users/jane/Documents/Claude/Projects/Weblänksida/schedule_instances.py) som materialiserar veckoschema till datuminstanser inom ett fast publiceringsfönster och merge:ar in exakta dags-/liveavgångar.
   - Uppdaterade [generera_json.py](/Users/jane/Documents/Claude/Projects/Weblänksida/generera_json.py) så att `farjor_data.json` alltid innehåller `avgangsinstanser` redan från basgenereringen.
@@ -149,7 +159,7 @@ Automationen är nu uppdelad i faktisk driftmodell: timvis uppdatering för dyna
 
 ## Pågående arbete
 
-- Visuell QA av den nya instansrenderingen i riktig browser när nätverk/lokal preview är tillgänglig.
+- Slutlig visuell QA av den nya instansrenderingen i riktig browser när lokal browser-runtime finns tillgänglig igen.
 - Nästa utbyggnad av trafikinformationsspåret så att separata rederisidor kan generera explicita `traffic_notices`, inte bara kommentarer från livekällornas statusfält.
 - Separat källa för `Unity Line`/`Polferries` så att `Polsca` kan vara rent visningsnamn och inte lookup-nyckel.
 - Viking Lines server-side-källa behöver fortfarande återvalideras eftersom den i tidigare drift gav 403 och i denna miljö inte kunde nätverkstestas alls.
@@ -158,6 +168,7 @@ Automationen är nu uppdelad i faktisk driftmodell: timvis uppdatering för dyna
 
 - Dedikerade collectors för rederiernas separata trafikinformationssidor finns ännu inte. Nuvarande version kan bära status/kommentar från de livekällor som redan innehåller sådan information, men inte bevaka alla externa trafikbloggar/bulletinsidor.
 - `Viking Line` kan fortfarande inte verifieras fullt server-side i den här miljön eftersom alla nätanrop är blockerade lokalt och den tidigare produktionsobservationen var `403 Forbidden`.
+- Lokal headless-browserautomation kunde inte återanvändas fullt i denna session eftersom Playwright saknar installerad browser-binary i miljön. Innehållsrevisionen verifierades därför via officiella webbkällor, JSON-audit, funktionsprov av tooltip-normalisering och tidigare lokal preview.
 - `polsca_datum` är en separat specialkedja med egen period (`2026-05-01` till `2026-11-30`) och innehåller bara `Świnoujście ↔ Trelleborg`, medan `Ystad ↔ Świnoujście` och `Gdańsk ↔ Nynäshamn` fortfarande ligger i statiskt schema.
 - `intervall`-datan i JSON är i praktiken oanvänd i rendering och hjälper därför inte dagens tidtabellsvisning trots att den finns i datalagret.
 - Veckoschemat innehåller fortfarande vissa manuellt inlagda undantag och parallella varianter. Frontenden deduperar nu de uppenbara fallen, men datalagret kan fortfarande behöva en separat städning senare.
@@ -170,10 +181,10 @@ Automationen är nu uppdelad i faktisk driftmodell: timvis uppdatering för dyna
 
 ## Nästa steg
 
+- Kör en ny full browser-QA när lokal browser-runtime fungerar igen och kontrollera särskilt tooltipar, rotationsfartyg och källchippar i `In & Ut`-vyn.
 - Lägg till separat `traffic_notices`-collector per rederi där officiella trafikmeddelandesidor finns.
 - Bygg ut `source_registry` från dokumenterad matris till körbar konfiguration om kommande skript ska styras route-för-route.
 - Planera dubbel bevakning för `Polsca` där både `Polferries` och `Unity Line` bevakas separat och sammanfogas först före visning.
-- Kör visuell browser-QA av den nya panelen och de kolumnspecifika tidsgråtoningarna för att finjustera spacing/kontrast vid behov.
 - Bygg eller hitta en riktig importkälla för Unity Line/POLSCA-datum så `Świnoujście ↔ Ystad` och `Świnoujście ↔ Trelleborg` inte behöver förlita sig på blandade schema-/fallbackkällor.
 - Lägg till officiellt verifierade men saknade rutter direkt i veckoschemat `farjor_data.json` eller i framtida statisk fallbackgenerering, med prioritet:
   - TT-Line kompletta Sverigekopplade riktningar och Klaipėda-/Trelleborg-rutter
@@ -211,6 +222,7 @@ Automationen är nu uppdelad i faktisk driftmodell: timvis uppdatering för dyna
 
 ## Historik
 
+- 2026-05-21 20:45 CEST: Innehållsrevision efter datuminstans-ombyggnaden genomförd; fartygsfallbacks och källtooltipar normaliserades, exakta datumrader fick komplett källmeta och flera gamla verifieringstexter/anmärkningar städades.
 - 2026-05-21 10:56 CEST: Ny datuminstans-baserad version kopplades ihop end-to-end med timvis dynamic refresh, daglig backfill, källmärkning i UI och städad projektstruktur.
 - 2026-05-21 10:46 CEST: Dokumentation för ny körmodell lades till i `docs/` och befintligt Actions-workflow kompletterades med manuella bridge-lägen för dynamisk refresh och backfill.
 - 2026-05-21 10:30 CEST: Full nulägeskartläggning av tidtabellskedjan genomförd inför planerat omtag av logiken kring live-/datumkällor, veckoschema och trafikinformation.

@@ -80,6 +80,100 @@ def legacy_dynamic_sailings(avgangar_datum: dict) -> list[dict]:
     return sailings
 
 
+SOURCE_DEFAULTS = {
+    "Viking Line": {
+        "kalla": "https://www.sales.vikingline.com/find-trip/timetable/traffic-bulletin/",
+        "source_label": "Live-tidtabell",
+        "source_detail": vl.SOURCE_DETAIL,
+        "source_type": "dynamic_schedule",
+    },
+    "Tallink Silja": {
+        "kalla": "https://www.tallink.com/sv/tidtabeller",
+        "source_label": "Live-tidtabell",
+        "source_detail": tl.SOURCE_DETAIL,
+        "source_type": "dynamic_schedule",
+    },
+    "DFDS": {
+        "kalla": "https://www.dfds.com/sv-se/fraktfarjor-och-logistik/rutter-och-tidtabeller",
+        "source_label": "Live-tidtabell",
+        "source_detail": dfds.SOURCE_DETAIL,
+        "source_type": "dynamic_schedule",
+    },
+    "Finnlines": {
+        "kalla": "https://www.finnlines.com/freight/schedules/",
+        "source_label": "Live-tidtabell",
+        "source_detail": finn.SOURCE_DETAIL,
+        "source_type": "dynamic_schedule",
+    },
+    "Stena Line": {
+        "kalla": "https://stenalinefreight.com/timetable/",
+        "source_label": "Live-tidtabell",
+        "source_detail": stena.SOURCE_DETAIL,
+        "source_type": "dynamic_schedule",
+    },
+    "TT-Line": {
+        "kalla": "https://www.ttline.com/en/timetables/",
+        "source_label": "Live-tidtabell",
+        "source_detail": ttline.SOURCE_DETAIL,
+        "source_type": "dynamic_schedule",
+    },
+    "Polferries (POLSCA)": {
+        "kalla": "https://www.polferries.com/schedule-timetable/",
+        "source_label": "Datumtabell",
+        "source_detail": "Polferries schedule timetable",
+        "source_type": "date_table",
+    },
+}
+
+
+def enrich_instance_sources(instances_by_date: dict[str, list[dict]]) -> None:
+    for entries in instances_by_date.values():
+        for inst in entries or []:
+            operator = str(inst.get("source_operator") or inst.get("rederi") or "").strip()
+            defaults = SOURCE_DEFAULTS.get(operator)
+            if not defaults:
+                continue
+            if not inst.get("kalla"):
+                inst["kalla"] = defaults["kalla"]
+            if not inst.get("source_label"):
+                inst["source_label"] = defaults["source_label"]
+            if not inst.get("source_detail"):
+                inst["source_detail"] = defaults["source_detail"]
+            if not inst.get("source_type"):
+                inst["source_type"] = defaults["source_type"]
+
+
+def sync_legacy_fields_from_instances(instances_by_date: dict[str, list[dict]]) -> tuple[dict, dict]:
+    fartyg_datum: dict[str, dict[str, str]] = {}
+    avgangar_datum: dict[str, dict[str, dict]] = {}
+    for ds, entries in (instances_by_date or {}).items():
+        for inst in entries or []:
+            if str(inst.get("source_type") or "") not in {"dynamic_schedule", "date_table"}:
+                continue
+            rederi = str(inst.get("source_operator") or inst.get("rederi") or "").strip()
+            avghamn = str(inst.get("avghamn") or "").strip()
+            ankhamn = str(inst.get("ankhamn") or "").strip()
+            avgtid = str(inst.get("avgtid") or "").strip()
+            if not (ds and rederi and avghamn and ankhamn and avgtid):
+                continue
+            key = bygg_nyckel(rederi, avghamn, ankhamn, avgtid)
+            fartyg = str(inst.get("fartyg") or "").strip()
+            if fartyg:
+                fartyg_datum.setdefault(ds, {})[key] = fartyg
+            avgangar_datum.setdefault(ds, {})[key] = {
+                "fartyg": fartyg,
+                "anktid": str(inst.get("anktid") or "").strip(),
+                "ankomstdatum": str(inst.get("ankomstdatum") or ds).strip(),
+                "kalla": str(inst.get("kalla") or "").strip(),
+                "kalllabel": str(inst.get("source_label") or "").strip(),
+                "kalldetalj": str(inst.get("source_detail") or "").strip(),
+                "kalltyp": str(inst.get("source_type") or "").strip(),
+                "status": str(inst.get("status") or "").strip(),
+                "traffic_comment": str(inst.get("traffic_comment") or "").strip(),
+            }
+    return fartyg_datum, avgangar_datum
+
+
 def main():
     from_date = date.fromisoformat(sys.argv[1]) if len(sys.argv) > 1 else date.today()
     forward_days = env_int("FERRY_DYNAMIC_FORWARD_DAYS", 14)
@@ -221,6 +315,8 @@ def main():
     lägg_till(ttline_sailings)
 
     merge_dynamic_sailings(avgangsinstanser, dynamic_sailings)
+    enrich_instance_sources(avgangsinstanser)
+    fartyg_datum, avgangar_datum = sync_legacy_fields_from_instances(avgangsinstanser)
 
     # Spara tillbaka
     data["fartyg_datum"] = fartyg_datum
