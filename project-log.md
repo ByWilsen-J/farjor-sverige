@@ -14,8 +14,18 @@ Efter innehållsrevisionen 2026-05-21 visar UI:t tydligare skillnad mellan exakt
 
 TT-Lines tidigare fallbackluckor i grundschemat för `Travemünde ↔ Trelleborg`, `Świnoujście ↔ Trelleborg` och `Klaipėda ↔ Trelleborg` är nu kompletterade i själva genereringskedjan, så att rutterna finns i publiceringsfönstret även utanför det dynamiska 14-dagarsfönstret.
 
+Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: när officiell livekälla finns för en Stena-rutt på ett visst datum rensas motsvarande veckofallback bort från samma datum/rutt i `avgangsinstanser`.
+
 ## Senaste ändringar
 
+- 2026-05-21: Gjorde Stena-prioritering och UI-normalisering efter användar-QA.
+  - Uppdaterade [update_fartyg.py](/Users/jane/Documents/Claude/Projects/Weblänksida/update_fartyg.py) med route-day-pruning så `weekly_schedule` tas bort för samma datum/rutt när `dynamic_schedule` finns, vilket gör Stena-rutterna konsekventa i det dynamiska fönstret.
+  - Synkade [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json) mot den nya prioriteringslogiken och verifierade att Stena Line för aktuell dag nu bara visar live-rader för sina live-rutter.
+  - Uppdaterade [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) så källchipsen inte längre visas i listan, men källtypen ligger kvar sist i info-rutans tooltip.
+  - Bytte standardvyn vid första laddning från `Ankomster till Sverige` till `Avgångar mot Sverige`.
+  - Kortade riktningsbadges i tabellen till `↓ IN`, `↑ UT` och `Avg→SE` utan att röra valknapparna i högerpanelen.
+  - Tog bort prefixet `Rotation:` i fartygskolumnen men behöll tooltip-förklaringen om verifierad ruttrotation.
+  - Fixade tidsstämpeln i `Om sidan` så `DATA.meta.uppdaterad` visas i svensk lokal tid i stället för rå UTC, och lade till cache-busting/no-store vid hämtning av `farjor_data.json`.
 - 2026-05-21: Lade in verifierad TT-Line-fallback i genereringskedjan.
   - Lade till [verified_schema_overrides.py](/Users/jane/Documents/Claude/Projects/Weblänksida/verified_schema_overrides.py) som ersätter ofullständiga Excel-rader för TT-Line med verifierade officiella standardtidtabeller för `Travemünde ↔ Trelleborg`, `Świnoujście ↔ Trelleborg` och `Klaipėda ↔ Trelleborg`.
   - Uppdaterade [generera_json.py](/Users/jane/Documents/Claude/Projects/Weblänksida/generera_json.py) så att override-lagret alltid appliceras innan `farjor_data.json` och `avgangsinstanser` byggs.
@@ -181,6 +191,7 @@ TT-Lines tidigare fallbackluckor i grundschemat för `Travemünde ↔ Trelleborg
 - Veckoschemat innehåller fortfarande vissa manuellt inlagda undantag och parallella varianter. Frontenden deduperar nu de uppenbara fallen, men datalagret kan fortfarande behöva en separat städning senare.
 - Vissa schemaundantag ligger fortfarande som veckorader med anmärkning i datalagret. Den här omgången säkrade Viking-specialtiden, men fler undantag kan på sikt behöva samma typ av datumstyrning.
 - Unity Line finns inte som egen datumkälla i nuvarande JSON, så full separering eller exakt avgångsimport kräver ny importkedja.
+- Exakt dagsdata kan fortfarande saknas för vissa enskilda datum i slutet av det deklarerade dynamiska fönstret även när route-day-prioritering finns på plats. Då återstår veckofallback tills källfönster eller scraper-horisont justeras.
 - Officiellt bekräftade rutter saknas fortfarande helt eller delvis i själva veckoschemat `farjor_data.json`, även om flera nu kompletteras via datuminstanser:
   - Unity Line/POLSCA `Świnoujście ↔ Trelleborg` utanför nuvarande datumperiod
   - Eventuell framtida POLSCA `Gdańsk ↔ Karlshamn` när den faktiskt öppnar
@@ -228,6 +239,7 @@ TT-Lines tidigare fallbackluckor i grundschemat för `Travemünde ↔ Trelleborg
 
 ## Historik
 
+- 2026-05-21 21:39 CEST: Stena route-day-prioritering infördes i dynamiska fönstret, listans källchips togs bort, standardvyn byttes till `Mot Sverige`, badge-texterna kortades, `Rotation:` togs bort ur fartygskolumnen och `Data:`-tidsstämpeln började visas i svensk tid med cache-busting på JSON-hämtningen.
 - 2026-05-21 21:13 CEST: TT-Line-fallbacken flyttades upp i genereringskedjan med verifierade officiella standardtidtabeller för `Travemünde ↔ Trelleborg`, `Świnoujście ↔ Trelleborg` och `Klaipėda ↔ Trelleborg`, och aktuell `farjor_data.json` synkades mot den nya override-modellen.
 - 2026-05-21 20:45 CEST: Innehållsrevision efter datuminstans-ombyggnaden genomförd; fartygsfallbacks och källtooltipar normaliserades, exakta datumrader fick komplett källmeta och flera gamla verifieringstexter/anmärkningar städades.
 - 2026-05-21 10:56 CEST: Ny datuminstans-baserad version kopplades ihop end-to-end med timvis dynamic refresh, daglig backfill, källmärkning i UI och städad projektstruktur.

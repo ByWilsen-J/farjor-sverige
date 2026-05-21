@@ -343,9 +343,9 @@
       <div class="sb-hdr">Typ av lista</div>
       <div class="sb-block">
         <div class="chip-grid">
-          <button class="chip-btn aktiv vald" data-vy="ankomst" onclick="väljVy(this)"><span class="chip-ico">↓</span>Inkommande</button>
+          <button class="chip-btn" data-vy="ankomst" onclick="väljVy(this)"><span class="chip-ico">↓</span>Inkommande</button>
           <button class="chip-btn" data-vy="fran" onclick="väljVy(this)"><span class="chip-ico">↑</span>Utgående</button>
-          <button class="chip-btn" data-vy="mot" onclick="väljVy(this)"><span class="chip-ico">→</span>Mot Sverige</button>
+          <button class="chip-btn aktiv vald" data-vy="mot" onclick="väljVy(this)"><span class="chip-ico">→</span>Mot Sverige</button>
           <button class="chip-btn" data-vy="alla" onclick="väljVy(this)">In &amp; Ut</button>
         </div>
       </div>
@@ -360,7 +360,7 @@
       <div class="sb-apply">
         <label class="sb-label">Uppdatera visning</label>
         <button class="apply-btn" id="apply-controls">Visa vald lista</button>
-        <div class="sb-pending" id="pending-info">Ankomster till Sverige för dagens datum visas som standard.</div>
+        <div class="sb-pending" id="pending-info">Avgångar mot Sverige för dagens datum visas som standard.</div>
       </div>
       <div class="sb-hdr">Export</div>
       <div class="sb-block">
@@ -462,9 +462,9 @@ const VIEW_SUB = {
 // Riktnings-badge per rad (använder rad._riktning som sätts före rendering)
 function riktningsBadge(rad){
   const r = rad._riktning || 'okänd';
-  if(r === 'inkommande') return '<span class="badge badge-in" title="Färjan landar i svensk hamn under valt dygn">↓ Inkommande</span>';
-  if(r === 'utgaende')   return '<span class="badge badge-ut" title="Färjan avgår från svensk hamn under valt dygn">↑ Utgående</span>';
-  if(r === 'motsverige') return '<span class="badge badge-mot" title="Färjan avgår från utländsk hamn med kurs mot Sverige">→ Mot Sverige</span>';
+  if(r === 'inkommande') return '<span class="badge badge-in" title="Färjan landar i svensk hamn under valt dygn">↓ IN</span>';
+  if(r === 'utgaende')   return '<span class="badge badge-ut" title="Färjan avgår från svensk hamn under valt dygn">↑ UT</span>';
+  if(r === 'motsverige') return '<span class="badge badge-mot" title="Färjan avgår från utländsk hamn med kurs mot Sverige">Avg→SE</span>';
   return '';
 }
 const ARRIVAL_LOOKBACK_DAYS = 3;
@@ -694,9 +694,9 @@ const AVGANGSINSTANS_FALT = [
 let DATA = null;
 let valdDat = new Date();
 let valdVd  = '';
-let viewMode = 'ankomst'; // 'alla' | 'mot' | 'ankomst' | 'fran'
+let viewMode = 'mot'; // 'alla' | 'mot' | 'ankomst' | 'fran'
 let valtRederi = 'alla';
-let pendingViewMode = 'ankomst';
+let pendingViewMode = 'mot';
 let pendingDateStr = '';
 let pendingRederi = 'alla';
 let visaEndastKommande = false;
@@ -1595,7 +1595,7 @@ function getShipInfo(rad, depDate = valdDat){
     const lista = splitFartygLista(text);
     const ärRotation = source === 'rotation' || lista.length > 1;
     return {
-      text: ärRotation ? `Rotation: ${lista.join(' / ')}` : text,
+      text: ärRotation ? `${lista.join(' / ')}` : text,
       source: ärRotation ? 'rotation' : source,
       exact: exact && !ärRotation,
       hint: ärRotation
@@ -1747,6 +1747,22 @@ function byggDatakällaText(rad){
   return detaljer.join(' · ').trim();
 }
 
+function formatMetaTimestampLocal(isoText){
+  const s = String(isoText || '').trim();
+  if(!s) return '';
+  const d = new Date(s);
+  if(Number.isNaN(d.getTime())) return s;
+  return new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Europe/Stockholm',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).format(d);
+}
+
 function normaliseraVerifieringText(värde){
   const s = String(värde||'').trim();
   if(!s || /^verifierad$/i.test(s) || /^verifierad via datumimport\.?$/i.test(s)) return '';
@@ -1825,7 +1841,7 @@ async function hämtaDFDSFartyg(dateStr){
 // ── Initiering ──
 async function init(){
   try{
-    const resp = await fetch('farjor_data.json');
+    const resp = await fetch(`farjor_data.json?v=${Date.now()}`, {cache:'no-store'});
     if(!resp.ok) throw new Error('HTTP ' + resp.status);
     DATA = await resp.json();
   }catch(e){
@@ -1837,14 +1853,15 @@ async function init(){
   const nu = nuInfo.date;
   const tid = minuterTillTid(nuInfo.minuter);
   const upd = DATA.meta?.uppdaterad||'';
-  document.getElementById('upd').textContent = (upd?'Data: '+upd+'  ·  ':'')+' Laddad '+tid;
+  const updLocal = formatMetaTimestampLocal(upd);
+  document.getElementById('upd').textContent = (updLocal ? 'Data: ' + updLocal + ' · ' : '') + 'Laddad ' + tid;
 
   initAvgangsinstanser();
   byggDynamiskaRuttFallbacks();
   valdDat = nu;
   valdVd = VD[nu.getDay()];
   pendingDateStr = dStr(nu);
-  pendingViewMode = 'ankomst';
+  pendingViewMode = 'mot';
   pendingRederi = 'alla';
   valtRederi = 'alla';
   sättDatum(nu);
@@ -2227,21 +2244,16 @@ function bygTr(rad){
   const lh = rad.länk ? `<a class="tlnk" href="${esc(rad.länk)}" target="_blank" rel="noopener" title="Öppna tidtabell hos ${esc(rad.rederi)}">&#8599;</a>` : '';
   // Rederi
   const färg = REDERI_FARG[rad.rederi] || 'var(--blå)';
-  const kallaChip = rad._kallaChip
-    ? `<span class="kalla-chip kalla-chip-${rad._kallaChip.klass}" title="${esc(rad._kallaChip.titel)}">${esc(rad._kallaChip.badge)}</span>`
-    : '';
   const rederiText = rad.länk
     ? `<a class="rl" href="${esc(rad.länk)}" target="_blank" rel="noopener" style="color:${esc(färg)}">${esc(rad.rederi)}</a>`
     : `<strong style="color:${esc(färg)}">${esc(rad.rederi)}</strong>`;
-  const rh = `<span class="rederi-cell">${rederiText}${kallaChip}</span>`;
+  const rh = `<span class="rederi-cell">${rederiText}</span>`;
 
   // Riktnings-badge
   const bh = riktningsBadge(rad);
 
   // Info-tooltip
   const tooltipRader = [];
-  const datakällaText = byggDatakällaText(rad) || rad._kallaChip?.titel || '';
-  if(datakällaText) tooltipRader.push(`<strong>Datakälla:</strong> ${esc(datakällaText)}`);
   const operatorTxt = normaliseraOperatörText(rad);
   if(operatorTxt) tooltipRader.push(`<strong>Operatör:</strong> ${esc(operatorTxt)}`);
   const verTxt = normaliseraVerifieringText(rad.verifiering);
@@ -2249,6 +2261,8 @@ function bygTr(rad){
   if(rad._shipInfo?.hint) tooltipRader.push(`<strong>Fartyg:</strong> ${esc(rad._shipInfo.hint)}`);
   if(rad.anm) tooltipRader.push(`<strong>Kommentar:</strong> ${esc(rad.anm)}`);
   if(rad.källa) tooltipRader.push(`<strong>Källa:</strong> <a href="${esc(rad.källa)}" target="_blank" rel="noopener">${esc(rad.källa)}</a>`);
+  const datakällaText = byggDatakällaText(rad) || rad._kallaChip?.titel || '';
+  if(datakällaText) tooltipRader.push(`<strong>Datakälla:</strong> ${esc(datakällaText)}`);
   const ih = tooltipRader.length
     ? `<span class="info-knapp" tabindex="0">i<span class="info-pop">${tooltipRader.join('<br>')}</span></span>`
     : '';

@@ -174,6 +174,38 @@ def sync_legacy_fields_from_instances(instances_by_date: dict[str, list[dict]]) 
     return fartyg_datum, avgangar_datum
 
 
+def prune_weekly_fallbacks_for_live_routes(
+    instances_by_date: dict[str, list[dict]],
+    sailings: list[dict],
+) -> None:
+    live_route_days: set[tuple[str, str, str, str]] = set()
+    for sailing in sailings:
+        dep_date_iso = str(sailing.get("date") or sailing.get("datum") or "").strip()
+        rederi = str(sailing.get("rederi") or "").strip()
+        avghamn = str(sailing.get("avghamn") or "").strip()
+        ankhamn = str(sailing.get("ankhamn") or "").strip()
+        source_type = str(sailing.get("source_type") or "dynamic_schedule").strip()
+        if not dep_date_iso or not rederi or not avghamn or not ankhamn:
+            continue
+        if source_type != "dynamic_schedule":
+            continue
+        live_route_days.add((dep_date_iso, rederi, avghamn, ankhamn))
+
+    for dep_date_iso, entries in instances_by_date.items():
+        filtered: list[dict] = []
+        for inst in entries or []:
+            route_key = (
+                dep_date_iso,
+                str(inst.get("rederi") or "").strip(),
+                str(inst.get("avghamn") or "").strip(),
+                str(inst.get("ankhamn") or "").strip(),
+            )
+            if route_key in live_route_days and str(inst.get("source_type") or "") == "weekly_schedule":
+                continue
+            filtered.append(inst)
+        instances_by_date[dep_date_iso] = filtered
+
+
 def main():
     from_date = date.fromisoformat(sys.argv[1]) if len(sys.argv) > 1 else date.today()
     forward_days = env_int("FERRY_DYNAMIC_FORWARD_DAYS", 14)
@@ -315,6 +347,7 @@ def main():
     lägg_till(ttline_sailings)
 
     merge_dynamic_sailings(avgangsinstanser, dynamic_sailings)
+    prune_weekly_fallbacks_for_live_routes(avgangsinstanser, dynamic_sailings)
     enrich_instance_sources(avgangsinstanser)
     fartyg_datum, avgangar_datum = sync_legacy_fields_from_instances(avgangsinstanser)
 
