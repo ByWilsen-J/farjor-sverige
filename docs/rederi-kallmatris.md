@@ -19,7 +19,6 @@ målbild per rederi i ombyggnaden.
 | Wasaline | Verifierat statiskt schema i Excel/JSON | Manuell/statiskt verifierad | Saknar central automatisk dags- och trafikbevakning | Officiell dagtabell om tillgänglig, annars veckovis verifierad statisk källa | Ingen ytterligare fallback |
 | Eckerö Linjen | Verifierat statiskt schema i Excel/JSON | Manuell/statiskt verifierad | Samma som Wasaline | Officiell dagtabell om tillgänglig, annars veckovis verifierad statisk källa | Ingen ytterligare fallback |
 | DFDS (tidigare Tallink Silja) | Legacy-schema för `Paldiski ↔ Kapellskär` | Statiskt i schema, medan motsvarande datumdata finns via annan kedja | Dubbla modeller för samma trafik | Låt samma datumkälla som DFDS/Tallink äga rutten | Legacy-schemat avvecklas |
-| CLdN / Cobelfret | PDF-/dokumentschema | Statisk kontroll | Risk för gamla dokument och lång ledtid | Veckovis dokumentkontroll | Senast verifierade schema |
 | Wagenborg | PDF-/dokumentschema | Statisk kontroll | Samma som CLdN | Veckovis dokumentkontroll | Senast verifierade schema |
 | Wallenius SOL | Statiskt schema | Statisk kontroll | Samma som CLdN | Veckovis dokumentkontroll | Senast verifierade schema |
 | SCA Logistics | Statiskt schema | Statisk kontroll | Samma som CLdN | Veckovis dokumentkontroll | Senast verifierade schema |

@@ -18,6 +18,7 @@ from verified_schema_overrides import apply_verified_schema_overrides
 SCRIPT_DIR = Path(__file__).parent
 XLSX_PATH  = SCRIPT_DIR / "Farjor_Sverige_v2_normaliserad.xlsx"
 JSON_OUT   = SCRIPT_DIR / "farjor_data.json"
+EXCLUDED_OPERATORS = {"CLdN / Cobelfret"}
 
 if not XLSX_PATH.exists():
     print(f"FEL: Hittar inte {XLSX_PATH}")
@@ -57,6 +58,7 @@ for row in ws.iter_rows(min_row=2, values_only=True):
     })
 
 schema = apply_verified_schema_overrides(schema)
+schema = [row for row in schema if row.get("rederi") not in EXCLUDED_OPERATORS]
 
 ws2 = wb['Schemaregister_Intervall']
 hdrs2 = [c.value for c in ws2[1]]
@@ -79,6 +81,8 @@ for row in ws2.iter_rows(min_row=2, values_only=True):
         "verifiering":  d.get('Verifiering') or '',
         "kalla":        d.get('Källa') or '',
     })
+
+intervall = [row for row in intervall if row.get("rederi") not in EXCLUDED_OPERATORS]
 
 rederier = sorted(set(r['rederi'] for r in schema if r['rederi']))
 hamnar   = sorted(set(r['avghamn'] for r in schema if r['avghamn']) |

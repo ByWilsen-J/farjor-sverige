@@ -18,6 +18,11 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Senaste ändringar
 
+- 2026-05-21: Tog bort `CLdN / Cobelfret` helt ur publicerad data och dokumentation.
+  - Uppdaterade [generera_json.py](/Users/jane/Documents/Claude/Projects/Weblänksida/generera_json.py) så `CLdN / Cobelfret` filtreras bort redan vid JSON-generering från Excel-källan, i stället för att bara döljas i frontend.
+  - Synkade [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json) så rederiet, dess `Göteborg ↔ Killingholme`-veckorader, intervallelement och tillhörande datuminstanser inte längre publiceras.
+  - Tog bort den nu överflödiga frontend-exkluderingen i [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) och rensade `docs/rederi-kallmatris.md` från CLdN-raden.
+  - Bekräftade att den enda förekomsten av `Logent Ports Ro-Ro terminal` låg i den gamla CLdN-anmärkningen och därmed försvann samtidigt.
 - 2026-05-21: Gjorde Stena-prioritering och UI-normalisering efter användar-QA.
   - Uppdaterade [update_fartyg.py](/Users/jane/Documents/Claude/Projects/Weblänksida/update_fartyg.py) med route-day-pruning så `weekly_schedule` tas bort för samma datum/rutt när `dynamic_schedule` finns, vilket gör Stena-rutterna konsekventa i det dynamiska fönstret.
   - Synkade [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json) mot den nya prioriteringslogiken och verifierade att Stena Line för aktuell dag nu bara visar live-rader för sina live-rutter.
@@ -155,6 +160,7 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Beslut och motiveringar
 
+- `CLdN / Cobelfret` ska inte längre publiceras alls i webbplatsens data eller dokumenterade källmatris. Motiveringen är att användarbehovet nu är att helt ta bort rederiet och dess terminalreferenser, inte bara dölja det i UI:t.
 - Nästa större omtag bör bygga på avgångsinstanser per datum, inte på att veckoschemat alltid renderas först. Motiveringen är att exakt dagsdata då kan vara systemets sanning i stället för ett overlay-lager.
 - Live-/datumkällor ska prioriteras per rutt och rederi i en uttrycklig källhierarki. Motiveringen är att undvika dagens blandning där vissa rader kommer från veckoschema, andra från exakta datum och andra från browsercache utan gemensam regelmotor.
 - Browser-side livehämtning ska inte vara primär uppdateringsmekanism för produktionsdata. Motiveringen är att GitHub-sidan annars saknar gemensam, automatiskt uppdaterad källa och olika besökare kan se olika resultat.
