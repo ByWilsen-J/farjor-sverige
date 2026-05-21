@@ -18,6 +18,10 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Senaste ändringar
 
+- 2026-05-21: Lade till minimal noindex-konfiguration för GitHub Pages.
+  - Skapade [robots.txt](/Users/jane/Documents/Claude/Projects/Weblänksida/robots.txt) i projektroten med `User-agent: *` och `Disallow: /` för att avråda all crawlning/indexering.
+  - Lade in `<meta name="robots" content="noindex, nofollow">` i [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) och [farjor.html](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor.html) utan att ändra routing, styling eller GitHub Pages-deployment.
+  - Behöll övriga head-taggar, inklusive redirect och canonical på `farjor.html`, eftersom användarbehovet här är minskad upptäckbarhet snarare än åtkomstskydd.
 - 2026-05-21: Tog bort `CLdN / Cobelfret` helt ur publicerad data och dokumentation.
   - Uppdaterade [generera_json.py](/Users/jane/Documents/Claude/Projects/Weblänksida/generera_json.py) så `CLdN / Cobelfret` filtreras bort redan vid JSON-generering från Excel-källan, i stället för att bara döljas i frontend.
   - Synkade [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json) så rederiet, dess `Göteborg ↔ Killingholme`-veckorader, intervallelement och tillhörande datuminstanser inte längre publiceras.
@@ -160,6 +164,7 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Beslut och motiveringar
 
+- Webbplatsen ska förbli publikt åtkomlig via direkt-URL men aktivt avråda sökmotorindexering via `robots.txt` och `meta name="robots"`. Motiveringen är att minska oavsiktlig upptäckbarhet utan att införa autentisering eller påverka GitHub Pages-driften.
 - `CLdN / Cobelfret` ska inte längre publiceras alls i webbplatsens data eller dokumenterade källmatris. Motiveringen är att användarbehovet nu är att helt ta bort rederiet och dess terminalreferenser, inte bara dölja det i UI:t.
 - Nästa större omtag bör bygga på avgångsinstanser per datum, inte på att veckoschemat alltid renderas först. Motiveringen är att exakt dagsdata då kan vara systemets sanning i stället för ett overlay-lager.
 - Live-/datumkällor ska prioriteras per rutt och rederi i en uttrycklig källhierarki. Motiveringen är att undvika dagens blandning där vissa rader kommer från veckoschema, andra från exakta datum och andra från browsercache utan gemensam regelmotor.
