@@ -1,0 +1,79 @@
+name: Daglig backfill av avgångsfönster
+
+on:
+  schedule:
+    - cron: '35 2 * * *'
+  workflow_dispatch:
+    inputs:
+      anchor_date:
+        description: 'Ankardatum (YYYY-MM-DD). Tomt = dagens datum i UTC.'
+        required: false
+        default: ''
+
+concurrency:
+  group: daily-backfill-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backfill:
+    name: Återbygg publiceringsfönster
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checka ut kod
+        uses: actions/checkout@v4
+
+      - name: Sätt upp Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installera beroenden
+        run: pip install requests
+
+      - name: Räkna ut publiceringsfönster
+        id: window
+        shell: bash
+        run: |
+          ANCHOR="${{ github.event.inputs.anchor_date }}"
+          if [ -z "$ANCHOR" ]; then
+            ANCHOR="$(date -u +%F)"
+          fi
+
+          START="$(date -u -d "$ANCHOR -1 month" +%F)"
+          END="$(date -u -d "$ANCHOR +3 month" +%F)"
+          START_EPOCH="$(date -u -d "$START" +%s)"
+          END_EPOCH="$(date -u -d "$END" +%s)"
+          FORWARD_DAYS="$(((END_EPOCH - START_EPOCH) / 86400))"
+
+          echo "anchor=$ANCHOR" >> "$GITHUB_OUTPUT"
+          echo "start=$START" >> "$GITHUB_OUTPUT"
+          echo "end=$END" >> "$GITHUB_OUTPUT"
+          echo "forward_days=$FORWARD_DAYS" >> "$GITHUB_OUTPUT"
+
+          echo "Ankardatum: $ANCHOR"
+          echo "Startdatum: $START"
+          echo "Slutdatum: $END"
+          echo "Forward days: $FORWARD_DAYS"
+
+      - name: Kör update_fartyg.py för hela publiceringsfönstret
+        env:
+          FERRY_DYNAMIC_FORWARD_DAYS: ${{ steps.window.outputs.forward_days }}
+          FERRY_PUBLIC_ANCHOR_DATE: ${{ steps.window.outputs.anchor }}
+        run: python3 update_fartyg.py "${{ steps.window.outputs.start }}"
+
+      - name: Commit och push om farjor_data.json ändrats
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add farjor_data.json
+          if git diff --staged --quiet; then
+            echo "Inga ändringar – inget commit behövs."
+          else
+            START="${{ steps.window.outputs.start }}"
+            END="${{ steps.window.outputs.end }}"
+            git commit -m "Auto: daglig backfill $START..$END [skip ci]"
+            git push
+          fi

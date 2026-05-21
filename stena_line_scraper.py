@@ -25,6 +25,7 @@ HEADERS = {
     "Content-Type": "application/x-www-form-urlencoded",
     "X-Requested-With": "XMLHttpRequest",
 }
+SOURCE_DETAIL = "Stena Freight LiveView"
 
 ROUTES = {
     "GOFR": "Gothenburg – Frederikshavn",
@@ -157,6 +158,15 @@ def parse_time_only(text: str) -> str:
     return m.group(1).zfill(5) if m else ""
 
 
+def build_traffic_comment(status: str) -> str:
+    value = " ".join((status or "").split())
+    if not value:
+        return ""
+    if re.search(r"^(on time|scheduled|planerad)$", value, re.I):
+        return ""
+    return f"Stena-status: {value}"
+
+
 def get_nonce() -> Optional[str]:
     try:
         resp = requests.get(TIMETABLE_URL, headers=HEADERS, timeout=20)
@@ -220,6 +230,7 @@ def fetch_all(date_from: date = None, date_to: date = None) -> list[dict]:
             if not ds or not avghamn or not ankhamn or not row.get("dep"):
                 continue
             anktid = parse_time_only(row.get("arr", ""))
+            status = " ".join((row.get("status", "") or "").split())
             all_sailings.append({
                 "date": ds,
                 "avghamn": avghamn,
@@ -229,6 +240,12 @@ def fetch_all(date_from: date = None, date_to: date = None) -> list[dict]:
                 "anktid": anktid,
                 "fartyg": normalize_ship(row.get("vessel", "")),
                 "rederi": "Stena Line",
+                "kalla": TIMETABLE_URL,
+                "source_label": "Live-tidtabell",
+                "source_detail": SOURCE_DETAIL,
+                "source_type": "dynamic_schedule",
+                "status": status,
+                "traffic_comment": build_traffic_comment(status),
             })
         log.info("  %d avgångar.", len(rows))
         time.sleep(1)

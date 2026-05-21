@@ -12,6 +12,8 @@ import openpyxl, json, re, sys
 from pathlib import Path
 from datetime import date
 
+from schedule_instances import build_base_instances
+
 SCRIPT_DIR = Path(__file__).parent
 XLSX_PATH  = SCRIPT_DIR / "Farjor_Sverige_v2_normaliserad.xlsx"
 JSON_OUT   = SCRIPT_DIR / "farjor_data.json"
@@ -43,6 +45,7 @@ for row in ws.iter_rows(min_row=2, values_only=True):
         "ankhamn":      d.get('Ankomsthamn') or '',
         "veckodag":     d.get('Veckodag') or '',
         "avgtid":       clean_time(d.get('Avgångstid')),
+        "avgtid_raw":   clean_time(d.get('Avgångstid')),
         "anktid":       str(d.get('Ankomsttid') or ''),
         "nasta_dag":    bool(d.get('AnkomstNästaDag')),
         "mot_sverige":  bool(d.get('MotSverige')),
@@ -90,6 +93,9 @@ out = {
     "schema":    schema,
     "intervall": intervall,
 }
+
+out["avgangsinstanser"] = build_base_instances(out)
+out["meta"]["avgangsinstans_dagar"] = len(out["avgangsinstanser"])
 
 JSON_OUT.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding='utf-8')
 kb = JSON_OUT.stat().st_size / 1024

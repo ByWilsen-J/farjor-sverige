@@ -21,6 +21,7 @@ from typing import Optional
 
 BASE_URL = "https://www.dfds.com/api/timetable"
 HEADERS  = {"Accept": "application/json"}
+SOURCE_DETAIL = "DFDS timetable API"
 
 # Portkoder (DFDS 5-char) → visningsnamn
 PORT_NAMES = {
@@ -104,11 +105,15 @@ def fetch_all(date_from: date = None, date_to: date = None) -> list[dict]:
         for avg in data:
             dep_str = avg.get("scheduledDeparture","")
             arr_str = avg.get("scheduledArrival","") or avg.get("estimatedArrival","")
+            status = str(avg.get("status") or "").strip()
             ds, avgtid = parse_local_time(dep_str)
             ankdatum, anktid = parse_local_time(arr_str)
             if not ds or not avgtid:
                 continue
             fartyg = avg.get("vehicleName","") or ""
+            traffic_comment = ""
+            if status and status.upper() not in {"TALLIED"}:
+                traffic_comment = f"DFDS-status: {status}"
             all_sailings.append({
                 "date":    ds,
                 "avghamn": PORT_NAMES.get(pol, pol),
@@ -118,6 +123,12 @@ def fetch_all(date_from: date = None, date_to: date = None) -> list[dict]:
                 "anktid": anktid,
                 "fartyg":  fartyg,
                 "rederi":  "DFDS",
+                "kalla": BASE_URL,
+                "source_label": "Live-tidtabell",
+                "source_detail": SOURCE_DETAIL,
+                "source_type": "dynamic_schedule",
+                "status": status,
+                "traffic_comment": traffic_comment,
             })
         log.info("  %d avgångar.", sum(1 for a in all_sailings if a.get("avghamn")==PORT_NAMES.get(pol,pol)))
     return all_sailings

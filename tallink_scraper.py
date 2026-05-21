@@ -21,6 +21,7 @@ from typing import Optional
 
 BASE_URL = "https://cms-web-api-nx.tallink.com/api/seaweb/timetables"
 HEADERS  = {"Accept": "application/json", "Accept-Language": "en"}
+SOURCE_DETAIL = "Tallink CMS timetable API"
 
 # Fartyg: API-kod → visningsnamn
 FARTYG = {
@@ -139,6 +140,10 @@ def extract_sailings(data: dict, dep: str, arr: str) -> list[dict]:
                 "anktid": anktid,
                 "fartyg":   fartyg,
                 "rederi":   rederi,
+                "kalla": BASE_URL,
+                "source_label": "Live-tidtabell",
+                "source_detail": SOURCE_DETAIL,
+                "source_type": "dynamic_schedule",
             })
     return sailings
 

@@ -176,8 +176,13 @@
     .rutt-sep{display:inline-block;min-width:10px;text-align:center;color:var(--linje-stark);font-weight:500}
     .rl{color:var(--text);text-decoration:none;font-weight:600;font-size:.89rem;letter-spacing:-.003em}
     .rl:hover{color:var(--blå);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+    .rederi-cell{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
     .fartyg{color:var(--text-mjuk);font-style:italic;font-size:.83rem;font-weight:400}
     .fartyg.tom{color:var(--tertiär);font-style:normal}
+    .kalla-chip{display:inline-flex;align-items:center;padding:1.5px 7px;border-radius:var(--r-pill);border:1px solid var(--linje);background:var(--yta-svag);color:var(--dim);font-size:.60rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;line-height:1.45;white-space:nowrap}
+    .kalla-chip-live{background:var(--ut-ljus);color:var(--ut-mörk);border-color:rgba(30,79,170,.16)}
+    .kalla-chip-datum{background:#f7f2e7;color:#7a5c21;border-color:rgba(184,137,62,.24)}
+    .kalla-chip-meta{background:var(--yta-svag);color:var(--dim);border-color:var(--linje)}
 
     /* Länk-ikon i tabell */
     .lnk-c{width:40px;text-align:center}
@@ -679,6 +684,11 @@ const ROUTE_FLEETS = {
   'Polsca|Trelleborg|Świnoujście':'Copernicus / Epsilon / Galileusz / Jan Śniadecki',
   'Polsca|Świnoujście|Trelleborg':'Copernicus / Epsilon / Galileusz / Jan Śniadecki',
 };
+const AVGANGSINSTANS_FALT = [
+  'rederi','avghamn','ankhamn','avgtid','avgtid_raw',
+  'departure_time','departureTime','anktid','ankomsttid',
+  'nyckel','key','route_key'
+];
 
 // ── State ──
 let DATA = null;
@@ -692,6 +702,8 @@ let pendingRederi = 'alla';
 let visaEndastKommande = false;
 let visadeRader = [];  // för Excel-export
 let DYNAMIC_ROUTE_FLEETS = {};
+let HAR_AVGANGSINSTANSER = false;
+let AVGANGSINSTANSER_PER_DATUM = {};
 
 // ── Ship-caches (live API) ──
 let vlCache = {};  // key: 'STO→HEL:16:00' → fartygsnamn
@@ -713,6 +725,22 @@ function dStr(d){
   const dag = String(d.getDate()).padStart(2,'0');
   return `${y}-${m}-${dag}`;
 }
+function harEgenNyckel(obj, nyckel){
+  return !!obj && Object.prototype.hasOwnProperty.call(obj, nyckel);
+}
+function ärIsoDatumStr(värde){
+  return typeof värde === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(värde.trim());
+}
+function normaliseraIsoDatum(värde){
+  if(värde instanceof Date) return dStr(värde);
+  const s = String(värde ?? '').trim();
+  if(!s) return '';
+  const iso = s.match(/\b(\d{4}-\d{2}-\d{2})\b/);
+  if(iso) return iso[1];
+  const kompakt = s.match(/\b(\d{4})(\d{2})(\d{2})\b/);
+  if(kompakt) return `${kompakt[1]}-${kompakt[2]}-${kompakt[3]}`;
+  return '';
+}
 function fmtDat(d){ return d.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
 function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function pad2(n){ return String(n).padStart(2,'0'); }
@@ -726,6 +754,48 @@ function dagarMellanIso(startIso, endIso){
 function tidTillMinuter(tid){
   const m = String(tid||'').match(/(\d{2}):(\d{2})/);
   return m ? (parseInt(m[1],10) * 60) + parseInt(m[2],10) : null;
+}
+function normaliseraTidStr(värde){
+  const m = String(värde||'').match(/\b(\d{2}:\d{2})\b/);
+  return m ? m[1] : '';
+}
+function ärSann(värde){
+  if(värde === true || värde === 1) return true;
+  if(typeof värde === 'string') return /^(true|1|ja|yes)$/i.test(värde.trim());
+  return false;
+}
+function förstaDefinieradeVärde(källor, nycklar){
+  for(const källa of källor){
+    if(!källa || typeof källa !== 'object') continue;
+    for(const nyckel of nycklar){
+      if(harEgenNyckel(källa, nyckel) && källa[nyckel] != null) return källa[nyckel];
+    }
+  }
+  return undefined;
+}
+function förstaIckeTommaVärde(källor, nycklar){
+  for(const källa of källor){
+    if(!källa || typeof källa !== 'object') continue;
+    for(const nyckel of nycklar){
+      if(!harEgenNyckel(källa, nyckel) || källa[nyckel] == null) continue;
+      const värde = källa[nyckel];
+      if(typeof värde === 'string'){
+        const s = värde.trim();
+        if(s) return s;
+        continue;
+      }
+      return värde;
+    }
+  }
+  return '';
+}
+function metaObjektFörRad(rad){
+  const list = [];
+  if(rad && typeof rad === 'object' && !Array.isArray(rad)) list.push(rad);
+  ['meta','metadata','instansmeta','instans_meta','kallmeta','kalla_meta','källa_meta'].forEach(nyckel=>{
+    if(rad?.[nyckel] && typeof rad[nyckel] === 'object' && !Array.isArray(rad[nyckel])) list.push(rad[nyckel]);
+  });
+  return list;
 }
 function minuterTillTid(totalMin){
   const mins = mod(totalMin, 1440);
@@ -1051,6 +1121,239 @@ function slåIhopFartygListor(...listor){
   });
   return unika.join(' / ');
 }
+function normaliseraKallaChipInfo(källor){
+  const labelRaw = String(förstaIckeTommaVärde(källor, [
+    'kalllabel','källa_label','kalla_label','source_label','sourceLabel','label'
+  ]) || '').trim();
+  const typRaw = String(förstaIckeTommaVärde(källor, [
+    'kalltyp','källa_typ','kalla_typ','source_type','sourceType','instans_typ','typ'
+  ]) || '').trim();
+  const detaljRaw = String(förstaIckeTommaVärde(källor, [
+    'kalldetalj','källa_detalj','kalla_detalj','source_detail','sourceDetail',
+    'beskrivning','description','detalj'
+  ]) || '').trim();
+  const internaTyper = {
+    dynamic_schedule: 'Live-tidtabell',
+    weekly_schedule: 'Veckoschema',
+    date_table: 'Datumtabell',
+  };
+  const typNorm = typRaw.toLowerCase();
+  const typVis = internaTyper[typNorm] || typRaw;
+  if(!labelRaw && !typVis && !detaljRaw) return null;
+
+  const samlad = `${labelRaw} ${typVis} ${detaljRaw}`.trim();
+  let klass = 'meta';
+  let badge = '';
+  if(/live|realtid|real[\s-]?time|api/i.test(samlad)){
+    klass = 'live';
+    badge = 'Live';
+  }else if(/datum|date|tidtabell|schedule|dagsdata|exakt/i.test(samlad)){
+    klass = 'datum';
+    badge = 'Datum';
+  }else if(labelRaw && labelRaw.length <= 12){
+    badge = labelRaw;
+  }else{
+    badge = 'Källa';
+  }
+
+  const detaljer = [];
+  const sedda = new Set();
+  [labelRaw, typVis === labelRaw ? '' : typVis, detaljRaw].forEach(värde=>{
+    const s = String(värde||'').trim();
+    const key = s.toLowerCase();
+    if(!s || sedda.has(key)) return;
+    sedda.add(key);
+    detaljer.push(s);
+  });
+  return {
+    badge,
+    klass,
+    titel: detaljer.join(' · ') || badge,
+  };
+}
+function serUtSomAvgangsinstans(raw, ctx = {}){
+  if(!raw || typeof raw !== 'object' || Array.isArray(raw)) return false;
+  if(ctx.instansNyckel){
+    const harFalt = AVGANGSINSTANS_FALT.some(nyckel=>harEgenNyckel(raw, nyckel))
+      || ['fartyg','anktid','ankomstdatum','kalla','source_type','source_label'].some(nyckel=>harEgenNyckel(raw, nyckel));
+    if(harFalt) return true;
+    return Object.values(raw).every(v=>v == null || ['string','number','boolean'].includes(typeof v));
+  }
+  return AVGANGSINSTANS_FALT.some(nyckel=>harEgenNyckel(raw, nyckel));
+}
+function parsaInstansNyckel(nyckel){
+  const m = String(nyckel||'').match(/^([^:]+):(.+?)(?:→|->)(.+?):(\d{2}:\d{2})$/);
+  return m ? {
+    rederi:m[1].trim(),
+    avghamn:m[2].trim(),
+    ankhamn:m[3].trim(),
+    avgtid:m[4],
+  } : null;
+}
+function normaliseraAvgangsinstans(raw, ctx = {}){
+  if(!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+  const källor = metaObjektFörRad(raw);
+  const ctxObj = ctx && typeof ctx === 'object' ? ctx : {};
+  const nyckel = String(
+    förstaIckeTommaVärde([...källor, ctxObj], [
+      'nyckel','key','instansnyckel','instans_nyckel','route_key'
+    ]) || ctxObj.instansNyckel || ''
+  ).trim();
+  const parsed = parsaInstansNyckel(nyckel) || {};
+  const depDate = normaliseraIsoDatum(
+    förstaIckeTommaVärde([...källor, ctxObj], [
+      'avgangsdatum','avgångsdatum','datum',
+      'dep_date','depDate','departure_date','departureDate'
+    ]) || ctxObj.depDate
+  );
+  const rederi = normRederi(
+    förstaIckeTommaVärde(källor, ['rederi','carrier','operator']) || parsed.rederi || ''
+  );
+  const avghamn = String(
+    förstaIckeTommaVärde(källor, [
+      'avghamn','avgangshamn','avgångshamn','departure_port','departurePort','from'
+    ]) || parsed.avghamn || ''
+  ).trim();
+  const ankhamn = String(
+    förstaIckeTommaVärde(källor, [
+      'ankhamn','ankomsthamn','arrival_port','arrivalPort','to'
+    ]) || parsed.ankhamn || ''
+  ).trim();
+  const avgtidSpec = String(
+    förstaIckeTommaVärde(källor, [
+      'avgtid','departure_time','departureTime'
+    ]) || parsed.avgtid || ''
+  ).trim();
+  const avgtidRaw = normaliseraTidStr(
+    förstaIckeTommaVärde(källor, [
+      'avgtid_raw','departure_time_raw','departureTimeRaw'
+    ]) || avgtidSpec || parsed.avgtid || ''
+  );
+  const anktidSpec = String(
+    förstaIckeTommaVärde(källor, [
+      'anktid','ankomsttid','arrival_time','arrivalTime'
+    ]) || ''
+  ).trim();
+  const anktidRaw = normaliseraTidStr(anktidSpec);
+  let ankomstdatum = normaliseraIsoDatum(
+    förstaIckeTommaVärde(källor, [
+      'ankomstdatum','ankomst_datum','arrival_date','arrivalDate'
+    ])
+  );
+  const nastaDagFlagga = förstaDefinieradeVärde(källor, [
+    'nasta_dag','nästa_dag','next_day','nextDay'
+  ]);
+  if(!ankomstdatum && depDate && ärSann(nastaDagFlagga)){
+    ankomstdatum = isoEfterOffset(parseDate(depDate), 1);
+  }
+  if(!depDate || !rederi || !avghamn || !ankhamn || !avgtidRaw) return null;
+
+  const motSverigeVärde = förstaDefinieradeVärde(källor, ['mot_sverige','motSverige','towards_sweden']);
+  const franSverigeVärde = förstaDefinieradeVärde(källor, ['fran_sverige','från_sverige','franSverige','from_sweden']);
+  const kalla = String(
+    förstaIckeTommaVärde(källor, ['kalla','källa','source_url','sourceUrl']) || ''
+  ).trim();
+  const fartyg = String(
+    förstaIckeTommaVärde(källor, ['fartyg','ship','vessel']) || ''
+  ).trim();
+  const avgMeta = normaliseraAvgangsMeta({
+    fartyg,
+    anktid: anktidRaw,
+    ankomstdatum,
+    kalla,
+    kalltyp: förstaIckeTommaVärde(källor, ['kalltyp','källa_typ','kalla_typ','source_type','sourceType']) || '',
+    kalllabel: förstaIckeTommaVärde(källor, ['kalllabel','källa_label','kalla_label','source_label','sourceLabel']) || '',
+    kalldetalj: förstaIckeTommaVärde(källor, ['kalldetalj','källa_detalj','kalla_detalj','source_detail','sourceDetail','beskrivning','description','detalj']) || '',
+  });
+
+  return {
+    kategori: String(förstaIckeTommaVärde(källor, ['kategori','category']) || 'Passagerare').trim(),
+    rederi,
+    rutt: String(förstaIckeTommaVärde(källor, ['rutt','route']) || `${avghamn}–${ankhamn}`).trim(),
+    avghamn,
+    ankhamn,
+    avgtid: avgtidSpec || avgtidRaw,
+    avgtid_raw: avgtidRaw,
+    anktid: anktidSpec || anktidRaw,
+    nasta_dag: !!(ankomstdatum && depDate && ankomstdatum !== depDate) || ärSann(nastaDagFlagga),
+    mot_sverige: motSverigeVärde == null ? SVENSKA_HAMNAR.has(ankhamn) : ärSann(motSverigeVärde),
+    fran_sverige: franSverigeVärde == null ? SVENSKA_HAMNAR.has(avghamn) : ärSann(franSverigeVärde),
+    anmarkning: String(förstaIckeTommaVärde(källor, ['anmarkning','anmärkning','note','notes']) || '').trim(),
+    verifiering: String(förstaIckeTommaVärde(källor, ['verifiering','verification']) || '').trim(),
+    kalla,
+    länk: String(förstaIckeTommaVärde(källor, ['lank','länk','link','href','timetable_url','timetableUrl']) || '').trim(),
+    fartyg,
+    ankomstdatum,
+    source_type: String(förstaIckeTommaVärde(källor, ['source_type','sourceType','kalltyp','källa_typ','kalla_typ']) || '').trim(),
+    source_label: String(förstaIckeTommaVärde(källor, ['source_label','sourceLabel','kalllabel','källa_label','kalla_label']) || '').trim(),
+    source_detail: String(förstaIckeTommaVärde(källor, ['source_detail','sourceDetail','kalldetalj','källa_detalj','kalla_detalj']) || '').trim(),
+    source_priority: Number(förstaIckeTommaVärde(källor, ['source_priority','sourcePriority']) || 0) || 0,
+    is_live: ärSann(förstaDefinieradeVärde(källor, ['is_live','isLive'])),
+    is_exact: ärSann(förstaDefinieradeVärde(källor, ['is_exact','isExact'])),
+    source_operator: String(förstaIckeTommaVärde(källor, ['source_operator','sourceOperator']) || '').trim(),
+    display_group: String(förstaIckeTommaVärde(källor, ['display_group','displayGroup']) || '').trim(),
+    operator_id: String(förstaIckeTommaVärde(källor, ['operator_id','operatorId']) || '').trim(),
+    route_id: String(förstaIckeTommaVärde(källor, ['route_id','routeId']) || '').trim(),
+    status: String(förstaIckeTommaVärde(källor, ['status']) || '').trim(),
+    traffic_comment: String(förstaIckeTommaVärde(källor, ['traffic_comment','trafficComment']) || '').trim(),
+    id: String(förstaIckeTommaVärde(källor, ['id']) || nyckel || '').trim(),
+    _depDate: depDate,
+    _avgMeta: avgMeta,
+    _instansKalla: normaliseraKallaChipInfo([...metaObjektFörRad(avgMeta), ...källor]),
+  };
+}
+function normaliseraAvgangsinstanser(instanser){
+  const perDatum = new Map();
+  const läggTill = rad=>{
+    const depDate = rad?._depDate || '';
+    if(!depDate) return;
+    if(!perDatum.has(depDate)) perDatum.set(depDate, []);
+    perDatum.get(depDate).push(rad);
+  };
+  const samla = (värde, ctx = {})=>{
+    if(Array.isArray(värde)){
+      värde.forEach(post=>samla(post, ctx));
+      return;
+    }
+    if(!värde || typeof värde !== 'object') return;
+    if(serUtSomAvgangsinstans(värde, ctx)){
+      const normaliserad = normaliseraAvgangsinstans(värde, ctx);
+      if(normaliserad) läggTill(normaliserad);
+      return;
+    }
+    const basCtx = {...ctx};
+    const ctxDatum = normaliseraIsoDatum(förstaIckeTommaVärde([värde], [
+      'avgangsdatum','avgångsdatum','datum',
+      'dep_date','depDate','departure_date','departureDate'
+    ]));
+    if(ctxDatum) basCtx.depDate = ctxDatum;
+    const ctxNyckel = String(förstaIckeTommaVärde([värde], [
+      'nyckel','key','instansnyckel','instans_nyckel','route_key'
+    ]) || '').trim();
+    if(ctxNyckel) basCtx.instansNyckel = ctxNyckel;
+    Object.entries(värde).forEach(([nyckel, post])=>{
+      const nästaCtx = {...basCtx};
+      if(ärIsoDatumStr(nyckel)) nästaCtx.depDate = nyckel;
+      if(parsaInstansNyckel(nyckel)) nästaCtx.instansNyckel = nyckel;
+      samla(post, nästaCtx);
+    });
+  };
+  samla(instanser);
+  return Object.fromEntries(
+    [...perDatum.entries()]
+      .sort(([a],[b])=>a.localeCompare(b,'sv'))
+      .map(([datum, rader])=>[datum, rader])
+  );
+}
+function initAvgangsinstanser(){
+  HAR_AVGANGSINSTANSER = !!(DATA && harEgenNyckel(DATA, 'avgangsinstanser'));
+  AVGANGSINSTANSER_PER_DATUM = HAR_AVGANGSINSTANSER
+    ? normaliseraAvgangsinstanser(DATA.avgangsinstanser)
+    : {};
+}
+function avgangsinstanserFörDatum(depDs){
+  return (AVGANGSINSTANSER_PER_DATUM||{})[depDs] || [];
+}
 function byggDynamiskaRuttFallbacks(){
   const map = new Map();
   const läggTill = (rederi, avghamn, ankhamn, fartyg) => {
@@ -1062,6 +1365,11 @@ function byggDynamiskaRuttFallbacks(){
     });
   };
 
+  Object.values(AVGANGSINSTANSER_PER_DATUM||{}).forEach(rader=>{
+    (rader||[]).forEach(rad=>{
+      läggTill(rad.rederi, rad.avghamn, rad.ankhamn, rad.fartyg || normaliseraAvgangsMeta(rad._avgMeta)?.fartyg || '');
+    });
+  });
   Object.entries(DATA.avgangar_datum||{}).forEach(([, poster])=>{
     Object.entries(poster||{}).forEach(([nyckel, meta])=>{
       const m = nyckel.match(/^([^:]+):(.+?)→(.+?):\d{2}:\d{2}$/);
@@ -1088,13 +1396,42 @@ function allaRuttFallbacks(){
 }
 function normaliseraAvgangsMeta(meta){
   if(!meta) return null;
-  if(typeof meta === 'string') return { fartyg: meta, anktid: '', ankomstdatum: '' };
+  if(typeof meta === 'string'){
+    return {
+      fartyg: meta,
+      anktid: '',
+      ankomstdatum: '',
+      kalla: '',
+      kalltyp: '',
+      kalllabel: '',
+      kalldetalj: '',
+    };
+  }
+  const källor = metaObjektFörRad(meta);
   return {
-    fartyg: meta.fartyg || '',
-    anktid: meta.anktid || '',
-    ankomstdatum: meta.ankomstdatum || '',
-    kalla: meta.kalla || '',
+    fartyg: String(förstaIckeTommaVärde(källor, ['fartyg','ship','vessel']) || '').trim(),
+    anktid: String(förstaIckeTommaVärde(källor, ['anktid','ankomsttid','arrival_time','arrivalTime']) || '').trim(),
+    ankomstdatum: normaliseraIsoDatum(
+      förstaIckeTommaVärde(källor, ['ankomstdatum','ankomst_datum','arrival_date','arrivalDate'])
+    ),
+    kalla: String(förstaIckeTommaVärde(källor, ['kalla','källa','source_url','sourceUrl']) || '').trim(),
+    kalltyp: String(förstaIckeTommaVärde(källor, ['kalltyp','källa_typ','kalla_typ','source_type','sourceType']) || '').trim(),
+    kalllabel: String(förstaIckeTommaVärde(källor, ['kalllabel','källa_label','kalla_label','source_label','sourceLabel']) || '').trim(),
+    kalldetalj: String(förstaIckeTommaVärde(källor, ['kalldetalj','källa_detalj','kalla_detalj','source_detail','sourceDetail','beskrivning','description','detalj']) || '').trim(),
   };
+}
+function harAvgangsMetaInnehall(meta){
+  return !!(meta && [
+    meta.fartyg, meta.anktid, meta.ankomstdatum,
+    meta.kalla, meta.kalltyp, meta.kalllabel, meta.kalldetalj
+  ].some(v=>String(v||'').trim()));
+}
+function byggRadKallaChip(rad, avgMeta){
+  if(rad?._instansKalla?.badge) return rad._instansKalla;
+  return normaliseraKallaChipInfo([
+    ...metaObjektFörRad(avgMeta),
+    ...metaObjektFörRad(rad),
+  ]);
 }
 function ttLineKodFörNamn(namn){
   return TT_LINE_NAMN_TILL_KOD[String(namn||'').trim()] || String(namn||'').trim();
@@ -1128,6 +1465,8 @@ function hämtaTtLineMetaMedTolerans(rad, depDate, måltid){
   return kandidater[0].meta;
 }
 function hämtaAvgangsMeta(rad, depDate = valdDat){
+  const direktMeta = normaliseraAvgangsMeta(rad?._avgMeta || rad?.avgMeta || rad?.avgangsmeta);
+  if(harAvgangsMetaInnehall(direktMeta)) return direktMeta;
   const avgt = rad.avgtid_raw || rad.avgtid || '';
   const ds = dStr(depDate);
   const rederi = normRederi(rad.rederi || '');
@@ -1433,6 +1772,7 @@ async function init(){
   const upd = DATA.meta?.uppdaterad||'';
   document.getElementById('upd').textContent = (upd?'Data: '+upd+'  ·  ':'')+' Laddad '+tid;
 
+  initAvgangsinstanser();
   byggDynamiskaRuttFallbacks();
   valdDat = nu;
   valdVd = VD[nu.getDay()];
@@ -1613,7 +1953,7 @@ function kandidaterFörValtDatum(){
   const seddaSchemaDubletter = new Map();
   const läggTill = (rad, depDatum, prioritet) => {
     const r = normRederi(rad.rederi||'');
-    const o = bygRad(rad, r, getLnk(r), depDatum);
+    const o = bygRad(rad, r, rad.länk || getLnk(r), depDatum);
     const key = `${o.rederi}|${o._depDate}|${o.avghamn}|${o.ankhamn}|${rad.avgtid_raw||rad.avgtid||''}`;
     const bef = map.get(key);
     if(!bef || prioritet >= bef.prioritet) map.set(key, {prioritet, rad:o});
@@ -1624,6 +1964,11 @@ function kandidaterFörValtDatum(){
     depDatum.setDate(valdDat.getDate()+offset);
     const depDs = dStr(depDatum);
     const depVd = VD[depDatum.getDay()];
+
+    if(HAR_AVGANGSINSTANSER){
+      avgangsinstanserFörDatum(depDs).forEach(rad=>läggTill(rad, depDatum, 5));
+      continue;
+    }
 
     ((DATA.polsca_datum||{})[depDs]||[]).forEach(rad=>läggTill(rad, depDatum, 3));
 
@@ -1723,6 +2068,7 @@ function bygRad(rad, r, länk, depDatum = valdDat){
   const avgMeta = hämtaAvgangsMeta(rad, depDatum);
   const ankInfo = byggExaktAnkomst(avgMeta, depInfo, depDatum, rad.ankhamn||'')
     || normaliseraAnkomsttid(rad.anktid||'', depInfo, depVd, rad.ankhamn||'');
+  const kallaChip = byggRadKallaChip(rad, avgMeta);
   const depDate = isoEfterOffset(depDatum, depInfo.dayOffset);
   const arrDate = isoEfterOffset(depDatum, ankInfo.dayOffset);
   const motSverige = rad.mot_sverige===true || SVENSKA_HAMNAR.has(rad.ankhamn);
@@ -1761,6 +2107,7 @@ function bygRad(rad, r, länk, depDatum = valdDat){
     _sortSvenskHändelse:franSverige
       ? (Number.isFinite(depInfo.absSw) ? mod(depInfo.absSw, 1440) : Number.MAX_SAFE_INTEGER)
       : (Number.isFinite(ankInfo.sortAbs) ? mod(ankInfo.sortAbs, 1440) : Number.MAX_SAFE_INTEGER),
+    _kallaChip:kallaChip,
   };
 }
 
@@ -1809,19 +2156,26 @@ function bygTr(rad){
   const lh = rad.länk ? `<a class="tlnk" href="${esc(rad.länk)}" target="_blank" rel="noopener" title="Öppna tidtabell hos ${esc(rad.rederi)}">&#8599;</a>` : '';
   // Rederi
   const färg = REDERI_FARG[rad.rederi] || 'var(--blå)';
-  const rh = rad.länk ? `<a class="rl" href="${esc(rad.länk)}" target="_blank" rel="noopener" style="color:${esc(färg)}">${esc(rad.rederi)}</a>` : `<strong style="color:${esc(färg)}">${esc(rad.rederi)}</strong>`;
+  const kallaChip = rad._kallaChip
+    ? `<span class="kalla-chip kalla-chip-${rad._kallaChip.klass}" title="${esc(rad._kallaChip.titel)}">${esc(rad._kallaChip.badge)}</span>`
+    : '';
+  const rederiText = rad.länk
+    ? `<a class="rl" href="${esc(rad.länk)}" target="_blank" rel="noopener" style="color:${esc(färg)}">${esc(rad.rederi)}</a>`
+    : `<strong style="color:${esc(färg)}">${esc(rad.rederi)}</strong>`;
+  const rh = `<span class="rederi-cell">${rederiText}${kallaChip}</span>`;
 
   // Riktnings-badge
   const bh = riktningsBadge(rad);
 
   // Info-tooltip
+  const kallTxt = rad._kallaChip ? `<strong>Datakälla:</strong> ${esc(rad._kallaChip.titel)}<br>` : '';
   const verTxt = rad.verifiering ? `<strong>Verifiering:</strong> ${esc(rad.verifiering)}<br>` : '';
   const anmTxt = rad.anm ? `${esc(rad.anm)}<br>` : '';
   const källaHtml = rad.källa
     ? `<strong>Källa:</strong> <a href="${esc(rad.källa)}" target="_blank" rel="noopener">${esc(rad.källa)}</a>`
     : '';
-  const ih = (verTxt||anmTxt||källaHtml)
-    ? `<span class="info-knapp" tabindex="0">i<span class="info-pop">${verTxt}${anmTxt}${källaHtml}</span></span>`
+  const ih = (kallTxt||verTxt||anmTxt||källaHtml)
+    ? `<span class="info-knapp" tabindex="0">i<span class="info-pop">${kallTxt}${verTxt}${anmTxt}${källaHtml}</span></span>`
     : '';
 
   tr.innerHTML = `

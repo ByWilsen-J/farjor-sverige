@@ -15,7 +15,7 @@ Felhantering:
   - Varnar om fartygsnamn saknas i lookup-tabellen (ny båt)
   - Varnar om HTTP-fel uppstår
 
-Se viking_line_api_rediscovery_prompt.md om API:et slutar fungera.
+Se docs/research/viking_line_api_rediscovery_prompt.md om API:et slutar fungera.
 """
 
 import base64
@@ -30,6 +30,7 @@ import requests
 # ── Konfiguration ──────────────────────────────────────────────────────────────
 
 BASE_URL = "https://www.sales.vikingline.com/protheus-api/v1/ferry/eng/en"
+SOURCE_DETAIL = "Viking Protheus ferry API"
 
 SHIP_CODES = {
     "CI": "Viking Cinderella",
@@ -91,7 +92,7 @@ def fetch_week(search_date: str, dep: str, arr: str) -> Optional[dict]:
         return r.json()
     except requests.exceptions.HTTPError as e:
         log.error("HTTP-fel vid anrop till Viking Line API: %s — %s", url, e)
-        log.error(">>> API:et kan ha forandrats. Se viking_line_api_rediscovery_prompt.md")
+        log.error(">>> API:et kan ha forandrats. Se docs/research/viking_line_api_rediscovery_prompt.md")
         return None
     except requests.exceptions.RequestException as e:
         log.error("Natverksfel: %s", e)
@@ -171,6 +172,10 @@ def extract_sailings(data: dict, dep: str, arr: str) -> list:
                 "stops":          [PORT_NAMES.get(s["port"], s["port"])
                                    for s in oj.get("stops", [])],
                 "availability":   hit.get("availability", "UNKNOWN"),
+                "kalla":          BASE_URL,
+                "source_label":   "Live-tidtabell",
+                "source_detail":  SOURCE_DETAIL,
+                "source_type":    "dynamic_schedule",
             })
     return sailings
 

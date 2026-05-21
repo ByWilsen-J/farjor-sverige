@@ -4,12 +4,34 @@ GitHub-sida/statisk webbsida för färjetidtabeller till och från Sverige. Huvu
 
 ## Aktuell status
 
-Pågående men klart förbättrad. Sidan renderar nu en renare tabellvy där alla valbara kontroller ligger i högerpanelen, med rederifilter, rederiöversikt och färgkodade rederinamn. `index.html` är huvudvyn och `farjor.html` är nu en redirect till startsidan. Standardvyn är nu `Ankomster till Sverige` för dagens datum, och `Alla ankomster / avgångar` visas i en enda gemensam tabell utan separat pax-/fraktuppdelning. Fartygskolumnen hämtar serverförberedda fartygsnamn där möjligt och visar nu bredare ruttfallback även när exakt tur-fartyg saknas.
+Genomförd huvudombyggnad 2026-05-21. `farjor_data.json` bygger nu ett publiceringsfönster på `idag - 1 månad` till `idag + 3 månader` som `avgangsinstanser`, och `index.html` renderar dessa instanser först när de finns. Veckoschema används därmed som fallback-datakälla i backend i stället för som primär renderkälla i frontend.
 
-Senaste UI-iteration: tabellen visar nu irrelevanta tidskolumner i ljusgrått per riktning (`Inkommande`, `Utgående`, `Mot Sverige`) i stället för att tona ned hela raden. Högerpanelen har samtidigt gjorts om till ett tydligare block- och chipbaserat kontrollkort för datum, rederi, listtyp, aktualitet och export.
+Sidan behåller den nya högerpanelen, rederifiltret och den gemensamma tabellvyn, men visar nu också källchippar för live-/datumrader. Dynamiska källor kan bära med sig källmeta och statuskommentarer ända fram till info-rutan per avgång. `farjor.html` är fortsatt redirect till startsidan.
+
+Automationen är nu uppdelad i faktisk driftmodell: timvis uppdatering för dynamiska datumkällor och daglig backfill för hela publiceringsfönstret. Kvarvarande större luckor gäller främst separat trafikbevakning från särskilda rederi-sidor, Viking Lines blockerade server-side-källa och full separering av `Polferries`/`Unity Line` under `Polsca`.
 
 ## Senaste ändringar
 
+- 2026-05-21: Slutförde första produktionsversionen av den nya datuminstans-modellen.
+  - Lade till [schedule_instances.py](/Users/jane/Documents/Claude/Projects/Weblänksida/schedule_instances.py) som materialiserar veckoschema till datuminstanser inom ett fast publiceringsfönster och merge:ar in exakta dags-/liveavgångar.
+  - Uppdaterade [generera_json.py](/Users/jane/Documents/Claude/Projects/Weblänksida/generera_json.py) så att `farjor_data.json` alltid innehåller `avgangsinstanser` redan från basgenereringen.
+  - Byggde om [update_fartyg.py](/Users/jane/Documents/Claude/Projects/Weblänksida/update_fartyg.py) så att dynamiska källor uppdaterar samma instanslager, bevarar källmeta och inte längre kräver fartygsnamn för att en exakt avgång ska få existera.
+  - Rättade fallback-parsern för äldre dynamiska nycklar så att tider som `13:30` inte längre feltolkas som rutttext.
+  - Lät scrapers för `DFDS`, `Tallink`, `Finnlines`, `Stena Line`, `TT-Line` och `Viking Line` bära med `kalla`, `source_label`, `source_detail` och i förekommande fall status/kommentar.
+  - Uppdaterade [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) så att `DATA.avgangsinstanser` är primär kandidatlistekälla och så att live-/datumkällor märks upp i rederikolumn och info-ruta.
+  - Delade upp GitHub Actions i timvis uppdatering av dynamiska avgångar och separat daglig backfill via [update-timetables.yml](/Users/jane/Documents/Claude/Projects/Weblänksida/.github/workflows/update-timetables.yml) och [daily-backfill.yml](/Users/jane/Documents/Claude/Projects/Weblänksida/.github/workflows/daily-backfill.yml).
+  - Städade projektroten genom att flytta research-rapporter till [docs/research](/Users/jane/Documents/Claude/Projects/Weblänksida/docs/research) och äldre backup-/överlämningsfiler till [archive](/Users/jane/Documents/Claude/Projects/Weblänksida/archive).
+- 2026-05-21: Förberedde automation- och dokumentationsspåret för den nya körmodellen.
+  - Lade till `docs/automation-kormodell.md` med fyra tydliga körspår: `statisk bas`, `timvis dynamisk uppdatering`, `daglig backfill` och `daglig trafikbevakning`.
+  - Länkade `docs/ombyggnadsarkitektur.md` till den nya körmodellen så målarkitektur och driftupplägg hänger ihop.
+  - Uppdaterade `.github/workflows/update-timetables.yml` med tydligare namn, `concurrency` och manuella bridge-lägen för `dynamic_refresh` respektive `daily_backfill`, utan att ändra nuvarande schemalagda 14-dagarskörning.
+- 2026-05-21: Gjorde en full nulägeskartläggning av tidtabellskedjan inför planerat omtag av logiken.
+  - Bekräftade att `farjor_data.json` genereras från Excel-arken `Schemaregister` och `Schemaregister_Intervall` via `generera_json.py`, alltså med veckoschema/intervall som grundkälla.
+  - Bekräftade att `update_fartyg.py` bara uppdaterar `fartyg_datum` och `avgangar_datum` för 15 dagar framåt och att GitHub Actions i dag bara kör detta var 14:e dag.
+  - Bekräftade att frontend i `index.html` fortfarande bygger kandidatlistan från `DATA.schema` för alla datum och först därefter lägger på `polsca_datum`, `avgangar_datum` och `fartyg_datum` med högre prioritet.
+  - Hittade att renderingsnyckeln inkluderar exakt avgångstid, vilket innebär att en live-/datumrad med justerad tid inte säkert ersätter veckoraden utan kan visas parallellt med den.
+  - Bekräftade att `DATA.intervall` i praktiken inte används i nuvarande rendering och att trafikinformation/avvikelsemeddelanden ännu inte hämtas in maskinellt.
+  - Kartlade källor per rederi: server-side datumimport finns för `Tallink Silja`, `DFDS`, `Finnlines`, `Stena Line` och `TT-Line`; `Viking Line` saknas just nu i `avgangar_datum`; `Polsca` använder separat `polsca_datum`; `Wasaline`, `Eckerö Linjen` och flera mindre rederier är fortsatt statiska.
 - 2026-05-20: Lade till generell schemadedupering i `index.html`.
   - Gick igenom dubblettmönster systematiskt i `schema`, `avgangar_datum` och `polsca_datum`.
   - Datumimporterna visade inga motsvarande när-dubbletter; problemet låg i veckoschemat.
@@ -106,6 +128,10 @@ Senaste UI-iteration: tabellen visar nu irrelevanta tidskolumner i ljusgrått pe
 
 ## Beslut och motiveringar
 
+- Nästa större omtag bör bygga på avgångsinstanser per datum, inte på att veckoschemat alltid renderas först. Motiveringen är att exakt dagsdata då kan vara systemets sanning i stället för ett overlay-lager.
+- Live-/datumkällor ska prioriteras per rutt och rederi i en uttrycklig källhierarki. Motiveringen är att undvika dagens blandning där vissa rader kommer från veckoschema, andra från exakta datum och andra från browsercache utan gemensam regelmotor.
+- Browser-side livehämtning ska inte vara primär uppdateringsmekanism för produktionsdata. Motiveringen är att GitHub-sidan annars saknar gemensam, automatiskt uppdaterad källa och olika besökare kan se olika resultat.
+- Trafikinformation ska behandlas som egen datakälla separat från tidtabell. Motiveringen är att avvikelser, inställda avgångar och kommentarer per avgång inte passar som fri text i dagens statiska anmärkningar.
 - Visuell nedtoning ska ske på den irrelevanta tidskolumnen, inte på hela raden. Det gör att operatören fortfarande direkt ser den tidpunkt som är viktig för respektive listtyp.
 - `Mot Sverige` ska fortsätta ses som aktuell tills både avgång och ankomst har passerat. Motiveringen är att färjan fortfarande är operativt relevant efter avgång så länge den ännu inte nått Sverige.
 - `Alla ankomster / avgångar` ska vara en enda kronologisk tabell, inte delas upp efter färjetyp. Användarbehovet är att se svenska hamnhändelser i tidsordning oavsett om turen är pax, RoRo eller frakt.
@@ -123,39 +149,48 @@ Senaste UI-iteration: tabellen visar nu irrelevanta tidskolumner i ljusgrått pe
 
 ## Pågående arbete
 
-- Fartygskolumnen är stabilare i UI, men datatäckningen är inte komplett för alla rutter utan serverförberedd dagsdata.
-- Rederiöversikten och rederifiltret fungerar i UI, men bygger fortfarande på nuvarande JSON + fallback snarare än fullständig route-import för alla rederier.
-- Den nya paneldesignen är införd i kod men bör gärna visuell-QA:as i riktig browser igen när lokal förhandsvisning är tillgänglig i miljön.
-- POLSCA-rader använder fortfarande gemensam datakälla utan separat Unity-import.
-- Projektroten innehåller flera rapport- och testfiler som bör sorteras in i `docs/` eller `archive/` vid separat städpass.
+- Visuell QA av den nya instansrenderingen i riktig browser när nätverk/lokal preview är tillgänglig.
+- Nästa utbyggnad av trafikinformationsspåret så att separata rederisidor kan generera explicita `traffic_notices`, inte bara kommentarer från livekällornas statusfält.
+- Separat källa för `Unity Line`/`Polferries` så att `Polsca` kan vara rent visningsnamn och inte lookup-nyckel.
+- Viking Lines server-side-källa behöver fortfarande återvalideras eftersom den i tidigare drift gav 403 och i denna miljö inte kunde nätverkstestas alls.
 
 ## Problem / blockerare
 
+- Dedikerade collectors för rederiernas separata trafikinformationssidor finns ännu inte. Nuvarande version kan bära status/kommentar från de livekällor som redan innehåller sådan information, men inte bevaka alla externa trafikbloggar/bulletinsidor.
+- `Viking Line` kan fortfarande inte verifieras fullt server-side i den här miljön eftersom alla nätanrop är blockerade lokalt och den tidigare produktionsobservationen var `403 Forbidden`.
+- `polsca_datum` är en separat specialkedja med egen period (`2026-05-01` till `2026-11-30`) och innehåller bara `Świnoujście ↔ Trelleborg`, medan `Ystad ↔ Świnoujście` och `Gdańsk ↔ Nynäshamn` fortfarande ligger i statiskt schema.
+- `intervall`-datan i JSON är i praktiken oanvänd i rendering och hjälper därför inte dagens tidtabellsvisning trots att den finns i datalagret.
 - Veckoschemat innehåller fortfarande vissa manuellt inlagda undantag och parallella varianter. Frontenden deduperar nu de uppenbara fallen, men datalagret kan fortfarande behöva en separat städning senare.
 - Vissa schemaundantag ligger fortfarande som veckorader med anmärkning i datalagret. Den här omgången säkrade Viking-specialtiden, men fler undantag kan på sikt behöva samma typ av datumstyrning.
-- Senaste regressionsfelet kom från att riktning/specifik radlabel sattes senare än passerad-/betoningslogiken. Den delen är nu korrigerad i frontend.
-- Vissa rader saknar fortfarande fartygsnamn när API:ets avgångstid avviker från det normaliserade veckoschemat, t.ex. försenade/ändrade avgångar.
-- Viking Lines server-side API-anrop ger 403 Forbidden i `update_fartyg.py`. Frontend/anmarkningsfallback ger fortfarande vissa Viking-namn, men API-flödet behöver återupptäckas.
 - Unity Line finns inte som egen datumkälla i nuvarande JSON, så full separering eller exakt avgångsimport kräver ny importkedja.
-- Officiellt bekräftade rutter saknas fortfarande helt eller delvis i själva veckoschemat `farjor_data.json`, även om flera nu kompletteras i UI från datumdata:
+- Officiellt bekräftade rutter saknas fortfarande helt eller delvis i själva veckoschemat `farjor_data.json`, även om flera nu kompletteras via datuminstanser:
   - TT-Line `Travemünde → Trelleborg`, `Świnoujście → Trelleborg` och delar av `Klaipėda ↔ Trelleborg`
   - Unity Line/POLSCA `Świnoujście ↔ Trelleborg` utanför nuvarande datumperiod
   - Eventuell framtida POLSCA `Gdańsk ↔ Karlshamn` när den faktiskt öppnar
-- Flera filer i arbetskopian verkar ha namn-/normaliseringsdiffar i git, så större filflyttar bör göras försiktigt.
 
 ## Nästa steg
 
+- Lägg till separat `traffic_notices`-collector per rederi där officiella trafikmeddelandesidor finns.
+- Bygg ut `source_registry` från dokumenterad matris till körbar konfiguration om kommande skript ska styras route-för-route.
+- Planera dubbel bevakning för `Polsca` där både `Polferries` och `Unity Line` bevakas separat och sammanfogas först före visning.
 - Kör visuell browser-QA av den nya panelen och de kolumnspecifika tidsgråtoningarna för att finjustera spacing/kontrast vid behov.
 - Bygg eller hitta en riktig importkälla för Unity Line/POLSCA-datum så `Świnoujście ↔ Ystad` och `Świnoujście ↔ Trelleborg` inte behöver förlita sig på blandade schema-/fallbackkällor.
-- Lägg till officiellt verifierade men saknade rutter direkt i veckoschemat `farjor_data.json`, med prioritet:
+- Lägg till officiellt verifierade men saknade rutter direkt i veckoschemat `farjor_data.json` eller i framtida statisk fallbackgenerering, med prioritet:
   - TT-Line kompletta Sverigekopplade riktningar och Klaipėda-/Trelleborg-rutter
   - Finnlines `Malmö ↔ Świnoujście` i framtida genereringskedja, inte bara manuellt i JSON
 - Återupptäck Viking Lines aktuella API eller lägg till en robust server-side fallback.
-- Överväg fuzzy matching/tolerans för avgångstider som ändrats av rederiets live-API men ännu inte finns i veckoschemat.
-- Städa projektroten genom att flytta analysrapporter till `docs/` och test-/låsfiler till `archive/`.
+- Överväg att slå ihop eller avveckla legacy-fälten `fartyg_datum` och `avgangar_datum` när full parity mot `avgangsinstanser` är verifierad.
 
 ## TODO / backlog
 
+- [x] Besluta och dokumentera ny källhierarki per rederi/rutt: `live datumkälla` -> `statisk datumtabell` -> `veckoschema` -> `ingen visning`.
+- [x] Bygg om datamodellen så att avgångar lagras som datuminstanser och inte primärt som veckomönster.
+- [ ] Inför separat datalager för trafikinformation/avvikelser per rederi och avgång.
+- [x] Begränsa synliga/importerade datum till 3 månader framåt och 1 månad bakåt.
+- [x] Byt uppdateringsschema från var 14:e dag till timvis för dynamiska källor.
+- [ ] Inför daglig bevakning av trafikinformationssidor där sådana finns.
+- [x] Inför tydlig UI-märkning för avgångar som kommer från live-/datumkälla.
+- [ ] Kartlägg och bygg dubbel bevakning för `Polsca` (`Polferries` + `Unity Line`) innan sammanslagning i UI.
 - [x] Finnlines-skrapare för fartygsnamn.
 - [x] Stena Line Freight-skrapare för fartygsnamn.
 - [x] TT-Line-skrapare för fartygsnamn.
@@ -171,11 +206,14 @@ Senaste UI-iteration: tabellen visar nu irrelevanta tidskolumner i ljusgrått pe
 - [x] Frontend: `Ankomster till Sverige` baseras på verkligt ankomstdatum till svensk hamn.
 - [x] Lägg till Finnlines `Malmö ↔ Świnoujście` i datalagret.
 - [ ] Lägg till saknade TT-Line-riktningar/rutter i datalagret med verifierad tidtabell.
-- [ ] Projektstruktur: skapa/uppdatera `docs/`, `archive/`, `temp/`, `exports/`.
+- [x] Projektstruktur: skapa/uppdatera `docs/`, `archive/`, `temp/`, `exports/`.
 - [ ] Kontrollera GitHub Actions efter att fler skrapare kopplats in.
 
 ## Historik
 
+- 2026-05-21 10:56 CEST: Ny datuminstans-baserad version kopplades ihop end-to-end med timvis dynamic refresh, daglig backfill, källmärkning i UI och städad projektstruktur.
+- 2026-05-21 10:46 CEST: Dokumentation för ny körmodell lades till i `docs/` och befintligt Actions-workflow kompletterades med manuella bridge-lägen för dynamisk refresh och backfill.
+- 2026-05-21 10:30 CEST: Full nulägeskartläggning av tidtabellskedjan genomförd inför planerat omtag av logiken kring live-/datumkällor, veckoschema och trafikinformation.
 - 2026-05-20 18:22 CEST: Generell dedupering av veckoschema infördes efter genomgång av flera liknande dublettfall.
 - 2026-05-20 18:12 CEST: Viking-specialtid för Helsingfors → Stockholm begränsades till rätt datumintervall.
 - 2026-05-20 18:07 CEST: Regressionsfix för label-baserad tidslogik dokumenterad i projektloggen.

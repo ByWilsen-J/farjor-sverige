@@ -19,7 +19,18 @@ pdf_export_macro.bas
 
 # Övrigt
 *.md
+!project-log.md
+!docs/
+!docs/**/*.md
+!archive/
+!archive/**/*.md
 *.bas
 
 # Backuper
 *.bak
+
+# Temp/export-kataloger
+temp/*
+!temp/.gitkeep
+exports/*
+!exports/.gitkeep

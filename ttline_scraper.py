@@ -20,6 +20,7 @@ import requests
 BASE_URL = "https://www.ttline.com"
 TIMETABLE_URL = f"{BASE_URL}/en/timetables/"
 SAILING_URL = f"{BASE_URL}/sailing/info/"
+SOURCE_DETAIL = "TT-Line timetable endpoint"
 
 ROUTES = [
     "TRA;TRE", "TRE;TRA",
@@ -182,6 +183,15 @@ def infer_arrival_date(dep_date: str, dep_time: str, arr_date: str, arr_time: st
     return (date.fromisoformat(dep_date) + timedelta(days=1)).isoformat()
 
 
+def build_traffic_comment(status: str) -> str:
+    value = " ".join((status or "").split())
+    if not value:
+        return ""
+    if re.search(r"^(on time|scheduled|planerad)$", value, re.I):
+        return ""
+    return f"TT-Line-status: {value}"
+
+
 def fetch_route(session: requests.Session, token: str, route: str, day: date) -> Optional[str]:
     payload = {
         "route": route,
@@ -225,6 +235,12 @@ def parse_table(html_text: str, fallback_year: int) -> list[dict]:
             "anktid": anktid,
             "fartyg": resolve_ship(cells[2]),
             "rederi": "TT-Line",
+            "kalla": TIMETABLE_URL,
+            "source_label": "Live-tidtabell",
+            "source_detail": SOURCE_DETAIL,
+            "source_type": "dynamic_schedule",
+            "status": cells[5] if len(cells) > 5 else "",
+            "traffic_comment": build_traffic_comment(cells[5] if len(cells) > 5 else ""),
         })
     return rows
 

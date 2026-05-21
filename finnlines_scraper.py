@@ -15,6 +15,7 @@ import requests
 
 GRAPHQL_URL = "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql"
 API_KEY = "da2-zvuktusyubbstlw7khps4vyeie"
+SOURCE_DETAIL = "Finnlines GraphQL timetable API"
 HEADERS = {
     "Content-Type": "application/json",
     "x-api-key": API_KEY,
@@ -151,6 +152,10 @@ def fetch_all(date_from: date = None, date_to: date = None) -> list[dict]:
                 "anktid": anktid,
                 "fartyg": fartyg,
                 "rederi": "Finnlines",
+                "kalla": GRAPHQL_URL,
+                "source_label": "Live-tidtabell",
+                "source_detail": SOURCE_DETAIL,
+                "source_type": "dynamic_schedule",
             })
         log.info("  %d avgångar.", len(data))
     return all_sailings

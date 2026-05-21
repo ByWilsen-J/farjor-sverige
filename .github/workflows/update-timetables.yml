@@ -1,19 +1,22 @@
-name: Uppdatera fartygsnamn (var 14:e dag)
+name: Timvis uppdatering av dynamiska avgångar
 
 on:
   schedule:
-    # Kör 04:00 UTC den 1:a och 15:e varje månad (~var 14:e dag)
-    - cron: '0 4 1,15 * *'
+    - cron: '17 * * * *'
   workflow_dispatch:
     inputs:
       from_date:
-        description: 'Startdatum (YYYY-MM-DD). Tom = dagens datum.'
+        description: 'Startdatum (YYYY-MM-DD). Tomt = dagens datum i UTC.'
         required: false
         default: ''
 
+concurrency:
+  group: dynamic-refresh-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   update:
-    name: Hämta fartygsnamn & uppdatera JSON
+    name: Hämta dynamiska datumrader
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -30,14 +33,21 @@ jobs:
       - name: Installera beroenden
         run: pip install requests
 
-      - name: Kör update_fartyg.py
+      - name: Bestäm startdatum
+        id: start
+        shell: bash
         run: |
           FROM="${{ github.event.inputs.from_date }}"
           if [ -z "$FROM" ]; then
-            python3 update_fartyg.py
-          else
-            python3 update_fartyg.py "$FROM"
+            FROM="$(date -u +%F)"
           fi
+          echo "from=$FROM" >> "$GITHUB_OUTPUT"
+          echo "Startdatum: $FROM"
+
+      - name: Kör update_fartyg.py
+        env:
+          FERRY_DYNAMIC_FORWARD_DAYS: "14"
+        run: python3 update_fartyg.py "${{ steps.start.outputs.from }}"
 
       - name: Commit och push om farjor_data.json ändrats
         run: |
@@ -47,7 +57,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "Inga ändringar – inget commit behövs."
           else
-            DATUM=$(date +%Y-%m-%d)
-            git commit -m "Auto: fartygsnamn uppdaterade $DATUM [skip ci]"
+            FROM="${{ steps.start.outputs.from }}"
+            git commit -m "Auto: dynamiska avgångar uppdaterade $FROM (hourly) [skip ci]"
             git push
           fi
