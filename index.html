@@ -573,7 +573,7 @@ const KANDA_FARTYG = [
   'Sfix','Sirena Seaways','Luna Seaways','Robin Hood','Optima Seaways','Nils Holgersson','Nils Dacke','Marco Polo',
   'Galileusz','Epsilon','Polonia','Skania','Mazovia','Copernicus','Jan Śniadecki','Nova Star',
 ];
-const UTESLUT = new Set(['Wagenborg','Wallenius SOL','SCA Logistics']);
+const UTESLUT = new Set(['Wallenius SOL','SCA Logistics']);
 const SVENSKA_HAMNAR = new Set([
   'Stockholm','Nynäshamn','Kapellskär','Grisslehamn',
   'Göteborg','Trelleborg','Ystad','Malmö','Helsingborg',
@@ -1106,9 +1106,23 @@ function ruttNyckel(rederi, avghamn, ankhamn){
 }
 function splitFartygLista(värde){
   return String(värde||'')
-    .split(/\s*\/\s*/)
+    .split(/\s+\/\s+/)
     .map(s=>s.trim())
     .filter(Boolean);
+}
+function komprimeraDfdsKlaKaaFallback(nyckel, fartyg){
+  const ärDfdsKarlshamnKlaipeda =
+    nyckel === 'DFDS|Karlshamn|Klaipėda'
+    || nyckel === 'DFDS|Klaipėda|Karlshamn';
+  if(!ärDfdsKarlshamnKlaipeda) return fartyg;
+  return splitFartygLista(fartyg)
+    .map(namn=>({
+      'Robin Hood':'RH',
+      'Nils Holgersson':'NH',
+      'Nils Dacke':'ND',
+    }[namn] || namn))
+    .filter(Boolean)
+    .join(' / ');
 }
 function slåIhopFartygListor(...listor){
   const unika = [];
@@ -1579,10 +1593,10 @@ function namnetFrånAnm(anm){
 
 function routeFleetFallback(rad, rederi){
   const nyckel = ruttNyckel(rederi, rad.avghamn, rad.ankhamn);
-  return slåIhopFartygListor(
+  return komprimeraDfdsKlaKaaFallback(nyckel, slåIhopFartygListor(
     splitFartygLista(DYNAMIC_ROUTE_FLEETS[nyckel]),
     splitFartygLista(ROUTE_FLEETS[nyckel])
-  );
+  ));
 }
 
 function getShipInfo(rad, depDate = valdDat){

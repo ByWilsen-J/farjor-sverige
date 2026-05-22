@@ -18,6 +18,12 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Senaste ändringar
 
+- 2026-05-22: Tog bort Wagenborg helt och justerade fartygsvisning för Eckerö/DFDS.
+  - Uppdaterade [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json) så `Wagenborg` inte längre publiceras i `meta.rederier`, `schema` eller `avgangsinstanser`.
+  - Uppdaterade [generera_json.py](/Users/jane/Documents/Claude/Projects/Weblänksida/generera_json.py) så `Wagenborg` filtreras bort redan vid framtida JSON-generering från Excel-källan.
+  - Justerade [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) så `M/S Eckerö` inte feltolkas som en fartygsrotation och därför inte längre renderas som `M / S Eckerö`.
+  - Lade in rutt-specifik komprimering i [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) så DFDS `Klaipėda ↔ Karlshamn` visas som `Luna Seaways / Optima Seaways / RH / NH / ND` när exakt fartyg saknas och fallbackrotation används.
+  - Rensade [docs/rederi-kallmatris.md](/Users/jane/Documents/Claude/Projects/Weblänksida/docs/rederi-kallmatris.md) från den nu inaktuella Wagenborg-raden.
 - 2026-05-21: Lade till minimal noindex-konfiguration för GitHub Pages.
   - Skapade [robots.txt](/Users/jane/Documents/Claude/Projects/Weblänksida/robots.txt) i projektroten med `User-agent: *` och `Disallow: /` för att avråda all crawlning/indexering.
   - Lade in `<meta name="robots" content="noindex, nofollow">` i [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) och [farjor.html](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor.html) utan att ändra routing, styling eller GitHub Pages-deployment.
@@ -166,6 +172,7 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 - Webbplatsen ska förbli publikt åtkomlig via direkt-URL men aktivt avråda sökmotorindexering via `robots.txt` och `meta name="robots"`. Motiveringen är att minska oavsiktlig upptäckbarhet utan att införa autentisering eller påverka GitHub Pages-driften.
 - `CLdN / Cobelfret` ska inte längre publiceras alls i webbplatsens data eller dokumenterade källmatris. Motiveringen är att användarbehovet nu är att helt ta bort rederiet och dess terminalreferenser, inte bara dölja det i UI:t.
+- `Wagenborg` ska inte längre publiceras alls i webbplatsens data, UI-fallbacks eller dokumenterade källmatris. Motiveringen är att användarbehovet nu är att rederiet inte ska förekomma över huvud taget i listor eller källöversikter.
 - Nästa större omtag bör bygga på avgångsinstanser per datum, inte på att veckoschemat alltid renderas först. Motiveringen är att exakt dagsdata då kan vara systemets sanning i stället för ett overlay-lager.
 - Live-/datumkällor ska prioriteras per rutt och rederi i en uttrycklig källhierarki. Motiveringen är att undvika dagens blandning där vissa rader kommer från veckoschema, andra från exakta datum och andra från browsercache utan gemensam regelmotor.
 - Browser-side livehämtning ska inte vara primär uppdateringsmekanism för produktionsdata. Motiveringen är att GitHub-sidan annars saknar gemensam, automatiskt uppdaterad källa och olika besökare kan se olika resultat.
@@ -249,6 +256,8 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 - [ ] Kontrollera GitHub Actions efter att fler skrapare kopplats in.
 
 ## Historik
+
+- 2026-05-22 06:12 CEST: Wagenborg togs bort helt ur publicerad JSON och framtida genereringskedja; samtidigt rättades fartygsvisningen så `M/S Eckerö` inte delas på snedstreck och DFDS `Klaipėda ↔ Karlshamn` använder den kortade fallbackrotationen `Luna Seaways / Optima Seaways / RH / NH / ND`.
 
 - 2026-05-21 21:39 CEST: Stena route-day-prioritering infördes i dynamiska fönstret, listans källchips togs bort, standardvyn byttes till `Mot Sverige`, badge-texterna kortades, `Rotation:` togs bort ur fartygskolumnen och `Data:`-tidsstämpeln började visas i svensk tid med cache-busting på JSON-hämtningen.
 - 2026-05-21 21:13 CEST: TT-Line-fallbacken flyttades upp i genereringskedjan med verifierade officiella standardtidtabeller för `Travemünde ↔ Trelleborg`, `Świnoujście ↔ Trelleborg` och `Klaipėda ↔ Trelleborg`, och aktuell `farjor_data.json` synkades mot den nya override-modellen.

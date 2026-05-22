@@ -18,7 +18,7 @@ from verified_schema_overrides import apply_verified_schema_overrides
 SCRIPT_DIR = Path(__file__).parent
 XLSX_PATH  = SCRIPT_DIR / "Farjor_Sverige_v2_normaliserad.xlsx"
 JSON_OUT   = SCRIPT_DIR / "farjor_data.json"
-EXCLUDED_OPERATORS = {"CLdN / Cobelfret"}
+EXCLUDED_OPERATORS = {"CLdN / Cobelfret", "Wagenborg"}
 
 if not XLSX_PATH.exists():
     print(f"FEL: Hittar inte {XLSX_PATH}")
