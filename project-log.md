@@ -18,6 +18,11 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Senaste ändringar
 
+- 2026-05-25: Verifierade CI-fixen end-to-end i GitHub Actions.
+  - Pushade commit `38b6c56` (`Fix legacy dynamic sailing normalization`) till `main` och triggade `update-timetables.yml` manuellt.
+  - Bekräftade att nya körningen `26393939678` gick igenom grönt på `2026-05-25` och att den tidigare `.items()`-kraschen i `legacy_dynamic_sailings(...)` därmed är löst.
+  - Workflowen hann också skriva tillbaka uppdaterad [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json) i automatisk commit `71ae7d1` (`Auto: dynamiska avgångar uppdaterade 2026-05-25 (hourly) [skip ci]`).
+  - Kvarvarande observationer i grön körning: Viking Line gav fortfarande `403 Forbidden` på sin server-side-källa och TT-Line gav fortfarande SSL/CSRF-problem, men dessa loggas nu som fel utan att workflowen kraschar eller stoppar hela uppdateringen.
 - 2026-05-25: Felsökte och patchade GitHub Actions-felet i `update-timetables.yml`.
   - Hämtade faktisk logg för körning `26392655565` via `gh run view --log`.
   - Bekräftade att felet inte låg i checkout eller Python-setup utan i `python3 update_fartyg.py "2026-05-25"`.
@@ -224,6 +229,9 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 ## Problem / blockerare
 
 - Lokal fullverifiering av `update_fartyg.py` mot samma runtime som GitHub Actions saknas fortfarande, eftersom den här maskinen bara har Python `3.9.6` installerad som `python3` medan workflowen kör `3.11`. Det blockerar inte patchen men gör att slutlig bekräftelse bör tas via nästa Actions-körning eller lokal 3.11-miljö.
+- `update-timetables.yml` kraschar inte längre på legacy-formatet, men två externa källor är fortfarande sköra i grön körning:
+  - `Viking Line` svarar fortsatt `403 Forbidden` på nuvarande server-side API-anrop.
+  - `TT-Line` gav `SSLCertVerificationError` vid hämtning av CSRF-token från `www.ttline.com`.
 - Den här Codex-miljön har inte full GitHub-ytåtkomst i ett enda lager:
   - lokal `gh`-CLI är inte inloggad
   - sandboxat nätverk blockerar direkta GitHub-anrop tills kommandon uttryckligen körs utanför sandbox
@@ -244,8 +252,8 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Nästa steg
 
-- Kör om workflowen `Timvis uppdatering av dynamiska avgångar` eller trigga `update-timetables.yml` manuellt för att bekräfta att formatnormaliseringen i `update_fartyg.py` tar bort `.items()`-kraschen.
-- Öppna den failande GitHub Actions-steploggen för `Hämta dynamiska datumrader` och fånga första tracebacken/röda felraden; därefter hårdna `update_fartyg.py` eller enskild scraper utifrån faktiskt fel.
+- Återvalidera eller ersätt Viking Lines nuvarande API-kedja eftersom den fortfarande ger `403 Forbidden` i GitHub Actions.
+- Undersök TT-Lines TLS/CSRF-kedja i GitHub Actions-miljö, eftersom själva workflowen nu går klart men TT-Line-källan fortfarande faller bort.
 - Kör en ny full browser-QA när lokal browser-runtime fungerar igen och kontrollera särskilt tooltipar, rotationsfartyg och källchippar i `In & Ut`-vyn.
 - Lägg till separat `traffic_notices`-collector per rederi där officiella trafikmeddelandesidor finns.
 - Bygg ut `source_registry` från dokumenterad matris till körbar konfiguration om kommande skript ska styras route-för-route.
