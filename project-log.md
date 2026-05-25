@@ -18,6 +18,28 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Senaste ändringar
 
+- 2026-05-25: Felsökte och patchade GitHub Actions-felet i `update-timetables.yml`.
+  - Hämtade faktisk logg för körning `26392655565` via `gh run view --log`.
+  - Bekräftade att felet inte låg i checkout eller Python-setup utan i `python3 update_fartyg.py "2026-05-25"`.
+  - Identifierade konkret traceback i [update_fartyg.py](/Users/jane/Documents/Claude/Projects/Weblänksida/update_fartyg.py): `legacy_dynamic_sailings(avgangar_datum)` kraschade med `AttributeError: 'list' object has no attribute 'items'`.
+  - Verifierade att nuvarande [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json) innehåller `fartyg_datum` och `avgangar_datum` som `datum -> list` i stället för det äldre `datum -> dict`-formatet som skriptet förväntade sig.
+  - Patchade [update_fartyg.py](/Users/jane/Documents/Claude/Projects/Weblänksida/update_fartyg.py) med defensiv normalisering av båda legacy-fälten innan de läses, så workflowen accepterar både gammalt och nuvarande JSON-format.
+  - Lokal fullkörning kunde inte verifieras 1:1 eftersom den här maskinen bara har `python3` = `3.9.6`, medan workflowen kör Python `3.11` och skriptet använder `datetime.UTC`. Själva root-cause-fixen är dock statiskt verifierad mot den failande kodvägen.
+- 2026-05-25: Felsökte GitHub-åtkomst i Codex-miljön.
+  - Verifierade att lokal `gh`-CLI inte är inloggad i denna miljö (`gh auth status` returnerar att ingen GitHub-host är inloggad).
+  - Verifierade att Codex GitHub-connectorn fortfarande har partiell åtkomst till kontot; den kunde lista nyliga PR/issues från andra repos under `ByWilsen-J`.
+  - Verifierade att repots `origin` pekar på `git@github.com:ByWilsen-J/farjor-sverige.git`.
+  - Bekräftade att `git ls-remote origin` först fallerade i sandbox med DNS-felet `Could not resolve hostname github.com`, men fungerade utanför sandbox och kunde läsa `HEAD`/`main`.
+  - Bekräftade att SSH-nyckeln `~/.ssh/farjor_cowork` redan är korrekt kopplad till GitHub-kontot; `ssh -T` svarar `Hi ByWilsen-J!`.
+  - Genomförde `gh auth login` via device flow och verifierade därefter att `gh repo view`, `gh run list` och `gh api user` fungerar mot GitHub.
+  - Noterade samtidigt att `gh auth status` fortfarande rapporterade ogiltig sparad default-token och att `gh auth token` inte kunde läsa någon lokalt lagrad OAuth-token. Det betyder att åtkomsten fungerar i praktiken för testade kommandon, men att lokal credential storage i denna Codex-miljö inte blev konsekvent.
+  - Försök att göra en permanent lokal fix via `gh auth login --insecure-storage` stoppades av Codex säkerhetspolicy eftersom klartextlagring av token kräver uttryckligt användargodkännande.
+  - Slutsats: problemet är inte repoaccess eller SSH, utan kombinationen av sandboxad nätverksblockering och instabil/låst lokal tokenlagring för `gh` i denna Codex-session. Säkrast fallback är SSH för git och antingen GitHub-connectorn eller en manuellt godkänd `gh`-lagringsmetod.
+- 2026-05-25: Påbörjade CI-felsökning för `update-timetables.yml`.
+  - Verifierade att den röda markeringen ligger i workflowsteget `Hämta dynamiska datumrader`, alltså själva körningen av `python3 update_fartyg.py`, inte i checkout/setup-stegen.
+  - Bekräftade att Node 20-meddelandet i GitHub Actions bara är en varning om framtida depreciering för `actions/checkout@v4` och `actions/setup-python@v5`, inte den direkta orsaken till exit code `1`.
+  - Noterade att senaste automatiska commit från timworkflowen i git-historiken är `2026-05-20`, vilket tyder på att felet sannolikt började efter ombyggnaden av `update_fartyg.py` och workflowen `2026-05-21`.
+  - GitHub-pluginens token var utgången i denna miljö, så faktisk Actions-logg kunde inte hämtas direkt härifrån. Nästa steg är att läsa tracebacken i den failande steploggen eller hårdna skriptet kring runtime-/JSON-fel.
 - 2026-05-22: Tog bort Wagenborg helt och justerade fartygsvisning för Eckerö/DFDS.
   - Uppdaterade [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json) så `Wagenborg` inte längre publiceras i `meta.rederier`, `schema` eller `avgangsinstanser`.
   - Uppdaterade [generera_json.py](/Users/jane/Documents/Claude/Projects/Weblänksida/generera_json.py) så `Wagenborg` filtreras bort redan vid framtida JSON-generering från Excel-källan.
@@ -201,6 +223,12 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Problem / blockerare
 
+- Lokal fullverifiering av `update_fartyg.py` mot samma runtime som GitHub Actions saknas fortfarande, eftersom den här maskinen bara har Python `3.9.6` installerad som `python3` medan workflowen kör `3.11`. Det blockerar inte patchen men gör att slutlig bekräftelse bör tas via nästa Actions-körning eller lokal 3.11-miljö.
+- Den här Codex-miljön har inte full GitHub-ytåtkomst i ett enda lager:
+  - lokal `gh`-CLI är inte inloggad
+  - sandboxat nätverk blockerar direkta GitHub-anrop tills kommandon uttryckligen körs utanför sandbox
+  - GitHub-connectorn här täcker repo/PR/issue-flöden men inte hela GitHub, särskilt inte full Actions-loggning på samma sätt som webben eller komplett `gh`-session
+- GitHub Actions-fel i `update-timetables.yml` är bekräftat i steget `Hämta dynamiska datumrader`, men exakt traceback saknas ännu i lokal analys eftersom GitHub-pluginens token i denna miljö var utgången. Node 20-varningen i annotations är inte själva root cause.
 - Dedikerade collectors för rederiernas separata trafikinformationssidor finns ännu inte. Nuvarande version kan bära status/kommentar från de livekällor som redan innehåller sådan information, men inte bevaka alla externa trafikbloggar/bulletinsidor.
 - `Viking Line` kan fortfarande inte verifieras fullt server-side i den här miljön eftersom alla nätanrop är blockerade lokalt och den tidigare produktionsobservationen var `403 Forbidden`.
 - Lokal headless-browserautomation kunde inte återanvändas fullt i denna session eftersom Playwright saknar installerad browser-binary i miljön. Innehållsrevisionen verifierades därför via officiella webbkällor, JSON-audit, funktionsprov av tooltip-normalisering och tidigare lokal preview.
@@ -216,6 +244,8 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Nästa steg
 
+- Kör om workflowen `Timvis uppdatering av dynamiska avgångar` eller trigga `update-timetables.yml` manuellt för att bekräfta att formatnormaliseringen i `update_fartyg.py` tar bort `.items()`-kraschen.
+- Öppna den failande GitHub Actions-steploggen för `Hämta dynamiska datumrader` och fånga första tracebacken/röda felraden; därefter hårdna `update_fartyg.py` eller enskild scraper utifrån faktiskt fel.
 - Kör en ny full browser-QA när lokal browser-runtime fungerar igen och kontrollera särskilt tooltipar, rotationsfartyg och källchippar i `In & Ut`-vyn.
 - Lägg till separat `traffic_notices`-collector per rederi där officiella trafikmeddelandesidor finns.
 - Bygg ut `source_registry` från dokumenterad matris till körbar konfiguration om kommande skript ska styras route-för-route.

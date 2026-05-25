@@ -53,6 +53,43 @@ def env_int(name: str, default: int) -> int:
         return default
 
 
+def normalize_fartyg_datum(raw: object) -> dict[str, dict[str, str]]:
+    normalized: dict[str, dict[str, str]] = {}
+    if not isinstance(raw, dict):
+        return normalized
+    for ds, poster in raw.items():
+        if isinstance(poster, dict):
+            normalized[str(ds)] = {
+                str(nyckel): str(fartyg or "")
+                for nyckel, fartyg in poster.items()
+            }
+            continue
+        if isinstance(poster, list):
+            normalized[str(ds)] = {
+                str(nyckel): ""
+                for nyckel in poster
+                if isinstance(nyckel, str)
+            }
+    return normalized
+
+
+def normalize_avgangar_datum(raw: object) -> dict[str, dict[str, dict]]:
+    normalized: dict[str, dict[str, dict]] = {}
+    if not isinstance(raw, dict):
+        return normalized
+    for ds, poster in raw.items():
+        day_entries: dict[str, dict] = {}
+        if isinstance(poster, dict):
+            for nyckel, meta in poster.items():
+                day_entries[str(nyckel)] = meta if isinstance(meta, dict) else {}
+        elif isinstance(poster, list):
+            for nyckel in poster:
+                if isinstance(nyckel, str):
+                    day_entries[nyckel] = {}
+        normalized[str(ds)] = day_entries
+    return normalized
+
+
 def legacy_dynamic_sailings(avgangar_datum: dict) -> list[dict]:
     sailings: list[dict] = []
     for ds, poster in (avgangar_datum or {}).items():
@@ -222,8 +259,10 @@ def main():
     with open(DATA_FILE, encoding="utf-8") as f:
         data = json.load(f)
 
-    fartyg_datum: dict = data.get("fartyg_datum", {})
-    avgangar_datum: dict = data.get("avgangar_datum", {})
+    # Legacy-fälten har förekommit både som datum->dict och datum->list.
+    # Normalisera tidigt så äldre JSON-varianter inte kraschar workflowen.
+    fartyg_datum: dict[str, dict[str, str]] = normalize_fartyg_datum(data.get("fartyg_datum", {}))
+    avgangar_datum: dict[str, dict[str, dict]] = normalize_avgangar_datum(data.get("avgangar_datum", {}))
     avgangsinstanser: dict = build_base_instances(data, anchor=public_anchor)
     dynamic_sailings: list[dict] = legacy_dynamic_sailings(avgangar_datum)
 
