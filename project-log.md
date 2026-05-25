@@ -18,6 +18,11 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Senaste ändringar
 
+- 2026-05-25: Slutverifierade tomfältsfixen i publicerad data.
+  - Pushade commit `4cf3774` (`Backfill missing timetable arrival fields`) till `main` och triggade `update-timetables.yml` manuellt igen.
+  - Bekräftade att körning `26394332342` gick grönt i GitHub Actions.
+  - Verifierade direkt mot workflowens nya auto-commit `d0fa61a` att uppdaterad [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json) nu har `0` rader med tomma kärnfält i `avgangsinstanser`.
+  - Slutsats: både frontend-renderingen och den publicerade backend-datan täcker nu tidigare tomma `anktid`-fält.
 - 2026-05-25: Åtgärdade tomma tabellfält från ofullständiga dynamiska rader.
   - Identifierade 59 rader i `avgangsinstanser` med tomma kärnfält, nästan alltid tom `anktid`, främst från `TT-Line`, `DFDS`, `Tallink Silja` och `Stena Line`.
   - Verifierade att problemet låg i ofullständiga `dynamic_schedule`-rader, inte i själva veckoschemat eller tabellrenderingen.
@@ -229,7 +234,6 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Pågående arbete
 
-- Verifiering av den nya backfill-logiken mot livekörning i GitHub Actions så att `farjor_data.json` också blir ren från tomma `anktid`-fält, inte bara den renderade tabellen.
 - Slutlig visuell QA av den nya instansrenderingen i riktig browser när lokal browser-runtime finns tillgänglig igen.
 - Nästa utbyggnad av trafikinformationsspåret så att separata rederisidor kan generera explicita `traffic_notices`, inte bara kommentarer från livekällornas statusfält.
 - Separat källa för `Unity Line`/`Polferries` så att `Polsca` kan vara rent visningsnamn och inte lookup-nyckel.
@@ -261,7 +265,6 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Nästa steg
 
-- Kör om `update-timetables.yml` och verifiera att den nya backend-backfillen faktiskt skriver bort tomma `anktid`-fält i publicerad `farjor_data.json`.
 - Återvalidera eller ersätt Viking Lines nuvarande API-kedja eftersom den fortfarande ger `403 Forbidden` i GitHub Actions.
 - Undersök TT-Lines TLS/CSRF-kedja i GitHub Actions-miljö, eftersom själva workflowen nu går klart men TT-Line-källan fortfarande faller bort.
 - Kör en ny full browser-QA när lokal browser-runtime fungerar igen och kontrollera särskilt tooltipar, rotationsfartyg och källchippar i `In & Ut`-vyn.
