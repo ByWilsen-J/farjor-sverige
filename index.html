@@ -1362,10 +1362,102 @@ function normaliseraAvgangsinstanser(instanser){
       .map(([datum, rader])=>[datum, rader])
   );
 }
+function instansTidNyckel(rad){
+  return `${ruttNyckel(rad.rederi, rad.avghamn, rad.ankhamn)}|${rad.avgtid_raw || rad.avgtid || ''}`;
+}
+function väljVanligasteAnkomst(kandidater){
+  const counts = new Map();
+  let best = null;
+  let bestCount = -1;
+  (kandidater || []).forEach(kandidat=>{
+    if(!kandidat?.anktid) return;
+    const key = `${kandidat.anktid}||${kandidat.ankomstdatum || ''}`;
+    const next = (counts.get(key) || 0) + 1;
+    counts.set(key, next);
+    if(
+      next > bestCount
+      || (next === bestCount && (kandidat.source_priority || 0) > ((best && best.source_priority) || 0))
+    ){
+      best = kandidat;
+      bestCount = next;
+    }
+  });
+  return best;
+}
+function formatVaraktighetsIntervall(minuterLista){
+  const minuter = (minuterLista || [])
+    .filter(v=>Number.isFinite(v) && v > 0 && v < (72 * 60))
+    .sort((a,b)=>a-b);
+  if(!minuter.length) return '';
+  const minH = Math.max(1, Math.floor(minuter[0] / 60));
+  const maxH = Math.max(minH, Math.ceil(minuter[minuter.length - 1] / 60));
+  return minH === maxH ? `+${minH} h` : `+${minH}–${maxH} h`;
+}
+function berikaOfullständigaAvgangsinstanser(perDatum){
+  const tidKandidater = new Map();
+  const ruttVaraktigheter = new Map();
+  Object.values(perDatum || {}).forEach(rader=>{
+    (rader || []).forEach(rad=>{
+      const routeKey = ruttNyckel(rad.rederi, rad.avghamn, rad.ankhamn);
+      const timeKey = instansTidNyckel(rad);
+      if(rad.anktid){
+        if(!tidKandidater.has(timeKey)) tidKandidater.set(timeKey, []);
+        tidKandidater.get(timeKey).push({
+          anktid: rad.anktid,
+          ankomstdatum: rad.ankomstdatum || '',
+          source_priority: rad.source_priority || 0,
+        });
+      }
+      const depDate = parseDate(rad._depDate || '');
+      if(!depDate || !rad.anktid) return;
+      const depInfo = normaliseraAvgangstid(rad.avgtid_raw || rad.avgtid || '', rad.avghamn || '', rad.avgtid || '');
+      const avgMeta = normaliseraAvgangsMeta(rad._avgMeta || {});
+      const ankInfo = byggExaktAnkomst(avgMeta, depInfo, depDate, rad.ankhamn || '')
+        || normaliseraAnkomsttid(rad.anktid || '', depInfo, VD[depDate.getDay()], rad.ankhamn || '');
+      const durationMinutes = Number.isFinite(ankInfo?.sortAbs) && Number.isFinite(depInfo?.absSw)
+        ? ankInfo.sortAbs - depInfo.absSw
+        : null;
+      if(!Number.isFinite(durationMinutes) || durationMinutes <= 0) return;
+      if(!ruttVaraktigheter.has(routeKey)) ruttVaraktigheter.set(routeKey, []);
+      ruttVaraktigheter.get(routeKey).push(durationMinutes);
+    });
+  });
+
+  const bästaAnkomster = new Map(
+    [...tidKandidater.entries()].map(([key, kandidater])=>[key, väljVanligasteAnkomst(kandidater)])
+  );
+  const ruttIntervall = new Map(
+    [...ruttVaraktigheter.entries()].map(([key, minuter])=>[key, formatVaraktighetsIntervall(minuter)])
+  );
+
+  Object.values(perDatum || {}).forEach(rader=>{
+    (rader || []).forEach(rad=>{
+      if(rad.anktid) return;
+      const routeKey = ruttNyckel(rad.rederi, rad.avghamn, rad.ankhamn);
+      const timeKey = instansTidNyckel(rad);
+      const exakt = bästaAnkomster.get(timeKey);
+      const extra = EXTRA_ROUTE_INFO[routeKey];
+      const routeFallback = ruttIntervall.get(routeKey);
+      if(exakt?.anktid){
+        rad.anktid = exakt.anktid;
+        if(!rad.ankomstdatum && exakt.ankomstdatum) rad.ankomstdatum = exakt.ankomstdatum;
+      } else if(extra?.anktid){
+        rad.anktid = extra.anktid;
+      } else if(routeFallback){
+        rad.anktid = routeFallback;
+      }
+      if(!rad.verifiering && extra?.verifiering) rad.verifiering = extra.verifiering;
+      if(!rad.kalla && extra?.kalla) rad.kalla = extra.kalla;
+      if(rad._avgMeta && !rad._avgMeta.anktid && rad.anktid) rad._avgMeta.anktid = rad.anktid;
+      if(rad._avgMeta && !rad._avgMeta.ankomstdatum && rad.ankomstdatum) rad._avgMeta.ankomstdatum = rad.ankomstdatum;
+    });
+  });
+  return perDatum;
+}
 function initAvgangsinstanser(){
   HAR_AVGANGSINSTANSER = !!(DATA && harEgenNyckel(DATA, 'avgangsinstanser'));
   AVGANGSINSTANSER_PER_DATUM = HAR_AVGANGSINSTANSER
-    ? normaliseraAvgangsinstanser(DATA.avgangsinstanser)
+    ? berikaOfullständigaAvgangsinstanser(normaliseraAvgangsinstanser(DATA.avgangsinstanser))
     : {};
 }
 function avgangsinstanserFörDatum(depDs){

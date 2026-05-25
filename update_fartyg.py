@@ -17,6 +17,7 @@ import logging
 import os
 import re
 import sys
+from collections import Counter, defaultdict
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
@@ -26,7 +27,7 @@ import dfds_scraper         as dfds
 import finnlines_scraper    as finn
 import stena_line_scraper   as stena
 import ttline_scraper       as ttline
-from schedule_instances import build_base_instances, merge_dynamic_sailings, public_window
+from schedule_instances import build_base_instances, merge_dynamic_sailings, parse_time_minutes, public_window
 
 DATA_FILE = Path(__file__).parent / "farjor_data.json"
 
@@ -243,6 +244,117 @@ def prune_weekly_fallbacks_for_live_routes(
         instances_by_date[dep_date_iso] = filtered
 
 
+def instance_route_key(inst: dict) -> tuple[str, str, str]:
+    return (
+        str(inst.get("rederi") or "").strip(),
+        str(inst.get("avghamn") or "").strip(),
+        str(inst.get("ankhamn") or "").strip(),
+    )
+
+
+def instance_time_key(inst: dict) -> tuple[str, str, str, str]:
+    route_key = instance_route_key(inst)
+    dep_time = str(inst.get("avgtid") or "").strip()
+    return route_key + (dep_time,)
+
+
+def choose_most_common_arrival(candidates: list[dict]) -> dict | None:
+    if not candidates:
+        return None
+    counts = Counter(
+        (
+            str(item.get("anktid") or "").strip(),
+            str(item.get("ankomstdatum") or "").strip(),
+        )
+        for item in candidates
+        if str(item.get("anktid") or "").strip()
+    )
+    best: dict | None = None
+    best_count = -1
+    best_priority = -1
+    for item in candidates:
+        arr_time = str(item.get("anktid") or "").strip()
+        if not arr_time:
+            continue
+        arr_date = str(item.get("ankomstdatum") or "").strip()
+        count = counts[(arr_time, arr_date)]
+        priority = int(item.get("source_priority", 0) or 0)
+        if count > best_count or (count == best_count and priority > best_priority):
+            best = item
+            best_count = count
+            best_priority = priority
+    return best
+
+
+def infer_duration_minutes(inst: dict) -> int | None:
+    dep_time = parse_time_minutes(str(inst.get("avgtid") or ""))
+    arr_time = parse_time_minutes(str(inst.get("anktid") or ""))
+    dep_date = str(inst.get("datum") or "").strip()
+    arr_date = str(inst.get("ankomstdatum") or dep_date).strip()
+    if dep_time is None or arr_time is None or not dep_date:
+        return None
+    day_offset = 0
+    if arr_date and dep_date:
+        try:
+            day_offset = (date.fromisoformat(arr_date) - date.fromisoformat(dep_date)).days
+        except ValueError:
+            day_offset = 1 if "+1" in str(inst.get("anktid") or "") else 0
+    minutes = arr_time - dep_time + (day_offset * 1440)
+    if minutes <= 0 and "+1" in str(inst.get("anktid") or ""):
+        minutes += 1440
+    if minutes <= 0 or minutes >= 72 * 60:
+        return None
+    return minutes
+
+
+def format_duration_fallback(minutes: list[int]) -> str:
+    valid = sorted(m for m in minutes if 0 < m < 72 * 60)
+    if not valid:
+        return ""
+    min_hours = max(1, valid[0] // 60)
+    max_hours = max(min_hours, (valid[-1] + 59) // 60)
+    return f"+{min_hours} h" if min_hours == max_hours else f"+{min_hours}–{max_hours} h"
+
+
+def backfill_incomplete_instances(instances_by_date: dict[str, list[dict]]) -> None:
+    exact_candidates: dict[tuple[str, str, str, str], list[dict]] = defaultdict(list)
+    route_durations: dict[tuple[str, str, str], list[int]] = defaultdict(list)
+
+    for entries in instances_by_date.values():
+        for inst in entries or []:
+            arr_time = str(inst.get("anktid") or "").strip()
+            if arr_time:
+                exact_candidates[instance_time_key(inst)].append(inst)
+                duration = infer_duration_minutes(inst)
+                if duration is not None:
+                    route_durations[instance_route_key(inst)].append(duration)
+
+    exact_fallbacks = {
+        key: choose_most_common_arrival(candidates)
+        for key, candidates in exact_candidates.items()
+    }
+    route_fallbacks = {
+        key: format_duration_fallback(minutes)
+        for key, minutes in route_durations.items()
+    }
+
+    for dep_date, entries in instances_by_date.items():
+        for inst in entries or []:
+            if str(inst.get("anktid") or "").strip():
+                continue
+            exact = exact_fallbacks.get(instance_time_key(inst))
+            if exact:
+                inst["anktid"] = str(exact.get("anktid") or "").strip()
+                if not inst.get("ankomstdatum") and exact.get("ankomstdatum"):
+                    inst["ankomstdatum"] = str(exact.get("ankomstdatum") or dep_date).strip()
+            if not str(inst.get("anktid") or "").strip():
+                route_fallback = route_fallbacks.get(instance_route_key(inst), "")
+                if route_fallback:
+                    inst["anktid"] = route_fallback
+            if not inst.get("ankomstdatum") and "+1" in str(inst.get("anktid") or ""):
+                inst["ankomstdatum"] = (date.fromisoformat(dep_date) + timedelta(days=1)).isoformat()
+
+
 def main():
     from_date = date.fromisoformat(sys.argv[1]) if len(sys.argv) > 1 else date.today()
     forward_days = env_int("FERRY_DYNAMIC_FORWARD_DAYS", 14)
@@ -388,6 +500,7 @@ def main():
     merge_dynamic_sailings(avgangsinstanser, dynamic_sailings)
     prune_weekly_fallbacks_for_live_routes(avgangsinstanser, dynamic_sailings)
     enrich_instance_sources(avgangsinstanser)
+    backfill_incomplete_instances(avgangsinstanser)
     fartyg_datum, avgangar_datum = sync_legacy_fields_from_instances(avgangsinstanser)
 
     # Spara tillbaka

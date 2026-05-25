@@ -18,6 +18,14 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Senaste ändringar
 
+- 2026-05-25: Åtgärdade tomma tabellfält från ofullständiga dynamiska rader.
+  - Identifierade 59 rader i `avgangsinstanser` med tomma kärnfält, nästan alltid tom `anktid`, främst från `TT-Line`, `DFDS`, `Tallink Silja` och `Stena Line`.
+  - Verifierade att problemet låg i ofullständiga `dynamic_schedule`-rader, inte i själva veckoschemat eller tabellrenderingen.
+  - Uppdaterade [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) så normaliserade avgångsinstanser nu backfyller saknad `anktid` från:
+    - samma rutt + avgångstid på andra datum
+    - annars beräknat ruttintervall från verifierade kompletta rader för samma rutt
+  - Uppdaterade [update_fartyg.py](/Users/jane/Documents/Claude/Projects/Weblänksida/update_fartyg.py) med motsvarande backend-backfill, så framtida GitHub Actions-körningar inte återintroducerar tomma tabellfält i `farjor_data.json`.
+  - Simulerad kontroll på nuvarande data visade att alla 59 tidigare tomma ankomstfält får täckning med den nya logiken.
 - 2026-05-25: Verifierade CI-fixen end-to-end i GitHub Actions.
   - Pushade commit `38b6c56` (`Fix legacy dynamic sailing normalization`) till `main` och triggade `update-timetables.yml` manuellt.
   - Bekräftade att nya körningen `26393939678` gick igenom grönt på `2026-05-25` och att den tidigare `.items()`-kraschen i `legacy_dynamic_sailings(...)` därmed är löst.
@@ -221,6 +229,7 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Pågående arbete
 
+- Verifiering av den nya backfill-logiken mot livekörning i GitHub Actions så att `farjor_data.json` också blir ren från tomma `anktid`-fält, inte bara den renderade tabellen.
 - Slutlig visuell QA av den nya instansrenderingen i riktig browser när lokal browser-runtime finns tillgänglig igen.
 - Nästa utbyggnad av trafikinformationsspåret så att separata rederisidor kan generera explicita `traffic_notices`, inte bara kommentarer från livekällornas statusfält.
 - Separat källa för `Unity Line`/`Polferries` så att `Polsca` kan vara rent visningsnamn och inte lookup-nyckel.
@@ -252,6 +261,7 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Nästa steg
 
+- Kör om `update-timetables.yml` och verifiera att den nya backend-backfillen faktiskt skriver bort tomma `anktid`-fält i publicerad `farjor_data.json`.
 - Återvalidera eller ersätt Viking Lines nuvarande API-kedja eftersom den fortfarande ger `403 Forbidden` i GitHub Actions.
 - Undersök TT-Lines TLS/CSRF-kedja i GitHub Actions-miljö, eftersom själva workflowen nu går klart men TT-Line-källan fortfarande faller bort.
 - Kör en ny full browser-QA när lokal browser-runtime fungerar igen och kontrollera särskilt tooltipar, rotationsfartyg och källchippar i `In & Ut`-vyn.
