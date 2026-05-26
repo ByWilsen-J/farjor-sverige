@@ -10,6 +10,8 @@ Sidan behåller den nya högerpanelen, rederifiltret och den gemensamma tabellvy
 
 Automationen är nu uppdelad i faktisk driftmodell: timvis uppdatering för dynamiska datumkällor och daglig backfill för hela publiceringsfönstret. Kvarvarande större luckor gäller främst separat trafikbevakning från särskilda rederi-sidor, Viking Lines blockerade server-side-källa och full separering av `Polferries`/`Unity Line` under `Polsca`.
 
+TT-Lines dynamiska källa fungerar åter i GitHub Actions efter en smal transportfallback i [ttline_scraper.py](/Users/jane/Documents/Claude/Projects/Weblänksida/ttline_scraper.py): senaste manuella körningen `26434933146` på `2026-05-26` hämtade `237` TT-Line-avgångar trots att runnern fortfarande misslyckas med vanlig certifikatverifiering mot `www.ttline.com`.
+
 Efter innehållsrevisionen 2026-05-21 visar UI:t tydligare skillnad mellan exakt fartyg och verifierad ruttrotation, mer konsekventa källetiketter (`Live`, `Datum`, `Veckoschema`) och renare info-rutor utan generiska `Källa`- eller revisionsrester i tooltip-text.
 
 TT-Lines tidigare fallbackluckor i grundschemat för `Travemünde ↔ Trelleborg`, `Świnoujście ↔ Trelleborg` och `Klaipėda ↔ Trelleborg` är nu kompletterade i själva genereringskedjan, så att rutterna finns i publiceringsfönstret även utanför det dynamiska 14-dagarsfönstret.
@@ -18,12 +20,18 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Senaste ändringar
 
+- 2026-05-26: Slutverifierade TT-Line-fixen i GitHub Actions.
+  - Pushade commit `87b5e00` (`Add last-resort TT-Line TLS fallback`) ovanpå senaste auto-commiten och triggade `update-timetables.yml` manuellt igen.
+  - Bekräftade att körning `26434933146` gick grönt på `2026-05-26` och att TT-Line i den körningen först föll på verifierad TLS, sedan slog över till den nya smala fallbacken utan certifikatverifiering och därefter hämtade `237` TT-Line-avgångar.
+  - Verifierade att workflowen skrev tillbaka uppdaterad [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json) i auto-commit `ab0d639` (`Auto: dynamiska avgångar uppdaterade 2026-05-26 (hourly) [skip ci]`).
+  - Stickprov mot aktuell JSON visar nu `335` TT-Line-rader av typen `dynamic_schedule` i datumfönstret `2026-05-20` till `2026-06-09`; kvarvarande tomma kärnfält i dessa rader gäller bara exakt `fartyg` (`98` rader) där TT-Lines svar saknade fartygsvärde, inte avgångs- eller ankomsttid.
 - 2026-05-26: Felsökte och åtgärdade TT-Line-källan.
   - Reproducerade att TT-Line-sidan och `sailing/info` fungerar via direkt HTTP/curl, vilket visade att problemet inte var ett borttaget endpoint utan den sköra klientkedjan i `ttline_scraper.py`.
   - Verifierade att `https://www.ttline.com/en/timetables/` fortfarande exponerar både dold `__RequestVerificationToken` och samma POST-flöde mot `https://www.ttline.com/sailing/info/`.
   - Uppdaterade [ttline_scraper.py](/Users/jane/Documents/Claude/Projects/Weblänksida/ttline_scraper.py) så den:
     - sätter explicit CA-bundle via `certifi` när den använder `requests`
     - faller tillbaka till `curl` för både tokenhämtning och POST-anrop om Python/TLS-kedjan fallerar
+    - gör en sista TT-Line-specifik retry utan certifikatverifiering endast när både verifierad `requests`- och verifierad `curl`-transport har fallerat i samma miljö
     - väljer senaste datum/tid i celler med flera tider, så TT-Lines försenade `Old/New`-rader nu tolkar den nya tiden i stället för den gamla
   - Lokal verifiering visade att TT-Line-scrapern efter fixen hämtar 35 live-rader över två dagar och fyller korrekta ankomsttider/fartyg för rutter som `Travemünde ↔ Trelleborg` och `Trelleborg ↔ Travemünde`.
 - 2026-05-25: Slutverifierade tomfältsfixen i publicerad data.
@@ -245,20 +253,15 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 - Slutlig visuell QA av den nya instansrenderingen i riktig browser när lokal browser-runtime finns tillgänglig igen.
 - Nästa utbyggnad av trafikinformationsspåret så att separata rederisidor kan generera explicita `traffic_notices`, inte bara kommentarer från livekällornas statusfält.
 - Separat källa för `Unity Line`/`Polferries` så att `Polsca` kan vara rent visningsnamn och inte lookup-nyckel.
-- Viking Lines server-side-källa behöver fortfarande återvalideras eftersom den i tidigare drift gav 403 och i denna miljö inte kunde nätverkstestas alls.
+- Viking Lines server-side-källa behöver fortfarande återvalideras eftersom den fortsatt gav `403 Forbidden` i senaste verifierade GitHub Actions-körningen `26434933146`.
 
 ## Problem / blockerare
 
-- Lokal fullverifiering av `update_fartyg.py` mot samma runtime som GitHub Actions saknas fortfarande, eftersom den här maskinen bara har Python `3.9.6` installerad som `python3` medan workflowen kör `3.11`. Det blockerar inte patchen men gör att slutlig bekräftelse bör tas via nästa Actions-körning eller lokal 3.11-miljö.
-- `update-timetables.yml` kraschar inte längre på legacy-formatet, men två externa källor är fortfarande sköra i grön körning:
-  - `Viking Line` svarar fortsatt `403 Forbidden` på nuvarande server-side API-anrop.
-- Den här Codex-miljön har inte full GitHub-ytåtkomst i ett enda lager:
-  - lokal `gh`-CLI är inte inloggad
-  - sandboxat nätverk blockerar direkta GitHub-anrop tills kommandon uttryckligen körs utanför sandbox
-  - GitHub-connectorn här täcker repo/PR/issue-flöden men inte hela GitHub, särskilt inte full Actions-loggning på samma sätt som webben eller komplett `gh`-session
-- GitHub Actions-fel i `update-timetables.yml` är bekräftat i steget `Hämta dynamiska datumrader`, men exakt traceback saknas ännu i lokal analys eftersom GitHub-pluginens token i denna miljö var utgången. Node 20-varningen i annotations är inte själva root cause.
+- Lokal fullverifiering av `update_fartyg.py` mot samma runtime som GitHub Actions saknas fortfarande, eftersom den här maskinen bara har Python `3.9.6` installerad som `python3` medan workflowen kör `3.11`. TT-Line-fixen är dock nu slutverifierad via GitHub Actions-körning `26434933146`.
+- `update-timetables.yml` kraschar inte längre på legacy-formatet och TT-Line fungerar åter, men `Viking Line` svarar fortsatt `403 Forbidden` på nuvarande server-side API-anrop.
+- TT-Line fungerar i GitHub Actions först efter en smal fallback utan certifikatverifiering när runnern inte kan validera `www.ttline.com`-kedjan. Det är en avgränsad driftmitigering men fortfarande en extern transport-risk om TT-Line ändrar sitt upplägg igen.
 - Dedikerade collectors för rederiernas separata trafikinformationssidor finns ännu inte. Nuvarande version kan bära status/kommentar från de livekällor som redan innehåller sådan information, men inte bevaka alla externa trafikbloggar/bulletinsidor.
-- `Viking Line` kan fortfarande inte verifieras fullt server-side i den här miljön eftersom alla nätanrop är blockerade lokalt och den tidigare produktionsobservationen var `403 Forbidden`.
+- `Viking Line` kan fortfarande inte verifieras fullt server-side i denna kedja eftersom senaste bekräftade produktionsbeteende i GitHub Actions fortfarande var `403 Forbidden`.
 - Lokal headless-browserautomation kunde inte återanvändas fullt i denna session eftersom Playwright saknar installerad browser-binary i miljön. Innehållsrevisionen verifierades därför via officiella webbkällor, JSON-audit, funktionsprov av tooltip-normalisering och tidigare lokal preview.
 - `polsca_datum` är en separat specialkedja med egen period (`2026-05-01` till `2026-11-30`) och innehåller bara `Świnoujście ↔ Trelleborg`, medan `Ystad ↔ Świnoujście` och `Gdańsk ↔ Nynäshamn` fortfarande ligger i statiskt schema.
 - `intervall`-datan i JSON är i praktiken oanvänd i rendering och hjälper därför inte dagens tidtabellsvisning trots att den finns i datalagret.
@@ -273,7 +276,7 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 ## Nästa steg
 
 - Återvalidera eller ersätt Viking Lines nuvarande API-kedja eftersom den fortfarande ger `403 Forbidden` i GitHub Actions.
-- Kör om `update-timetables.yml` och verifiera att TT-Line inte längre faller bort i GitHub Actions-loggen samt att nya TT-Line-liveposter skrivs in i `farjor_data.json`.
+- Övervaka ett par kommande schemalagda körningar så att TT-Lines nya transportfallback fortsätter leverera stabilt även utan manuell trigger.
 - Kör en ny full browser-QA när lokal browser-runtime fungerar igen och kontrollera särskilt tooltipar, rotationsfartyg och källchippar i `In & Ut`-vyn.
 - Lägg till separat `traffic_notices`-collector per rederi där officiella trafikmeddelandesidor finns.
 - Bygg ut `source_registry` från dokumenterad matris till körbar konfiguration om kommande skript ska styras route-för-route.
@@ -315,6 +318,7 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Historik
 
+- 2026-05-26 07:59 CEST: TT-Line slutverifierades i GitHub Actions; commit `87b5e00` lade till smal TLS-fallback i `ttline_scraper.py`, körning `26434933146` hämtade 237 TT-Line-avgångar trots runnerns certifikatfel och workflowen skrev tillbaka ny data i auto-commit `ab0d639`.
 - 2026-05-22 06:12 CEST: Wagenborg togs bort helt ur publicerad JSON och framtida genereringskedja; samtidigt rättades fartygsvisningen så `M/S Eckerö` inte delas på snedstreck och DFDS `Klaipėda ↔ Karlshamn` använder den kortade fallbackrotationen `Luna Seaways / Optima Seaways / RH / NH / ND`.
 
 - 2026-05-21 21:39 CEST: Stena route-day-prioritering infördes i dynamiska fönstret, listans källchips togs bort, standardvyn byttes till `Mot Sverige`, badge-texterna kortades, `Rotation:` togs bort ur fartygskolumnen och `Data:`-tidsstämpeln började visas i svensk tid med cache-busting på JSON-hämtningen.
