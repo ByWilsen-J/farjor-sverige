@@ -28,6 +28,11 @@ BASE_URL = "https://www.ttline.com"
 TIMETABLE_URL = f"{BASE_URL}/en/timetables/"
 SAILING_URL = f"{BASE_URL}/sailing/info/"
 SOURCE_DETAIL = "TT-Line timetable endpoint"
+ALLOW_INSECURE_FALLBACK = os.getenv("TTLINE_ALLOW_INSECURE_FALLBACK", "1").strip().lower() not in {
+    "0",
+    "false",
+    "no",
+}
 
 ROUTES = [
     "TRA;TRE", "TRE;TRA",
@@ -162,7 +167,7 @@ def extract_token(session: requests.Session) -> Optional[str]:
         return None
 
 
-def extract_token_with_curl() -> tuple[Optional[str], Optional[str]]:
+def extract_token_with_curl(insecure: bool = False) -> tuple[Optional[str], Optional[str]]:
     cookie_file = tempfile.NamedTemporaryFile(prefix="ttline_cookie_", suffix=".txt", delete=False)
     cookie_path = cookie_file.name
     cookie_file.close()
@@ -170,37 +175,45 @@ def extract_token_with_curl() -> tuple[Optional[str], Optional[str]]:
     body_path = body_file.name
     body_file.close()
     try:
+        cmd = [
+            "curl",
+            "-sS",
+            "-L",
+            "-A",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/124 Safari/537.36",
+            "-H",
+            "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "-c",
+            cookie_path,
+            "-o",
+            body_path,
+        ]
+        if insecure:
+            cmd.append("-k")
+        cmd.append(TIMETABLE_URL)
         subprocess.run(
-            [
-                "curl",
-                "-sS",
-                "-L",
-                "-A",
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/124 Safari/537.36",
-                "-H",
-                "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "-c",
-                cookie_path,
-                "-o",
-                body_path,
-                TIMETABLE_URL,
-            ],
+            cmd,
             check=True,
             timeout=30,
             capture_output=True,
             text=True,
         )
-        html_text = open(body_path, encoding="utf-8", errors="ignore").read()
+        with open(body_path, encoding="utf-8", errors="ignore") as fh:
+            html_text = fh.read()
         match = re.search(
             r'name="__RequestVerificationToken"\s+type="hidden"\s+value="([^"]+)"',
             html_text,
         )
         if not match:
-            log.error("Curl-fallback hittade ingen TT-Line CSRF-token i HTML-sidan.")
+            log.error("Curl-fallback%s hittade ingen TT-Line CSRF-token i HTML-sidan.", " utan TLS-verifiering" if insecure else "")
             return None, None
         return html.unescape(match.group(1)), cookie_path
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
-        log.error("Curl-fallback misslyckades vid tokenhämtning för TT-Line: %s", e)
+        log.error(
+            "Curl-fallback%s misslyckades vid tokenhämtning för TT-Line: %s",
+            " utan TLS-verifiering" if insecure else "",
+            e,
+        )
         return None, None
     finally:
         if os.path.exists(body_path):
@@ -269,38 +282,41 @@ def fetch_route(session: requests.Session, token: str, route: str, day: date) ->
         return None
 
 
-def fetch_route_with_curl(cookie_path: str, token: str, route: str, day: date) -> Optional[str]:
+def fetch_route_with_curl(cookie_path: str, token: str, route: str, day: date, insecure: bool = False) -> Optional[str]:
     try:
+        cmd = [
+            "curl",
+            "-sS",
+            "-b",
+            cookie_path,
+            "-c",
+            cookie_path,
+            "-X",
+            "POST",
+            "-H",
+            "Accept: text/html, */*",
+            "-H",
+            "X-Requested-With: XMLHttpRequest",
+            "--data-urlencode",
+            f"route={route}",
+            "--data-urlencode",
+            f"sdate={day.isoformat()}",
+            "--data-urlencode",
+            "Language=en",
+            "--data-urlencode",
+            "IsHomepageMode=False",
+            "--data-urlencode",
+            "IsFreightMode=False",
+            "--data-urlencode",
+            "ExcludedHarbours=",
+            "--data-urlencode",
+            f"__RequestVerificationToken={token}",
+        ]
+        if insecure:
+            cmd.append("-k")
+        cmd.append(SAILING_URL)
         resp = subprocess.run(
-            [
-                "curl",
-                "-sS",
-                "-b",
-                cookie_path,
-                "-c",
-                cookie_path,
-                "-X",
-                "POST",
-                "-H",
-                "Accept: text/html, */*",
-                "-H",
-                "X-Requested-With: XMLHttpRequest",
-                "--data-urlencode",
-                f"route={route}",
-                "--data-urlencode",
-                f"sdate={day.isoformat()}",
-                "--data-urlencode",
-                "Language=en",
-                "--data-urlencode",
-                "IsHomepageMode=False",
-                "--data-urlencode",
-                "IsFreightMode=False",
-                "--data-urlencode",
-                "ExcludedHarbours=",
-                "--data-urlencode",
-                f"__RequestVerificationToken={token}",
-                SAILING_URL,
-            ],
+            cmd,
             check=True,
             timeout=35,
             capture_output=True,
@@ -308,7 +324,13 @@ def fetch_route_with_curl(cookie_path: str, token: str, route: str, day: date) -
         )
         return resp.stdout
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
-        log.error("TT-Line curl-fallback API-fel (%s %s): %s", route, day, e)
+        log.error(
+            "TT-Line curl-fallback%s API-fel (%s %s): %s",
+            " utan TLS-verifiering" if insecure else "",
+            route,
+            day,
+            e,
+        )
         return None
 
 
@@ -360,10 +382,16 @@ def fetch_all(date_from: date = None, date_to: date = None) -> list[dict]:
 
     curl_cookie_path: Optional[str] = None
     use_curl_transport = False
+    curl_insecure = False
     token = extract_token(session)
     if not token:
         token, curl_cookie_path = extract_token_with_curl()
         use_curl_transport = bool(token and curl_cookie_path)
+    if not token and ALLOW_INSECURE_FALLBACK:
+        log.warning("TT-Line svarar inte med verifierad TLS i denna miljö, provar smal fallback utan certifikatverifiering.")
+        token, curl_cookie_path = extract_token_with_curl(insecure=True)
+        use_curl_transport = bool(token and curl_cookie_path)
+        curl_insecure = bool(token and curl_cookie_path)
     if not token:
         log.error("Ingen TT-Line CSRF-token hittades.")
         return []
@@ -375,15 +403,34 @@ def fetch_all(date_from: date = None, date_to: date = None) -> list[dict]:
         while current <= date_to:
             for route in ROUTES:
                 if use_curl_transport and curl_cookie_path:
-                    html_text = fetch_route_with_curl(curl_cookie_path, token, route, current)
+                    html_text = fetch_route_with_curl(curl_cookie_path, token, route, current, insecure=curl_insecure)
+                    if not html_text and not curl_insecure and ALLOW_INSECURE_FALLBACK:
+                        log.warning("TT-Line route %s %s kräver fallback utan certifikatverifiering.", route, current)
+                        html_text = fetch_route_with_curl(curl_cookie_path, token, route, current, insecure=True)
+                        if html_text:
+                            curl_insecure = True
                 else:
                     html_text = fetch_route(session, token, route, current)
                     if not html_text:
                         if not curl_cookie_path:
                             token, curl_cookie_path = extract_token_with_curl()
+                            if not token and ALLOW_INSECURE_FALLBACK:
+                                log.warning("TT-Line route %s %s faller tillbaka till curl utan certifikatverifiering.", route, current)
+                                token, curl_cookie_path = extract_token_with_curl(insecure=True)
+                                curl_insecure = bool(token and curl_cookie_path)
                         if token and curl_cookie_path:
                             use_curl_transport = True
-                            html_text = fetch_route_with_curl(curl_cookie_path, token, route, current)
+                            html_text = fetch_route_with_curl(
+                                curl_cookie_path,
+                                token,
+                                route,
+                                current,
+                                insecure=curl_insecure,
+                            )
+                            if not html_text and not curl_insecure and ALLOW_INSECURE_FALLBACK:
+                                html_text = fetch_route_with_curl(curl_cookie_path, token, route, current, insecure=True)
+                                if html_text:
+                                    curl_insecure = True
                 if not html_text:
                     continue
                 rows = parse_table(html_text, current.year)
