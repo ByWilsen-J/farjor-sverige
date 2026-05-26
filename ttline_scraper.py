@@ -9,13 +9,20 @@ Returnerar samma format som övriga skrapare:
 
 import html
 import logging
+import os
 import re
+import subprocess
+import tempfile
 import time
 from datetime import date, timedelta
 from html.parser import HTMLParser
 from typing import Optional
 
 import requests
+try:
+    import certifi
+except ImportError:
+    certifi = None
 
 BASE_URL = "https://www.ttline.com"
 TIMETABLE_URL = f"{BASE_URL}/en/timetables/"
@@ -155,20 +162,69 @@ def extract_token(session: requests.Session) -> Optional[str]:
         return None
 
 
+def extract_token_with_curl() -> tuple[Optional[str], Optional[str]]:
+    cookie_file = tempfile.NamedTemporaryFile(prefix="ttline_cookie_", suffix=".txt", delete=False)
+    cookie_path = cookie_file.name
+    cookie_file.close()
+    body_file = tempfile.NamedTemporaryFile(prefix="ttline_body_", suffix=".html", delete=False)
+    body_path = body_file.name
+    body_file.close()
+    try:
+        subprocess.run(
+            [
+                "curl",
+                "-sS",
+                "-L",
+                "-A",
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/124 Safari/537.36",
+                "-H",
+                "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "-c",
+                cookie_path,
+                "-o",
+                body_path,
+                TIMETABLE_URL,
+            ],
+            check=True,
+            timeout=30,
+            capture_output=True,
+            text=True,
+        )
+        html_text = open(body_path, encoding="utf-8", errors="ignore").read()
+        match = re.search(
+            r'name="__RequestVerificationToken"\s+type="hidden"\s+value="([^"]+)"',
+            html_text,
+        )
+        if not match:
+            log.error("Curl-fallback hittade ingen TT-Line CSRF-token i HTML-sidan.")
+            return None, None
+        return html.unescape(match.group(1)), cookie_path
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
+        log.error("Curl-fallback misslyckades vid tokenhämtning för TT-Line: %s", e)
+        return None, None
+    finally:
+        if os.path.exists(body_path):
+            os.unlink(body_path)
+        if not os.path.exists(cookie_path):
+            cookie_path = ""
+
+
 def parse_date_time_cell(text: str, fallback_year: int) -> tuple[str, str]:
     text = " ".join((text or "").replace(",", " ").split())
-    time_match = re.search(r"\b(\d{1,2}:\d{2})\b", text)
-    date_match = re.search(r"\b(\d{1,2})\s+([A-Za-zÅÄÖåäöüÜ]+)", text)
-    if not time_match:
+    time_matches = re.findall(r"\b(\d{1,2}:\d{2})\b", text)
+    date_matches = re.findall(r"\b(\d{1,2})\s+([A-Za-zÅÄÖåäöüÜ]+)", text)
+    if not time_matches:
         return "", ""
-    if not date_match:
-        return "", time_match.group(1).zfill(5)
-    day = int(date_match.group(1))
-    month_key = date_match.group(2).lower().strip(".")
+    chosen_time = time_matches[-1].zfill(5)
+    if not date_matches:
+        return "", chosen_time
+    day_text, month_text = date_matches[-1]
+    day = int(day_text)
+    month_key = month_text.lower().strip(".")
     month = MONTHS.get(month_key)
     if not month:
-        return "", time_match.group(1).zfill(5)
-    return date(fallback_year, month, day).isoformat(), time_match.group(1).zfill(5)
+        return "", chosen_time
+    return date(fallback_year, month, day).isoformat(), chosen_time
 
 
 def infer_arrival_date(dep_date: str, dep_time: str, arr_date: str, arr_time: str) -> str:
@@ -210,6 +266,49 @@ def fetch_route(session: requests.Session, token: str, route: str, day: date) ->
         return resp.text
     except requests.exceptions.RequestException as e:
         log.error("TT-Line API-fel (%s %s): %s", route, day, e)
+        return None
+
+
+def fetch_route_with_curl(cookie_path: str, token: str, route: str, day: date) -> Optional[str]:
+    try:
+        resp = subprocess.run(
+            [
+                "curl",
+                "-sS",
+                "-b",
+                cookie_path,
+                "-c",
+                cookie_path,
+                "-X",
+                "POST",
+                "-H",
+                "Accept: text/html, */*",
+                "-H",
+                "X-Requested-With: XMLHttpRequest",
+                "--data-urlencode",
+                f"route={route}",
+                "--data-urlencode",
+                f"sdate={day.isoformat()}",
+                "--data-urlencode",
+                "Language=en",
+                "--data-urlencode",
+                "IsHomepageMode=False",
+                "--data-urlencode",
+                "IsFreightMode=False",
+                "--data-urlencode",
+                "ExcludedHarbours=",
+                "--data-urlencode",
+                f"__RequestVerificationToken={token}",
+                SAILING_URL,
+            ],
+            check=True,
+            timeout=35,
+            capture_output=True,
+            text=True,
+        )
+        return resp.stdout
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
+        log.error("TT-Line curl-fallback API-fel (%s %s): %s", route, day, e)
         return None
 
 
@@ -256,30 +355,51 @@ def fetch_all(date_from: date = None, date_to: date = None) -> list[dict]:
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/124 Safari/537.36",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     })
+    if certifi is not None:
+        session.verify = certifi.where()
+
+    curl_cookie_path: Optional[str] = None
+    use_curl_transport = False
     token = extract_token(session)
+    if not token:
+        token, curl_cookie_path = extract_token_with_curl()
+        use_curl_transport = bool(token and curl_cookie_path)
     if not token:
         log.error("Ingen TT-Line CSRF-token hittades.")
         return []
 
     seen = set()
     all_sailings = []
-    current = date_from
-    while current <= date_to:
-        for route in ROUTES:
-            html_text = fetch_route(session, token, route, current)
-            if not html_text:
-                continue
-            rows = parse_table(html_text, current.year)
-            for row in rows:
-                if not (date_from.isoformat() <= row["date"] <= date_to.isoformat()):
+    try:
+        current = date_from
+        while current <= date_to:
+            for route in ROUTES:
+                if use_curl_transport and curl_cookie_path:
+                    html_text = fetch_route_with_curl(curl_cookie_path, token, route, current)
+                else:
+                    html_text = fetch_route(session, token, route, current)
+                    if not html_text:
+                        if not curl_cookie_path:
+                            token, curl_cookie_path = extract_token_with_curl()
+                        if token and curl_cookie_path:
+                            use_curl_transport = True
+                            html_text = fetch_route_with_curl(curl_cookie_path, token, route, current)
+                if not html_text:
                     continue
-                key = (row["date"], row["avghamn"], row["ankhamn"], row["avgtid"], row["fartyg"])
-                if key in seen:
-                    continue
-                seen.add(key)
-                all_sailings.append(row)
-            time.sleep(0.2)
-        current += timedelta(days=1)
+                rows = parse_table(html_text, current.year)
+                for row in rows:
+                    if not (date_from.isoformat() <= row["date"] <= date_to.isoformat()):
+                        continue
+                    key = (row["date"], row["avghamn"], row["ankhamn"], row["avgtid"], row["fartyg"])
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    all_sailings.append(row)
+                time.sleep(0.2)
+            current += timedelta(days=1)
+    finally:
+        if curl_cookie_path and os.path.exists(curl_cookie_path):
+            os.unlink(curl_cookie_path)
     log.info("Hämtade %d TT-Line-avgångar.", len(all_sailings))
     return all_sailings
 

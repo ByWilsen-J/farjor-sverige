@@ -18,6 +18,14 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Senaste ändringar
 
+- 2026-05-26: Felsökte och åtgärdade TT-Line-källan.
+  - Reproducerade att TT-Line-sidan och `sailing/info` fungerar via direkt HTTP/curl, vilket visade att problemet inte var ett borttaget endpoint utan den sköra klientkedjan i `ttline_scraper.py`.
+  - Verifierade att `https://www.ttline.com/en/timetables/` fortfarande exponerar både dold `__RequestVerificationToken` och samma POST-flöde mot `https://www.ttline.com/sailing/info/`.
+  - Uppdaterade [ttline_scraper.py](/Users/jane/Documents/Claude/Projects/Weblänksida/ttline_scraper.py) så den:
+    - sätter explicit CA-bundle via `certifi` när den använder `requests`
+    - faller tillbaka till `curl` för både tokenhämtning och POST-anrop om Python/TLS-kedjan fallerar
+    - väljer senaste datum/tid i celler med flera tider, så TT-Lines försenade `Old/New`-rader nu tolkar den nya tiden i stället för den gamla
+  - Lokal verifiering visade att TT-Line-scrapern efter fixen hämtar 35 live-rader över två dagar och fyller korrekta ankomsttider/fartyg för rutter som `Travemünde ↔ Trelleborg` och `Trelleborg ↔ Travemünde`.
 - 2026-05-25: Slutverifierade tomfältsfixen i publicerad data.
   - Pushade commit `4cf3774` (`Backfill missing timetable arrival fields`) till `main` och triggade `update-timetables.yml` manuellt igen.
   - Bekräftade att körning `26394332342` gick grönt i GitHub Actions.
@@ -244,7 +252,6 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 - Lokal fullverifiering av `update_fartyg.py` mot samma runtime som GitHub Actions saknas fortfarande, eftersom den här maskinen bara har Python `3.9.6` installerad som `python3` medan workflowen kör `3.11`. Det blockerar inte patchen men gör att slutlig bekräftelse bör tas via nästa Actions-körning eller lokal 3.11-miljö.
 - `update-timetables.yml` kraschar inte längre på legacy-formatet, men två externa källor är fortfarande sköra i grön körning:
   - `Viking Line` svarar fortsatt `403 Forbidden` på nuvarande server-side API-anrop.
-  - `TT-Line` gav `SSLCertVerificationError` vid hämtning av CSRF-token från `www.ttline.com`.
 - Den här Codex-miljön har inte full GitHub-ytåtkomst i ett enda lager:
   - lokal `gh`-CLI är inte inloggad
   - sandboxat nätverk blockerar direkta GitHub-anrop tills kommandon uttryckligen körs utanför sandbox
@@ -266,7 +273,7 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 ## Nästa steg
 
 - Återvalidera eller ersätt Viking Lines nuvarande API-kedja eftersom den fortfarande ger `403 Forbidden` i GitHub Actions.
-- Undersök TT-Lines TLS/CSRF-kedja i GitHub Actions-miljö, eftersom själva workflowen nu går klart men TT-Line-källan fortfarande faller bort.
+- Kör om `update-timetables.yml` och verifiera att TT-Line inte längre faller bort i GitHub Actions-loggen samt att nya TT-Line-liveposter skrivs in i `farjor_data.json`.
 - Kör en ny full browser-QA när lokal browser-runtime fungerar igen och kontrollera särskilt tooltipar, rotationsfartyg och källchippar i `In & Ut`-vyn.
 - Lägg till separat `traffic_notices`-collector per rederi där officiella trafikmeddelandesidor finns.
 - Bygg ut `source_registry` från dokumenterad matris till körbar konfiguration om kommande skript ska styras route-för-route.
