@@ -30,6 +30,7 @@ SOURCE_DETAIL = "Stena Freight LiveView"
 ROUTES = {
     "GOFR": "Gothenburg – Frederikshavn",
     "GDKA": "Gdynia – Karlskrona",
+    "NYVE": "Nynäshamn – Ventspils",
     "GOKI": "Gothenburg – Kiel",
     "TGRO": "Trelleborg – Rostock",
 }
@@ -41,8 +42,10 @@ PORT_NAMES = {
     "Kiel": "Kiel",
     "Gdynia": "Gdynia",
     "Karlskrona": "Karlskrona",
+    "Nynäshamn": "Nynäshamn",
     "Trelleborg": "Trelleborg",
     "Rostock": "Rostock",
+    "Ventspils": "Ventspils",
 }
 
 SHIP_NAMES = {
@@ -52,12 +55,23 @@ SHIP_NAMES = {
     "STENA EBBA": "Stena Ebba",
     "STENA ESTELLE": "Stena Estelle",
     "STENA SPIRIT": "Stena Spirit",
+    "STENA BALTICA": "Stena Baltica",
+    "STENA SCANDICA": "Stena Scandica",
     "STENA GERMANICA": "Stena Germanica",
     "STENA SCANDINAVICA": "Stena Scandinavica",
     "MECKLENBURG VORPOMMERN": "Mecklenburg-Vorpommern",
     "MECKLENBURG VORPOMMERN (C)": "Mecklenburg-Vorpommern",
+    "SKAANE (C)": "Skåne",
     "SKAANE": "Skåne",
     "SKÅNE": "Skåne",
+}
+
+ROUTE_ALLOWED_SHIPS = {
+    "GOFR": {"Stena Danica", "Stena Jutlandica"},
+    "GDKA": {"Stena Ebba", "Stena Estelle", "Stena Spirit"},
+    "NYVE": {"Stena Baltica", "Stena Scandica"},
+    "GOKI": {"Stena Germanica", "Stena Scandinavica"},
+    "TGRO": {"Mecklenburg-Vorpommern", "Skåne"},
 }
 
 logging.basicConfig(
@@ -158,6 +172,20 @@ def parse_time_only(text: str) -> str:
     return m.group(1).zfill(5) if m else ""
 
 
+def infer_arrival_date(dep_date_iso: str, dep_time: str, arr_time: str) -> str:
+    if not dep_date_iso or not dep_time or not arr_time:
+        return dep_date_iso
+    dep_match = re.search(r"\b(\d{1,2}):(\d{2})\b", dep_time)
+    arr_match = re.search(r"\b(\d{1,2}):(\d{2})\b", arr_time)
+    if not dep_match or not arr_match:
+        return dep_date_iso
+    dep_minutes = int(dep_match.group(1)) * 60 + int(dep_match.group(2))
+    arr_minutes = int(arr_match.group(1)) * 60 + int(arr_match.group(2))
+    if arr_minutes < dep_minutes:
+        return (date.fromisoformat(dep_date_iso) + timedelta(days=1)).isoformat()
+    return dep_date_iso
+
+
 def build_traffic_comment(status: str) -> str:
     value = " ".join((status or "").split())
     if not value:
@@ -230,15 +258,21 @@ def fetch_all(date_from: date = None, date_to: date = None) -> list[dict]:
             if not ds or not avghamn or not ankhamn or not row.get("dep"):
                 continue
             anktid = parse_time_only(row.get("arr", ""))
+            ankomstdatum = infer_arrival_date(ds, row["dep"], anktid)
             status = " ".join((row.get("status", "") or "").split())
+            vessel = normalize_ship(row.get("vessel", ""))
+            allowed_ships = ROUTE_ALLOWED_SHIPS.get(route_code)
+            if allowed_ships and vessel not in allowed_ships:
+                log.debug("Hoppar över %s på %s; inte Stena-fartyg för rutten.", vessel, route_code)
+                continue
             all_sailings.append({
                 "date": ds,
                 "avghamn": avghamn,
                 "ankhamn": ankhamn,
                 "avgtid": row["dep"],
-                "ankomstdatum": ds,
+                "ankomstdatum": ankomstdatum,
                 "anktid": anktid,
-                "fartyg": normalize_ship(row.get("vessel", "")),
+                "fartyg": vessel,
                 "rederi": "Stena Line",
                 "kalla": TIMETABLE_URL,
                 "source_label": "Live-tidtabell",

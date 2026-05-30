@@ -15,6 +15,7 @@ SVENSKA_HAMNAR = {
     "Ystad",
     "Malmö",
     "Helsingborg",
+    "Strömstad",
     "Karlskrona",
     "Karlshamn",
     "Oxelösund",
@@ -148,11 +149,24 @@ def special_interval_for_schema_row(row: dict) -> tuple[str, str] | None:
 
 
 def schema_row_active_for_date(row: dict, dep_date: date) -> bool:
+    valid_from = str(row.get("giltig_from") or "").strip()
+    valid_to = str(row.get("giltig_to") or "").strip()
+    dep_iso = dep_date.isoformat()
+    if valid_from and dep_iso < valid_from:
+        return False
+    if valid_to and dep_iso > valid_to:
+        return False
+    week_parity = str(row.get("iso_week_parity") or "").strip().lower()
+    if week_parity:
+        is_even_week = dep_date.isocalendar().week % 2 == 0
+        if week_parity == "even" and not is_even_week:
+            return False
+        if week_parity == "odd" and is_even_week:
+            return False
     interval = special_interval_for_schema_row(row)
     if not interval:
         return True
-    iso = dep_date.isoformat()
-    return interval[0] <= iso <= interval[1]
+    return interval[0] <= dep_iso <= interval[1]
 
 
 def infer_arrival_date(dep_date_iso: str, dep_time: str, arr_time: str, explicit_next_day: bool) -> str:
@@ -198,11 +212,11 @@ def make_schema_instance(row: dict, dep_date: date) -> dict:
         "anmarkning": row.get("anmarkning", "") or "",
         "verifiering": row.get("verifiering", "") or "",
         "kalla": row.get("kalla", "") or "",
-        "fartyg": "",
+        "fartyg": row.get("fartyg", "") or "",
         "source_type": "weekly_schedule",
         "source_priority": SOURCE_PRIORITIES["weekly_schedule"],
         "source_label": "Veckoschema",
-        "source_detail": "",
+        "source_detail": row.get("source_detail", "") or "",
         "is_live": False,
         "is_exact": False,
         "status": "",
@@ -308,8 +322,16 @@ def choose_match(existing: list[dict], sailing: dict) -> dict | None:
             return item
     if target_minutes is None:
         return None
+    # Fuzzy-matchning är till för att ersätta veckofallbackar när en livekälla
+    # har några minuters avvikelse. Den får inte slå ihop två täta liveavgångar.
+    fuzzy_candidates = [
+        item for item in candidates
+        if str(item.get("source_type") or "") != "dynamic_schedule"
+    ]
+    if not fuzzy_candidates:
+        return None
     scored = []
-    for item in candidates:
+    for item in fuzzy_candidates:
         minutes = parse_time_minutes(item.get("avgtid", ""))
         if minutes is None:
             continue

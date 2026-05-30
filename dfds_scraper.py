@@ -12,6 +12,8 @@ Rutter som täcks (berör Sverige):
   LTKLJ ↔ SETRG  (Klaipeda – Trelleborg)
   GBIMM ↔ SEGOT  (Immingham – Göteborg)
   BEGNE ↔ SEGOT  (Ghent – Göteborg)
+  NOBVK ↔ SEGOT  (Brevik – Göteborg)
+  BEZEE ↔ SEGOT  (Zeebrugge – Göteborg)
 """
 
 import logging
@@ -36,6 +38,8 @@ PORT_NAMES = {
     "GBNCL": "Newcastle",
     "DKEBJ": "Esbjerg",
     "NLRTM": "Rotterdam",
+    "NOBVK": "Brevik",
+    "BEZEE": "Zeebrugge",
 }
 
 # Rutter att hämta (POL, POD)
@@ -45,6 +49,8 @@ RUTTER = [
     ("LTKLJ","SETRG"), ("SETRG","LTKLJ"),
     ("GBIMM","SEGOT"), ("SEGOT","GBIMM"),
     ("BEGNE","SEGOT"), ("SEGOT","BEGNE"),
+    ("NOBVK","SEGOT"), ("SEGOT","NOBVK"),
+    ("BEZEE","SEGOT"), ("SEGOT","BEZEE"),
 ]
 
 logging.basicConfig(

@@ -37,9 +37,22 @@ ALLOW_INSECURE_FALLBACK = os.getenv("TTLINE_ALLOW_INSECURE_FALLBACK", "1").strip
 ROUTES = [
     "TRA;TRE", "TRE;TRA",
     "ROS;TRE", "TRE;ROS",
-    "KLA;TRE", "TRE;KLA",
     "SWI;TRE", "TRE;SWI",
+    "TRA;KAR", "KAR;TRA",
+    "ROS;KAR",
 ]
+
+# TT-Line listar även Klaipėda-linjer mot Sverige, men de samtrafikerade
+# avgångarna finns komplettare i DFDS API med fartygsnamn. Därför hämtas de
+# inte här, så samma avgång inte publiceras två gånger.
+def env_int(name: str, default: int) -> int:
+    try:
+        return max(1, int(os.getenv(name, str(default))))
+    except ValueError:
+        return default
+
+
+QUERY_STEP_DAYS = env_int("TTLINE_QUERY_STEP_DAYS", 3)
 
 SHIP_CODES = {
     "TS": "Tom Sawyer",
@@ -59,6 +72,7 @@ PORT_NAMES = {
     "Trelleborg": "Trelleborg",
     "Klaipeda": "Klaipėda",
     "Klaipėda": "Klaipėda",
+    "Karlshamn": "Karlshamn",
     "Swinoujscie": "Świnoujście",
     "Swinoujście": "Świnoujście",
     "Świnoujście": "Świnoujście",
@@ -137,6 +151,8 @@ class TTTableParser(HTMLParser):
 
 def resolve_ship(code: str) -> str:
     code = (code or "").strip()
+    if code in {"", "-", "–", "—", "N/A"}:
+        return ""
     return SHIP_CODES.get(code, code)
 
 
@@ -185,6 +201,8 @@ def extract_token_with_curl(insecure: bool = False) -> tuple[Optional[str], Opti
             "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "-c",
             cookie_path,
+            "--max-time",
+            "12",
             "-o",
             body_path,
         ]
@@ -194,7 +212,7 @@ def extract_token_with_curl(insecure: bool = False) -> tuple[Optional[str], Opti
         subprocess.run(
             cmd,
             check=True,
-            timeout=30,
+            timeout=15,
             capture_output=True,
             text=True,
         )
@@ -291,6 +309,8 @@ def fetch_route_with_curl(cookie_path: str, token: str, route: str, day: date, i
             cookie_path,
             "-c",
             cookie_path,
+            "--max-time",
+            "12",
             "-X",
             "POST",
             "-H",
@@ -318,7 +338,7 @@ def fetch_route_with_curl(cookie_path: str, token: str, route: str, day: date, i
         resp = subprocess.run(
             cmd,
             check=True,
-            timeout=35,
+            timeout=15,
             capture_output=True,
             text=True,
         )
@@ -443,7 +463,7 @@ def fetch_all(date_from: date = None, date_to: date = None) -> list[dict]:
                     seen.add(key)
                     all_sailings.append(row)
                 time.sleep(0.2)
-            current += timedelta(days=1)
+            current += timedelta(days=QUERY_STEP_DAYS)
     finally:
         if curl_cookie_path and os.path.exists(curl_cookie_path):
             os.unlink(curl_cookie_path)

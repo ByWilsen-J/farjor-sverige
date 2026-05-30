@@ -384,17 +384,10 @@
         <a class="sb-lnk" href="https://www.colorline.se/tidtabeller" target="_blank" rel="noopener">&#8594; colorline.se</a>
       </div>
       <div class="sb-linje">
-        <span class="sb-namn">Bornholmslinjen</span>
-        <span class="sb-rutt">Ystad &#8596; Rønne</span>
-        <span class="sb-info">4–8 avg/dag, varierar säsong</span>
-        <a class="sb-lnk" href="https://www.bornholmslinjen.se" target="_blank" rel="noopener">&#8594; bornholmslinjen.se</a>
-      </div>
-      <div class="sb-linje">
-        <span class="sb-namn">HH Ferries / ForSea</span>
-        <span class="sb-rutt">Helsingborg &#8596; Helsingör</span>
-        <span class="sb-info">Avgångar var 15–20 min dygnet runt</span>
-        <a class="sb-lnk" href="https://www.hh-ferries.se" target="_blank" rel="noopener">&#8594; hh-ferries.se</a>
-        <a class="sb-lnk" href="https://www.forsea.se" target="_blank" rel="noopener">&#8594; forsea.se</a>
+        <span class="sb-namn">Sundbusserne</span>
+        <span class="sb-rutt">Helsingborg &#8596; Helsingør</span>
+        <span class="sb-info">Passagerarfärja, 18 min</span>
+        <a class="sb-lnk" href="https://sundbusserne.dk/fartplan/" target="_blank" rel="noopener">&#8594; sundbusserne.dk</a>
       </div>
     </div>
 
@@ -567,16 +560,17 @@ const TT_LINE_NAMN_TILL_KOD = {
 const KANDA_FARTYG = [
   'Aurora Botnia','M/S Eckerö',
   'Viking Glory','Viking Cinderella','Birka Gotland','Gabriella','Viking Grace','Viking XPRS',
-  'Silja Symphony','Silja Serenade','Baltic Princess',
+  'Silja Symphony','Silja Serenade','Baltic Princess','Baltic Queen',
   'Stena Ebba','Stena Estelle','Stena Spirit','Stena Germanica','Stena Scandinavica','Estelle','Spirit',
   'Stena Danica','Stena Jutlandica',
   'Sfix','Sirena Seaways','Luna Seaways','Robin Hood','Optima Seaways','Nils Holgersson','Nils Dacke','Marco Polo',
   'Galileusz','Epsilon','Polonia','Skania','Mazovia','Copernicus','Jan Śniadecki','Nova Star',
+  'Express 1','Express 5','Tycho Brahe','Aurora','Hamlet','Pernille','Jeppe','Color Hybrid',
 ];
 const UTESLUT = new Set(['Wallenius SOL','SCA Logistics']);
 const SVENSKA_HAMNAR = new Set([
   'Stockholm','Nynäshamn','Kapellskär','Grisslehamn',
-  'Göteborg','Trelleborg','Ystad','Malmö','Helsingborg',
+  'Göteborg','Trelleborg','Ystad','Malmö','Helsingborg','Strömstad',
   'Karlskrona','Karlshamn','Oxelösund','Umeå','Gävle','Varberg',
 ]);
 const HAMN_KODER = {
@@ -586,8 +580,11 @@ const HAMN_KODER = {
   'Ghent':'GHE',
   'Gent':'GHE',
   'Grisslehamn':'GRI',
+  'Brevik':'BRV',
   'Göteborg':'GOT',
   'Frederikshavn':'FRH',
+  'Helsingborg':'HBG',
+  'Helsingør':'HGR',
   'Helsingfors':'HEL',
   'Immingham':'IMM',
   'Kapellskär':'KAP',
@@ -602,10 +599,15 @@ const HAMN_KODER = {
   'Oxelösund':'OXL',
   'Paldiski':'PAL',
   'Riga':'RIX',
+  'Rønne':'RNN',
   'Rostock':'ROS',
+  'Sandefjord':'SDF',
   'Stockholm':'STO',
+  'Strömstad':'STR',
   'Travemünde':'TRA',
   'Trelleborg':'TRE',
+  'Ventspils':'VNT',
+  'Zeebrugge':'ZEE',
   'Umeå':'UME',
   'Vasa':'VAS',
   'Ystad':'YST',
@@ -664,8 +666,18 @@ const ROUTE_FLEETS = {
   'Tallink Silja|Helsingfors|Stockholm':'Silja Symphony / Silja Serenade',
   'Tallink Silja|Stockholm|Åbo':'Baltic Princess',
   'Tallink Silja|Åbo|Stockholm':'Baltic Princess',
+  'Tallink Silja|Stockholm|Tallinn':'Baltic Queen',
+  'Tallink Silja|Tallinn|Stockholm':'Baltic Queen',
+  'Bornholmslinjen|Ystad|Rønne':'Express 1 / Express 5',
+  'Bornholmslinjen|Rønne|Ystad':'Express 1 / Express 5',
+  'Øresundslinjen|Helsingør|Helsingborg':'Tycho Brahe / Aurora / Hamlet',
+  'Øresundslinjen|Helsingborg|Helsingør':'Tycho Brahe / Aurora / Hamlet',
+  'Sundbusserne|Helsingør|Helsingborg':'Jeppe / Pernille',
+  'Sundbusserne|Helsingborg|Helsingør':'Pernille / Jeppe',
   'Stena Line|Karlskrona|Gdynia':'Stena Ebba / Stena Estelle / Stena Spirit',
   'Stena Line|Gdynia|Karlskrona':'Stena Ebba / Stena Estelle / Stena Spirit',
+  'Stena Line|Nynäshamn|Ventspils':'Stena Baltica / Stena Scandica',
+  'Stena Line|Ventspils|Nynäshamn':'Stena Baltica / Stena Scandica',
   'Stena Line|Göteborg|Frederikshavn':'Stena Danica / Stena Jutlandica',
   'Stena Line|Frederikshavn|Göteborg':'Stena Danica / Stena Jutlandica',
   'Stena Line|Göteborg|Kiel':'Stena Germanica / Stena Scandinavica',

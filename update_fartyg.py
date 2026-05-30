@@ -27,6 +27,8 @@ import dfds_scraper         as dfds
 import finnlines_scraper    as finn
 import stena_line_scraper   as stena
 import ttline_scraper       as ttline
+import molslinjen_scraper   as molslinjen
+from route_registry import filter_instances_to_primary_sources
 from schedule_instances import build_base_instances, merge_dynamic_sailings, parse_time_minutes, public_window
 
 DATA_FILE = Path(__file__).parent / "farjor_data.json"
@@ -155,6 +157,18 @@ SOURCE_DEFAULTS = {
         "source_detail": ttline.SOURCE_DETAIL,
         "source_type": "dynamic_schedule",
     },
+    "Bornholmslinjen": {
+        "kalla": "https://www.bornholmslinjen.dk/fartplan",
+        "source_label": "Live-tidtabell",
+        "source_detail": molslinjen.SOURCE_DETAIL,
+        "source_type": "dynamic_schedule",
+    },
+    "Øresundslinjen": {
+        "kalla": "https://www.oresundslinjen.dk/fartplan",
+        "source_label": "Live-tidtabell",
+        "source_detail": molslinjen.SOURCE_DETAIL,
+        "source_type": "dynamic_schedule",
+    },
     "Polferries (POLSCA)": {
         "kalla": "https://www.polferries.com/schedule-timetable/",
         "source_label": "Datumtabell",
@@ -167,6 +181,12 @@ SOURCE_DEFAULTS = {
 def enrich_instance_sources(instances_by_date: dict[str, list[dict]]) -> None:
     for entries in instances_by_date.values():
         for inst in entries or []:
+            # Veckoscheman ska behålla sin radkälla; dynamiska standardvärden
+            # används bara när en dynamisk rad saknar metadata.
+            if str(inst.get("source_type") or "") == "weekly_schedule":
+                if not inst.get("source_label"):
+                    inst["source_label"] = "Veckoschema"
+                continue
             operator = str(inst.get("source_operator") or inst.get("rederi") or "").strip()
             defaults = SOURCE_DEFAULTS.get(operator)
             if not defaults:
@@ -210,6 +230,31 @@ def sync_legacy_fields_from_instances(instances_by_date: dict[str, list[dict]]) 
                 "traffic_comment": str(inst.get("traffic_comment") or "").strip(),
             }
     return fartyg_datum, avgangar_datum
+
+
+def refresh_meta_lists(data: dict, instances_by_date: dict[str, list[dict]]) -> None:
+    rederier = {
+        str(row.get("rederi") or "").strip()
+        for row in data.get("schema") or []
+        if str(row.get("rederi") or "").strip()
+    }
+    hamnar = {
+        str(row.get(field) or "").strip()
+        for row in data.get("schema") or []
+        for field in ("avghamn", "ankhamn")
+        if str(row.get(field) or "").strip()
+    }
+    for entries in instances_by_date.values():
+        for inst in entries or []:
+            rederi = str(inst.get("rederi") or "").strip()
+            if rederi:
+                rederier.add(rederi)
+            for field in ("avghamn", "ankhamn"):
+                hamn = str(inst.get(field) or "").strip()
+                if hamn:
+                    hamnar.add(hamn)
+    data.setdefault("meta", {})["rederier"] = sorted(rederier)
+    data.setdefault("meta", {})["hamnar"] = sorted(hamnar)
 
 
 def prune_weekly_fallbacks_for_live_routes(
@@ -357,14 +402,13 @@ def backfill_incomplete_instances(instances_by_date: dict[str, list[dict]]) -> N
 
 def main():
     from_date = date.fromisoformat(sys.argv[1]) if len(sys.argv) > 1 else date.today()
-    forward_days = env_int("FERRY_DYNAMIC_FORWARD_DAYS", 14)
-    to_date = from_date + timedelta(days=forward_days)
     public_anchor_raw = os.getenv("FERRY_PUBLIC_ANCHOR_DATE", "").strip()
-    public_anchor = date.fromisoformat(public_anchor_raw) if public_anchor_raw else date.today()
+    public_anchor = date.fromisoformat(public_anchor_raw) if public_anchor_raw else from_date
     public_start, public_end = public_window(public_anchor)
+    dynamic_start, dynamic_end = public_start, public_end
     public_start_iso = public_start.isoformat()
     public_end_iso = public_end.isoformat()
-    log.info("Uppdaterar dynamiska avgångar %s – %s", from_date, to_date)
+    log.info("Uppdaterar dynamiska avgångar %s – %s", dynamic_start, dynamic_end)
     log.info("Publiceringsfönster %s – %s", public_start, public_end)
 
     # Ladda befintlig JSON
@@ -406,6 +450,7 @@ def main():
             source_type = s.get("source_type", "") or s.get("kalltyp", "")
             status = s.get("status", "")
             traffic_comment = s.get("traffic_comment", "")
+            is_exact = s.get("is_exact", True)
             if not (ds and rederi and avghamn and ankhamn and avgtid):
                 continue
             dynamic_sailings.append({
@@ -423,8 +468,9 @@ def main():
                 "source_type": source_type,
                 "status": status,
                 "traffic_comment": traffic_comment,
+                "is_exact": is_exact,
             })
-            if not (from_date.isoformat() <= ds <= to_date.isoformat()):
+            if not (dynamic_start.isoformat() <= ds <= dynamic_end.isoformat()):
                 continue
             if ds not in avgangar_datum:
                 avgangar_datum[ds] = {}
@@ -444,62 +490,78 @@ def main():
                 "kalltyp": source_type,
                 "status": status,
                 "traffic_comment": traffic_comment,
+                "is_exact": is_exact,
             }
 
     # ── Viking Line ──
     log.info("=== Viking Line ===")
-    # Veckovy returnerar 7 dagar; gör 2 anrop för att täcka 14 dagar
-    for offset in [0, 7]:
-        fd = from_date + timedelta(days=offset)
-        vl_data = vl.fetch_all_routes(from_date=fd.isoformat())
-        sailings = []
-        for route_key, route_sailings in vl_data.items():
-            for s in route_sailings:
-                sailings.append({
-                    "date":    s["date"],
-                    "avghamn": s["pol"],
-                    "ankhamn": s["pod"],
-                    "avgtid":  s["departure_time"],
-                    "anktid": s.get("arrival_time", ""),
-                    "ankomstdatum": s.get("arrival_date", s["date"]),
-                    "fartyg":  s["ship_name"],
-                    "rederi":  "Viking Line",
-                    "kalla": s.get("kalla", ""),
-                    "source_label": s.get("source_label", ""),
-                    "source_detail": s.get("source_detail", ""),
-                    "source_type": s.get("source_type", ""),
-                    "status": s.get("availability", ""),
-                })
-        lägg_till(sailings)
+    if os.getenv("FERRY_ENABLE_VIKING_API", "").strip().lower() in {"1", "true", "yes"}:
+        # Veckovy returnerar sju dagar; stega över hela publiceringsfönstret.
+        for offset in range(0, (dynamic_end - dynamic_start).days + 1, 7):
+            fd = dynamic_start + timedelta(days=offset)
+            vl_data = vl.fetch_all_routes(from_date=fd.isoformat())
+            sailings = []
+            for route_key, route_sailings in vl_data.items():
+                for s in route_sailings:
+                    sailings.append({
+                        "date":    s["date"],
+                        "avghamn": s["pol"],
+                        "ankhamn": s["pod"],
+                        "avgtid":  s["departure_time"],
+                        "anktid": s.get("arrival_time", ""),
+                        "ankomstdatum": s.get("arrival_date", s["date"]),
+                        "fartyg":  s["ship_name"],
+                        "rederi":  "Viking Line",
+                        "kalla": s.get("kalla", ""),
+                        "source_label": s.get("source_label", ""),
+                        "source_detail": s.get("source_detail", ""),
+                        "source_type": s.get("source_type", ""),
+                        "status": s.get("availability", ""),
+                    })
+            lägg_till(sailings)
+    else:
+        log.info("Hoppar över Viking Line API; officiellt veckoschema är primärkälla tills API:t är återverifierat.")
 
     # ── Tallink Silja ──
     log.info("=== Tallink Silja ===")
-    tl_sailings = tl.fetch_all(from_date, to_date)
+    tl_sailings = tl.fetch_all(dynamic_start, dynamic_end)
     lägg_till(tl_sailings)
 
     # ── DFDS ──
     log.info("=== DFDS ===")
-    dfds_sailings = dfds.fetch_all(from_date, to_date)
+    dfds_sailings = dfds.fetch_all(dynamic_start, dynamic_end)
     lägg_till(dfds_sailings)
 
     # ── Finnlines ──
     log.info("=== Finnlines ===")
-    finn_sailings = finn.fetch_all(from_date, to_date)
+    finn_sailings = finn.fetch_all(dynamic_start, dynamic_end)
     lägg_till(finn_sailings)
 
     # ── Stena Line ──
     log.info("=== Stena Line ===")
-    stena_sailings = stena.fetch_all(from_date, to_date)
+    stena_sailings = stena.fetch_all(dynamic_start, dynamic_end)
     lägg_till(stena_sailings)
 
     # ── TT-Line ──
     log.info("=== TT-Line ===")
-    ttline_sailings = ttline.fetch_all(from_date, to_date)
+    ttline_sailings = ttline.fetch_all(dynamic_start, dynamic_end)
     lägg_till(ttline_sailings)
+
+    # ── Bornholmslinjen / Øresundslinjen ──
+    log.info("=== Molslinjen family ===")
+    molslinjen_sailings = molslinjen.fetch_all(dynamic_start, dynamic_end)
+    lägg_till(molslinjen_sailings)
 
     merge_dynamic_sailings(avgangsinstanser, dynamic_sailings)
     prune_weekly_fallbacks_for_live_routes(avgangsinstanser, dynamic_sailings)
     enrich_instance_sources(avgangsinstanser)
+    source_filter_stats = filter_instances_to_primary_sources(avgangsinstanser)
+    if source_filter_stats:
+        log.info(
+            "Rensade %d avgångsinstanser från sekundära/nedlagda källor: %s",
+            sum(source_filter_stats.values()),
+            dict(source_filter_stats),
+        )
     backfill_incomplete_instances(avgangsinstanser)
     fartyg_datum, avgangar_datum = sync_legacy_fields_from_instances(avgangsinstanser)
 
@@ -510,7 +572,8 @@ def main():
     data["meta"]["uppdaterad"] = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     data["meta"]["avgangsinstans_dagar"] = len(avgangsinstanser)
     data["meta"]["publiceringsfonster"] = f"{public_start_iso} till {public_end_iso}"
-    data["meta"]["dynamic_window"] = f"{from_date.isoformat()} till {to_date.isoformat()}"
+    data["meta"]["dynamic_window"] = f"{dynamic_start.isoformat()} till {dynamic_end.isoformat()}"
+    refresh_meta_lists(data, avgangsinstanser)
 
     # Räkna
     totalt = sum(len(v) for v in fartyg_datum.values())

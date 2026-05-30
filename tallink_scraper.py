@@ -10,8 +10,10 @@ fungerar utan begränsningar.
 Rutter som täcks (mot/från Sverige):
   hel ↔ sto   (Helsingfors – Stockholm, Silja Line)
   tur ↔ sto   (Åbo – Stockholm, Silja Line)
-  pal ↔ kap   (Paldiski – Kapellskär, Tallink)
   tal ↔ sto   (Tallinn – Stockholm, Tallink)
+
+Paldiski ↔ Kapellskär hämtas via DFDS API i `dfds_scraper.py`; den ska
+inte dubbelpubliceras från Tallink CMS.
 """
 
 import logging
@@ -28,6 +30,8 @@ FARTYG = {
     "MEGASTAR":    "Megastar",
     "MYSTAR":      "MyStar",
     "VICTORIA":    "Victoria I",
+    "QUEEN":       "Baltic Queen",
+    "BALTIC_QUEEN": "Baltic Queen",
     "PRINCESS":    "Baltic Princess",
     "SERENADE":    "Silja Serenade",
     "SYMPHONY":    "Silja Symphony",
@@ -59,16 +63,19 @@ REDERI_PER_RUTT = {
     ("sto","tur"): "Tallink Silja",
     ("tal","sto"): "Tallink Silja",
     ("sto","tal"): "Tallink Silja",
-    ("pal","kap"): "DFDS",
-    ("kap","pal"): "DFDS",
 }
 
 # Rutter att hämta
 RUTTER = [
     ("hel","sto"), ("sto","hel"),
     ("tur","sto"), ("sto","tur"),
-    ("pal","kap"), ("kap","pal"),
+    ("tal","sto"), ("sto","tal"),
 ]
+
+ROUTE_FALLBACK_FARTYG = {
+    ("tal", "sto"): "Baltic Queen",
+    ("sto", "tal"): "Baltic Queen",
+}
 
 logging.basicConfig(
     level=logging.INFO,
@@ -130,7 +137,8 @@ def extract_sailings(data: dict, dep: str, arr: str) -> list[dict]:
             anktid = arr_dt[11:16] if len(arr_dt) >= 16 else ""
             if not avgtid:
                 continue
-            fartyg = resolve_fartyg(sail.get("shipCode", ""))
+            ship_code = sail.get("shipCode", "")
+            fartyg = resolve_fartyg(ship_code) or ROUTE_FALLBACK_FARTYG.get((dep, arr), "")
             sailings.append({
                 "date":     ds,
                 "avghamn":  PORT_NAMES.get(dep, dep),
@@ -144,6 +152,7 @@ def extract_sailings(data: dict, dep: str, arr: str) -> list[dict]:
                 "source_label": "Live-tidtabell",
                 "source_detail": SOURCE_DETAIL,
                 "source_type": "dynamic_schedule",
+                "is_exact": bool(ship_code),
             })
     return sailings
 

@@ -6,6 +6,14 @@ GitHub-sida/statisk webbsida för färjetidtabeller till och från Sverige. Huvu
 
 Genomförd huvudombyggnad 2026-05-21. `farjor_data.json` bygger nu ett publiceringsfönster på `idag - 1 månad` till `idag + 3 månader` som `avgangsinstanser`, och `index.html` renderar dessa instanser först när de finns. Veckoschema används därmed som fallback-datakälla i backend i stället för som primär renderkälla i frontend.
 
+Tallinks Tallinn–Stockholm-rutt är nu åter inkopplad i kodbasen för den dynamiska Tallink-hämtningen. `tallink_scraper.py` hämtar nu även `tal ↔ sto`, och UI-fallbacken visar `Baltic Queen` för `Stockholm ↔ Tallinn` även när exakt fartygsrad saknas i en enskild avgång.
+
+Stena Line `Nynäshamn ↔ Ventspils` är nu återlagd både som verifierad veckofallback och som dynamisk live-rutt i Stena-kedjan. Rutten finns därmed i hela publiceringsfönstret i `avgangsinstanser`, inte bara när livefönstret råkar täcka den.
+
+Större ankomstrevision 2026-05-31 är genomförd med [route_registry.py](/Users/jane/Documents/Claude/Projects/Weblänksida/route_registry.py) som körbar källa för aktiva rutter, borttagna rutter och dubblettregler. Kontrollskriptet [check_route_coverage.py](/Users/jane/Documents/Claude/Projects/Weblänksida/check_route_coverage.py) passerar med `65` aktiva publicerade Sverige-rutter i `farjor_data.json`.
+
+Stena Line `Grenaa/Grenå ↔ Halmstad` är rättad till nedlagd och ska inte publiceras. `TT-Line Klaipėda ↔ Karlshamn/Trelleborg` och `Tallink Paldiski ↔ Kapellskär` hålls borta som separata sekundärkällor när samma trafik har en utsedd primärkälla (`DFDS`). Kortlinjerna `Bornholmslinjen Ystad ↔ Rønne`, `Øresundslinjen Helsingør ↔ Helsingborg` och `Sundbusserne Helsingborg ↔ Helsingør` är nu med i data/källrapport; `Color Line Strömstad ↔ Sandefjord` finns fortfarande bara som länkvisare tills exakt datumimport är säker.
+
 Sidan behåller den nya högerpanelen, rederifiltret och den gemensamma tabellvyn, men visar nu också källchippar för live-/datumrader. Dynamiska källor kan bära med sig källmeta och statuskommentarer ända fram till info-rutan per avgång. `farjor.html` är fortsatt redirect till startsidan.
 
 Automationen är nu uppdelad i faktisk driftmodell: timvis uppdatering för dynamiska datumkällor och daglig backfill för hela publiceringsfönstret. Kvarvarande större luckor gäller främst separat trafikbevakning från särskilda rederi-sidor, Viking Lines blockerade server-side-källa och full separering av `Polferries`/`Unity Line` under `Polsca`.
@@ -19,6 +27,71 @@ TT-Lines tidigare fallbackluckor i grundschemat för `Travemünde ↔ Trelleborg
 Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: när officiell livekälla finns för en Stena-rutt på ett visst datum rensas motsvarande veckofallback bort från samma datum/rutt i `avgangsinstanser`.
 
 ## Senaste ändringar
+
+- 2026-05-31: Slutförde aktiv-rutt- och fartygsrevision med en primärkälla per rutt.
+  - Lade till [route_registry.py](/Users/jane/Documents/Claude/Projects/Weblänksida/route_registry.py) som central registry för aktiva rutter, nedlagda rutter och dubblettregler.
+  - Lade till [check_route_coverage.py](/Users/jane/Documents/Claude/Projects/Weblänksida/check_route_coverage.py) som kvalitetsgrind mot saknade aktiva rutter, nedlagda rutter, dubbla källor, dubbla avgångar och ogiltiga fartygsnamn.
+  - Lade till [generate_route_source_report.py](/Users/jane/Documents/Claude/Projects/Weblänksida/generate_route_source_report.py) och genererade [docs/farjelinjer-kallor.md](/Users/jane/Documents/Claude/Projects/Weblänksida/docs/farjelinjer-kallor.md) med rutt, fartygsnamn, antal avgångar och exakt käll-URL per publicerad rutt.
+  - Lade till [molslinjen_scraper.py](/Users/jane/Documents/Claude/Projects/Weblänksida/molslinjen_scraper.py) för Molslinjens officiella JSON-LD-katalog:
+    - `Bornholmslinjen Ystad ↔ Rønne` med `Express 1` och `Express 5`.
+    - `Øresundslinjen Helsingør ↔ Helsingborg` med `Tycho Brahe`, `Aurora` och `Hamlet`.
+  - Lade in `Sundbusserne Helsingborg ↔ Helsingør` från officiell sejlplan gällande från `2026-03-20`, med fartygsnamnen `Pernille` och `Jeppe`.
+  - Rättade deduperingen så täta liveavgångar inte slås ihop av 60-minutersmatchningen som egentligen bara ska ersätta veckofallbackar.
+  - Rättade `Stena Line Grenaa/Grenå ↔ Halmstad` till nedlagd rutt och säkerställde att den varken finns i schema eller avgångsinstanser.
+  - Utsedd primärkälla för samtrafik/dubbletter:
+    - `DFDS` äger `Klaipėda ↔ Karlshamn` och `Klaipėda ↔ Trelleborg`, även när TT-fartyg förekommer i DFDS API:t.
+    - `DFDS` äger `Paldiski ↔ Kapellskär`; Tallink CMS ska inte dubbelpublicera den rutten.
+    - `Stena Line Rostock ↔ Trelleborg` filtreras till Stenas egna fartyg (`Skåne`, `Mecklenburg-Vorpommern`) så TT-Line inte dupliceras där.
+  - Full omkörning:
+    - `generera_json.py`
+    - `update_fartyg.py 2026-05-31`
+    - `check_route_coverage.py`
+    - `py_compile` på uppdaterade Pythonfiler
+  - Slutresultat: `14011` avgångsinstanser över publiceringsfönstret `2026-04-30` till `2026-08-31`.
+
+- 2026-05-30: Gjorde full officiell revisionsrunda av ankomster till Sverige per rederi.
+  - Verifierade nuvarande inbound-rutter mot officiella källor för `Viking Line`, `Tallink Silja`, `Eckerö Linjen`, `Wasaline`, `DFDS`, `Finnlines`, `Polferries/Polsca/Unity Line`, `Stena Line` och `TT-Line`.
+  - Bekräftade och åtgärdade två tydliga systemluckor i publicerad data:
+    - `DFDS Brevik -> Göteborg`
+    - `DFDS Zeebrugge -> Göteborg`
+  - Uppdaterade [dfds_scraper.py](/Users/jane/Documents/Claude/Projects/Weblänksida/dfds_scraper.py) med portkoder/rutter `NOBVK ↔ SEGOT` och `BEZEE ↔ SEGOT`.
+  - Uppdaterade [update_fartyg.py](/Users/jane/Documents/Claude/Projects/Weblänksida/update_fartyg.py) så `Tallink` och `DFDS` nu hämtas över hela publiceringsfönstret (`public_start -> public_end`) i stället för bara det dynamiska 14-dagarsfönstret.
+  - Effekt av ändringen:
+    - `Tallink Silja Tallinn -> Stockholm` och `Åbo -> Stockholm` ligger nu kvar som exakta datumrader långt utanför livefönstret.
+    - `DFDS Paldiski -> Kapellskär`, `Klaipėda -> Trelleborg`, `Brevik -> Göteborg` och `Zeebrugge -> Göteborg` ligger nu kvar som exakta datumrader över hela publiceringsfönstret.
+  - Synkade [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json) och verifierade efter skrivning bland annat:
+    - `DFDS Brevik -> Göteborg`: `30` datuminstanser
+    - `DFDS Zeebrugge -> Göteborg`: `63` datuminstanser
+    - `Tallink Silja Tallinn -> Stockholm`: `92` datuminstanser
+    - `Tallink Silja Åbo -> Stockholm`: `100` datuminstanser
+  - Lade också till officiellt bekräftade TT-Line Karlshamn-rutter i [ttline_scraper.py](/Users/jane/Documents/Claude/Projects/Weblänksida/ttline_scraper.py):
+    - `Klaipėda ↔ Karlshamn`
+    - `Travemünde ↔ Karlshamn`
+    - `Rostock ↔ Karlshamn`
+  - Kvarvarande blockerare efter revisionen:
+    - Detta är historiskt överspelat 2026-05-31: TT-Line Karlshamn-rutterna materialiseras nu i lokal `farjor_data.json`.
+    - Detta är historiskt rättat 2026-05-31: `Stena Line Grenaa/Grenå ↔ Halmstad` är nedlagd och ska inte publiceras.
+    - `Viking Line Långnäs -> Stockholm` samt `Tallink Mariehamn/Långnäs -> Stockholm` är verifierade som stop-/hamnben i officiella källor, men kräver separat modellbeslut eftersom de annars dubblerar huvudrutterna i nuvarande presentationsmodell.
+
+- 2026-05-30: Lade tillbaka saknad Stena Line-rutt `Nynäshamn ↔ Ventspils`.
+  - Bekräftade mot Stena Line Freights officiella route code `NYVE` att rutten är aktiv i båda riktningar via deras WordPress-AJAX/livekälla.
+  - Uppdaterade [stena_line_scraper.py](/Users/jane/Documents/Claude/Projects/Weblänksida/stena_line_scraper.py) så `NYVE` nu hämtas tillsammans med övriga Stena-rutter, med normalisering för `Stena Baltica` och `Stena Scandica`.
+  - Rättade samtidigt Stena-scraperns ankomstdatumlogik så nattavgångar nu får nästa dag som `ankomstdatum` när ankomsttiden är tidigare än avgångstiden.
+  - Utökade [verified_schema_overrides.py](/Users/jane/Documents/Claude/Projects/Weblänksida/verified_schema_overrides.py) med verifierat fallbackschema för:
+    - `Nynäshamn -> Ventspils`: dagligen `21:15 -> 07:45+1`
+    - `Ventspils -> Nynäshamn`: `Mån-Ons 23:00 -> 07:30+1`, `Tor-Lör 22:45 -> 07:45+1`, `Sön 22:30 -> 07:30+1`
+  - Lade till UI-fallback i [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) som visar `Stena Baltica / Stena Scandica` för rutten när exakt livefartyg saknas, samt hamnkoden `VNT` för `Ventspils`.
+  - Synkade [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json) så rutten nu finns i publicerad data med `14` schema-rader och `246` datuminstanser i nuvarande publiceringsfönster `2026-04-30` till `2026-08-30`.
+
+- 2026-05-30: Lade tillbaka saknad Tallink-rutt `Tallinn ↔ Stockholm` i kod och fallback.
+  - Aktiverade `("tal","sto")` och `("sto","tal")` i [tallink_scraper.py](/Users/jane/Documents/Claude/Projects/Weblänksida/tallink_scraper.py), där rutten redan var förberedd i port-/rederimappningen men inte låg med i den faktiska hämtlistan.
+  - Lade till explicita fartygsmappningar `QUEEN` och `BALTIC_QUEEN` → `Baltic Queen` i samma scraper för att undvika generiska fartygsnamn från Tallink API:t.
+  - Lade till UI-fallback för `Tallink Silja|Stockholm|Tallinn` och `Tallink Silja|Tallinn|Stockholm` i [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html), så rutten visar `Baltic Queen` även om livefartyget inte matchar exakt på radnivå.
+  - Verifierade mot Tallinks officiella CMS-API den 2026-05-30 att rutten finns aktiv i båda riktningar med `shipCode: "QUEEN"`:
+    - `Tallinn -> Stockholm`: `2026-05-30 18:00` ankomst `2026-05-31 10:30`
+    - `Stockholm -> Tallinn`: `2026-05-31 17:30` ankomst `2026-06-01 11:00`
+  - Skrev därefter in Tallink-datan direkt i [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json) via projektets befintliga merge-logik, utan att invänta hela multirederi-kedjan.
+  - Verifierade efter skrivning att `farjor_data.json` nu innehåller `27` dynamiska `Tallink Silja`-instanser för `Tallinn ↔ Stockholm` i datumfönstret från `2026-05-30`, varav `13` rader redan bär exakt fartyg `Baltic Queen`.
 
 - 2026-05-26: Slutverifierade TT-Line-fixen i GitHub Actions.
   - Pushade commit `87b5e00` (`Add last-resort TT-Line TLS fallback`) ovanpå senaste auto-commiten och triggade `update-timetables.yml` manuellt igen.
@@ -226,6 +299,9 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Beslut och motiveringar
 
+- Alla aktiva Sverige-rutter ska finnas i `route_registry.py` med exakt en primärkälla. Motiveringen är att källvalet ska vara granskbart och testbart, inte bero på vilken scraper som råkar leverera först.
+- Nedlagda rutter och dubblettkällor ska listas explicit i samma registry. Motiveringen är att en borttagen rutt annars lätt kommer tillbaka via gammalt veckoschema eller legacy-data.
+- Kortlinjer med hög turtäthet får bara publiceras i huvudtabellen när det finns verifierbar tidtabell/import. `Sundbusserne` har officiell sejlplan med fartygsnamn och publiceras; `Color Line Strömstad ↔ Sandefjord` ligger tills vidare som länkvisare eftersom exakt datumimport ännu inte är säker.
 - Webbplatsen ska förbli publikt åtkomlig via direkt-URL men aktivt avråda sökmotorindexering via `robots.txt` och `meta name="robots"`. Motiveringen är att minska oavsiktlig upptäckbarhet utan att införa autentisering eller påverka GitHub Pages-driften.
 - `CLdN / Cobelfret` ska inte längre publiceras alls i webbplatsens data eller dokumenterade källmatris. Motiveringen är att användarbehovet nu är att helt ta bort rederiet och dess terminalreferenser, inte bara dölja det i UI:t.
 - `Wagenborg` ska inte längre publiceras alls i webbplatsens data, UI-fallbacks eller dokumenterade källmatris. Motiveringen är att användarbehovet nu är att rederiet inte ska förekomma över huvud taget i listor eller källöversikter.
@@ -250,6 +326,7 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Pågående arbete
 
+- Granska [docs/farjelinjer-kallor.md](/Users/jane/Documents/Claude/Projects/Weblänksida/docs/farjelinjer-kallor.md) mot användarens manuella källbedömning.
 - Slutlig visuell QA av den nya instansrenderingen i riktig browser när lokal browser-runtime finns tillgänglig igen.
 - Nästa utbyggnad av trafikinformationsspåret så att separata rederisidor kan generera explicita `traffic_notices`, inte bara kommentarer från livekällornas statusfält.
 - Separat källa för `Unity Line`/`Polferries` så att `Polsca` kan vara rent visningsnamn och inte lookup-nyckel.
@@ -257,7 +334,7 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Problem / blockerare
 
-- Lokal fullverifiering av `update_fartyg.py` mot samma runtime som GitHub Actions saknas fortfarande, eftersom den här maskinen bara har Python `3.9.6` installerad som `python3` medan workflowen kör `3.11`. TT-Line-fixen är dock nu slutverifierad via GitHub Actions-körning `26434933146`.
+- `Color Line Strömstad ↔ Sandefjord` är fortsatt länkvisare, inte datuminstanser. Den ska inte flyttas in i huvudtabellen förrän vi har en säker officiell datumkälla eller en verifierad statisk tabell som inte riskerar fel tider.
 - `update-timetables.yml` kraschar inte längre på legacy-formatet och TT-Line fungerar åter, men `Viking Line` svarar fortsatt `403 Forbidden` på nuvarande server-side API-anrop.
 - TT-Line fungerar i GitHub Actions först efter en smal fallback utan certifikatverifiering när runnern inte kan validera `www.ttline.com`-kedjan. Det är en avgränsad driftmitigering men fortfarande en extern transport-risk om TT-Line ändrar sitt upplägg igen.
 - Dedikerade collectors för rederiernas separata trafikinformationssidor finns ännu inte. Nuvarande version kan bära status/kommentar från de livekällor som redan innehåller sådan information, men inte bevaka alla externa trafikbloggar/bulletinsidor.
@@ -269,12 +346,11 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 - Vissa schemaundantag ligger fortfarande som veckorader med anmärkning i datalagret. Den här omgången säkrade Viking-specialtiden, men fler undantag kan på sikt behöva samma typ av datumstyrning.
 - Unity Line finns inte som egen datumkälla i nuvarande JSON, så full separering eller exakt avgångsimport kräver ny importkedja.
 - Exakt dagsdata kan fortfarande saknas för vissa enskilda datum i slutet av det deklarerade dynamiska fönstret även när route-day-prioritering finns på plats. Då återstår veckofallback tills källfönster eller scraper-horisont justeras.
-- Officiellt bekräftade rutter saknas fortfarande helt eller delvis i själva veckoschemat `farjor_data.json`, även om flera nu kompletteras via datuminstanser:
-  - Unity Line/POLSCA `Świnoujście ↔ Trelleborg` utanför nuvarande datumperiod
-  - Eventuell framtida POLSCA `Gdańsk ↔ Karlshamn` när den faktiskt öppnar
+- `route_registry.py` täcker nu publicerade aktiva rutter, men nya eller ändrade färjelinjer kräver fortsatt manuell source-of-truth-kontroll innan de läggs till.
 
 ## Nästa steg
 
+- Låt användaren granska [docs/farjelinjer-kallor.md](/Users/jane/Documents/Claude/Projects/Weblänksida/docs/farjelinjer-kallor.md) och särskilt bekräfta om `Color Line` ska byggas som tabellrad när säker källa hittats.
 - Återvalidera eller ersätt Viking Lines nuvarande API-kedja eftersom den fortfarande ger `403 Forbidden` i GitHub Actions.
 - Övervaka ett par kommande schemalagda körningar så att TT-Lines nya transportfallback fortsätter leverera stabilt även utan manuell trigger.
 - Kör en ny full browser-QA när lokal browser-runtime fungerar igen och kontrollera särskilt tooltipar, rotationsfartyg och källchippar i `In & Ut`-vyn.
@@ -282,9 +358,6 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 - Bygg ut `source_registry` från dokumenterad matris till körbar konfiguration om kommande skript ska styras route-för-route.
 - Planera dubbel bevakning för `Polsca` där både `Polferries` och `Unity Line` bevakas separat och sammanfogas först före visning.
 - Bygg eller hitta en riktig importkälla för Unity Line/POLSCA-datum så `Świnoujście ↔ Ystad` och `Świnoujście ↔ Trelleborg` inte behöver förlita sig på blandade schema-/fallbackkällor.
-- Lägg till officiellt verifierade men saknade rutter direkt i veckoschemat `farjor_data.json` eller i framtida statisk fallbackgenerering, med prioritet:
-  - TT-Line kompletta Sverigekopplade riktningar och Klaipėda-/Trelleborg-rutter
-  - Finnlines `Malmö ↔ Świnoujście` i framtida genereringskedja, inte bara manuellt i JSON
 - Återupptäck Viking Lines aktuella API eller lägg till en robust server-side fallback.
 - Överväg att slå ihop eller avveckla legacy-fälten `fartyg_datum` och `avgangar_datum` när full parity mot `avgangsinstanser` är verifierad.
 
@@ -313,11 +386,14 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 - [x] Frontend: `Ankomster till Sverige` baseras på verkligt ankomstdatum till svensk hamn.
 - [x] Lägg till Finnlines `Malmö ↔ Świnoujście` i datalagret.
 - [x] Lägg till saknade TT-Line-riktningar/rutter i datalagret med verifierad tidtabell för `Travemünde ↔ Trelleborg`, `Świnoujście ↔ Trelleborg` och `Klaipėda ↔ Trelleborg`.
+- [x] Lägg till aktiv-rutt-registry och kontroll som stoppar saknade aktiva rutter, nedlagda rutter och dubletter.
+- [x] Lägg till Bornholmslinjen, Øresundslinjen och Sundbusserne i datalagret/källrapporten.
 - [x] Projektstruktur: skapa/uppdatera `docs/`, `archive/`, `temp/`, `exports/`.
 - [ ] Kontrollera GitHub Actions efter att fler skrapare kopplats in.
 
 ## Historik
 
+- 2026-05-31 01:15 CEST: Aktiv-rutt-revision slutförd; `check_route_coverage.py` passerar med 65 aktiva publicerade Sverige-rutter, `Stena Line Grenaa/Grenå ↔ Halmstad` är borttagen som nedlagd, Molslinjen/Sundbusserne-linjerna är tillagda och källrapporten `docs/farjelinjer-kallor.md` är genererad.
 - 2026-05-26 07:59 CEST: TT-Line slutverifierades i GitHub Actions; commit `87b5e00` lade till smal TLS-fallback i `ttline_scraper.py`, körning `26434933146` hämtade 237 TT-Line-avgångar trots runnerns certifikatfel och workflowen skrev tillbaka ny data i auto-commit `ab0d639`.
 - 2026-05-22 06:12 CEST: Wagenborg togs bort helt ur publicerad JSON och framtida genereringskedja; samtidigt rättades fartygsvisningen så `M/S Eckerö` inte delas på snedstreck och DFDS `Klaipėda ↔ Karlshamn` använder den kortade fallbackrotationen `Luna Seaways / Optima Seaways / RH / NH / ND`.
 
