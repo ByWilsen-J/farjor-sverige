@@ -18,6 +18,8 @@ Sidan behåller den nya högerpanelen, rederifiltret och den gemensamma tabellvy
 
 Rederifiltret har nu ett standardval som visar alla publicerade rader utom `Bornholmslinjen`, `Øresundslinjen/Öresundslinjen` och `Sundbusserne`. Dessa kortlinjer finns fortfarande kvar i datan och kan visas genom att välja `Alla rederier (inkl. Bornholmslinjen, Öresundslinjen, Sundbusserne)`.
 
+Excel-exporten har två lägen: en detaljerad rapportexport och en enklare checklist-export som följer sidans kolumnordning, använder aktuellt datum/filter och lägger till kolumner för avbockning och anteckning.
+
 Automationen är nu uppdelad i faktisk driftmodell: timvis uppdatering för dynamiska datumkällor och daglig backfill för hela publiceringsfönstret. Kvarvarande större luckor gäller främst separat trafikbevakning från särskilda rederi-sidor, Viking Lines blockerade server-side-källa och full separering av `Polferries`/`Unity Line` under `Polsca`.
 
 TT-Lines dynamiska källa fungerar åter i GitHub Actions efter en smal transportfallback i [ttline_scraper.py](/Users/jane/Documents/Claude/Projects/Weblänksida/ttline_scraper.py): senaste manuella körningen `26434933146` på `2026-05-26` hämtade `237` TT-Line-avgångar trots att runnern fortfarande misslyckas med vanlig certifikatverifiering mot `www.ttline.com`.
@@ -29,6 +31,12 @@ TT-Lines tidigare fallbackluckor i grundschemat för `Travemünde ↔ Trelleborg
 Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: när officiell livekälla finns för en Stena-rutt på ett visst datum rensas motsvarande veckofallback bort från samma datum/rutt i `avgangsinstanser`.
 
 ## Senaste ändringar
+
+- 2026-05-31: Lade till ny Excel-preset för checklista.
+  - Uppdaterade [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) med en separat knapp `Exportera checklista` bredvid den detaljerade Excel-exporten.
+  - Checklistan exporterar nuvarande visade lista med datum, riktning, rederi, avgångs-/ankomsttid, hamnförkortningar, fartyg, överfart, avbockningsruta och anteckningskolumn.
+  - Den befintliga detaljerade exporten är kvar och bytt etikett till `Exportera detaljerad Excel`.
+  - Verifierat med JS-syntaxkontroll och lokal DOM-kontroll av exportknapparna.
 
 - 2026-05-31: Lade till standardfilter för kortlinjer i tabellvyn.
   - Uppdaterade [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) så rederidropdownen startar på `Visa alla utom: Bornholmslinjen, Öresundslinjen, Sundbusserne`.

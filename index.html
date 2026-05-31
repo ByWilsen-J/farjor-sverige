@@ -104,6 +104,7 @@
     .xl-knapp{width:100%;padding:10px 14px;border-radius:var(--r);border:1px solid var(--linje-stark);background:var(--vit);color:var(--text);font-size:.84rem;font-weight:500;cursor:pointer;white-space:nowrap;font-family:inherit;transition:background .15s,border-color .15s,color .15s,box-shadow .15s;letter-spacing:.005em}
     .xl-knapp:hover{background:var(--blå);color:var(--vit);border-color:var(--blå)}
     .xl-knapp:focus-visible{outline:none;box-shadow:0 0 0 3px var(--blå-ring)}
+    .xl-knapp + .xl-knapp{margin-top:8px}
 
     .apply-btn{width:100%;padding:11px 16px;border-radius:var(--r);border:1px solid var(--blå);background:var(--blå);color:var(--vit);font-size:.88rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s,box-shadow .15s;letter-spacing:.005em}
     .apply-btn:hover{background:var(--blå-ljus);border-color:var(--blå-ljus)}
@@ -365,7 +366,8 @@
       </div>
       <div class="sb-hdr">Export</div>
       <div class="sb-block">
-        <button class="xl-knapp" onclick="exportExcel()">&#8659; Exportera till Excel</button>
+        <button class="xl-knapp" onclick="exportExcel()">&#8659; Exportera detaljerad Excel</button>
+        <button class="xl-knapp" onclick="exportChecklistaExcel()">&#9745; Exportera checklista</button>
       </div>
     </div>
 
@@ -2435,7 +2437,7 @@ function riktningsText(rad){
   return '';
 }
 function exportExcel(){
-  if(typeof XLSX === 'undefined' || !XLSX?.utils || !XLSX?.writeFile){
+  if(!excelBibliotekRedo()){
     const msg = 'Excel-export kunde inte starta eftersom exportbiblioteket inte laddades. Ladda om sidan och prova igen.';
     console.error(msg);
     if(typeof window !== 'undefined' && typeof window.alert === 'function') window.alert(msg);
@@ -2537,6 +2539,122 @@ function exportExcel(){
 
   const rederiDel = rederiFilterFilnamnsdel(valtRederi);
   const filnamn = `farjor_${datum}_${viewMode}_${rederiDel}.xlsx`;
+  XLSX.writeFile(wb, filnamn);
+}
+
+function excelBibliotekRedo(){
+  return typeof XLSX !== 'undefined' && !!XLSX?.utils && typeof XLSX.writeFile === 'function';
+}
+
+function checklistTid(tid, dag){
+  const t = String(tid || '').trim();
+  const d = String(dag || '').trim();
+  if(!t && !d) return '';
+  return d ? `${t}\n${d}` : t;
+}
+
+function exportChecklistaExcel(){
+  if(!excelBibliotekRedo()){
+    const msg = 'Excel-export kunde inte starta eftersom exportbiblioteket inte laddades. Ladda om sidan och prova igen.';
+    console.error(msg);
+    if(typeof window !== 'undefined' && typeof window.alert === 'function') window.alert(msg);
+    return;
+  }
+
+  const datum = dStr(valdDat);
+  const vyTxt = VIEW_LABELS[viewMode] || 'Lista';
+  const vdagTxt = VDL[valdDat.getDay()];
+  const rederiTxt = rederiFilterLabel(valtRederi);
+  const statusTxt = visaEndastKommande ? 'Bara kommande' : 'Alla turer';
+  const titel = `Färjor Sverige — checklista`;
+  const subtitel = `${vyTxt} · ${vdagTxt} ${datum} · Filter: ${rederiTxt} · Status: ${statusTxt} · Antal: ${visadeRader.length}`;
+
+  const huvud = [
+    'KLAR','DATUM','RIKTNING','REDERI','AVG TID','ANK TID',
+    'AVG.HAMN','-','ANK.HAMN','FARTYG','ÖVERFART','ANTECKNING'
+  ];
+  const rader = visadeRader.map(r=>[
+    '☐',
+    datum,
+    riktningsText(r),
+    r.rederi,
+    checklistTid(r.avgtid, r.avVdag),
+    checklistTid(r.anktid, r.ankVdag),
+    hamnKod(r.avghamn),
+    '→',
+    hamnKod(r.ankhamn),
+    r.fartyg || '',
+    r.överfart || '',
+    ''
+  ]);
+
+  const aoa = [
+    [titel],
+    [subtitel],
+    [],
+    huvud,
+    ...rader
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [
+    {wch:7},   // KLAR
+    {wch:12},  // DATUM
+    {wch:14},  // RIKTNING
+    {wch:20},  // REDERI
+    {wch:10},  // AVG TID
+    {wch:10},  // ANK TID
+    {wch:10},  // AVG.HAMN
+    {wch:4},   // pil
+    {wch:10},  // ANK.HAMN
+    {wch:24},  // FARTYG
+    {wch:12},  // ÖVERFART
+    {wch:28},  // ANTECKNING
+  ];
+
+  const sista = huvud.length - 1;
+  ws['!merges'] = [
+    { s:{r:0,c:0}, e:{r:0,c:sista} },
+    { s:{r:1,c:0}, e:{r:1,c:sista} }
+  ];
+  ws['!freeze'] = { xSplit:0, ySplit:4 };
+  ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s:{r:3,c:0}, e:{r:3+rader.length,c:sista} }) };
+  ws['!rows'] = ws['!rows'] || [];
+  ws['!rows'][0] = { hpt: 22 };
+  ws['!rows'][1] = { hpt: 18 };
+  ws['!rows'][3] = { hpt: 22 };
+  for(let i=4; i<4+rader.length; i++) ws['!rows'][i] = { hpt: 30 };
+
+  if(ws['A1']) ws['A1'].s = { font:{bold:true,sz:14}, alignment:{horizontal:'left'} };
+  if(ws['A2']) ws['A2'].s = { font:{italic:true,sz:11,color:{rgb:'334155'}}, alignment:{horizontal:'left'} };
+  for(let c=0; c<=sista; c++){
+    const cellRef = XLSX.utils.encode_cell({r:3,c});
+    if(ws[cellRef]) ws[cellRef].s = {
+      font:{bold:true,color:{rgb:'FFFFFF'}},
+      fill:{patternType:'solid',fgColor:{rgb:'1E3A5F'}},
+      alignment:{horizontal:'left',vertical:'center',wrapText:false}
+    };
+  }
+  for(let r=4; r<4+rader.length; r++){
+    for(let c=0; c<=sista; c++){
+      const cellRef = XLSX.utils.encode_cell({r,c});
+      if(!ws[cellRef]) continue;
+      ws[cellRef].s = {
+        alignment:{vertical:'center',wrapText:true},
+        border:{
+          top:{style:'thin',color:{rgb:'CBD5E1'}},
+          bottom:{style:'thin',color:{rgb:'CBD5E1'}},
+          left:{style:'thin',color:{rgb:'E2E8F0'}},
+          right:{style:'thin',color:{rgb:'E2E8F0'}},
+        }
+      };
+    }
+  }
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Checklista');
+
+  const rederiDel = rederiFilterFilnamnsdel(valtRederi);
+  const filnamn = `farjor_${datum}_${viewMode}_${rederiDel}_checklista.xlsx`;
   XLSX.writeFile(wb, filnamn);
 }
 
