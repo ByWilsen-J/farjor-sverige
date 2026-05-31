@@ -361,7 +361,7 @@
       <div class="sb-apply">
         <label class="sb-label">Uppdatera visning</label>
         <button class="apply-btn" id="apply-controls">Visa vald lista</button>
-        <div class="sb-pending" id="pending-info">Avgångar mot Sverige för dagens datum visas som standard.</div>
+        <div class="sb-pending" id="pending-info">Avgångar mot Sverige för dagens datum visas som standard, utan Bornholmslinjen, Öresundslinjen och Sundbusserne.</div>
       </div>
       <div class="sb-hdr">Export</div>
       <div class="sb-block">
@@ -568,6 +568,13 @@ const KANDA_FARTYG = [
   'Express 1','Express 5','Tycho Brahe','Aurora','Hamlet','Pernille','Jeppe','Color Hybrid',
 ];
 const UTESLUT = new Set(['Wallenius SOL','SCA Logistics']);
+const REDERI_FILTER_UTAN_KORTLINJER = 'alla_utom_kortlinjer';
+const REDERI_FILTER_ALLA = 'alla';
+const DOLDA_STANDARDREDERIER = new Set(['Bornholmslinjen','Øresundslinjen','Öresundslinjen','Sundbusserne']);
+const REDERI_FILTER_LABELS = {
+  [REDERI_FILTER_UTAN_KORTLINJER]: 'Visa alla utom: Bornholmslinjen, Öresundslinjen, Sundbusserne',
+  [REDERI_FILTER_ALLA]: 'Alla rederier (inkl. Bornholmslinjen, Öresundslinjen, Sundbusserne)',
+};
 const SVENSKA_HAMNAR = new Set([
   'Stockholm','Nynäshamn','Kapellskär','Grisslehamn',
   'Göteborg','Trelleborg','Ystad','Malmö','Helsingborg','Strömstad',
@@ -706,10 +713,10 @@ let DATA = null;
 let valdDat = new Date();
 let valdVd  = '';
 let viewMode = 'mot'; // 'alla' | 'mot' | 'ankomst' | 'fran'
-let valtRederi = 'alla';
+let valtRederi = REDERI_FILTER_UTAN_KORTLINJER;
 let pendingViewMode = 'mot';
 let pendingDateStr = '';
-let pendingRederi = 'alla';
+let pendingRederi = REDERI_FILTER_UTAN_KORTLINJER;
 let visaEndastKommande = false;
 let visadeRader = [];  // för Excel-export
 let DYNAMIC_ROUTE_FLEETS = {};
@@ -1979,8 +1986,8 @@ async function init(){
   valdVd = VD[nu.getDay()];
   pendingDateStr = dStr(nu);
   pendingViewMode = 'mot';
-  pendingRederi = 'alla';
-  valtRederi = 'alla';
+  pendingRederi = REDERI_FILTER_UTAN_KORTLINJER;
+  valtRederi = REDERI_FILTER_UTAN_KORTLINJER;
   sättDatum(nu);
   synkaVyKnappar();
   uppdateraPendingInfo();
@@ -1992,7 +1999,7 @@ async function init(){
     uppdateraPendingInfo();
   });
   document.getElementById('rederi-filter').addEventListener('change', e=>{
-    pendingRederi = e.target.value || 'alla';
+    pendingRederi = e.target.value || REDERI_FILTER_UTAN_KORTLINJER;
     uppdateraPendingInfo();
   });
   document.getElementById('show-all-btn').addEventListener('click', ()=>sättKommandeFilter(false));
@@ -2044,23 +2051,41 @@ function sättKommandeFilter(endastKommande){
 }
 function uppdateraPendingInfo(){
   const d = parseDate(pendingDateStr || dStr(valdDat));
-  const rederiTxt = pendingRederi === 'alla' ? 'alla rederier' : pendingRederi;
+  const rederiTxt = rederiFilterLabel(pendingRederi).toLowerCase();
   document.getElementById('pending-info').textContent = `${VIEW_LABELS[pendingViewMode]} · ${fmtDat(d)} · ${rederiTxt}`;
   synkaVyKnappar();
+}
+
+function ärStandarddoltRederi(rederi){
+  return DOLDA_STANDARDREDERIER.has(normRederi(rederi || ''));
+}
+
+function rederiFilterLabel(värde){
+  return REDERI_FILTER_LABELS[värde] || värde || REDERI_FILTER_LABELS[REDERI_FILTER_UTAN_KORTLINJER];
+}
+
+function rederiFilterFilnamnsdel(värde){
+  if(värde === REDERI_FILTER_ALLA) return 'alla';
+  if(värde === REDERI_FILTER_UTAN_KORTLINJER) return 'alla_utom_kortlinjer';
+  return String(värde || 'rederi').toLowerCase().replace(/[^a-z0-9åäöéè]+/gi,'_');
 }
 
 function uppdateraRederiFilter(rader){
   const sel = document.getElementById('rederi-filter');
   const rederier = [...new Set(rader.map(r=>r.rederi).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'sv'));
-  const options = [{value:'alla',label:'Alla rederier'}].concat(rederier.map(r=>({value:r,label:r})));
+  const options = [
+    {value:REDERI_FILTER_UTAN_KORTLINJER,label:REDERI_FILTER_LABELS[REDERI_FILTER_UTAN_KORTLINJER]},
+    {value:REDERI_FILTER_ALLA,label:REDERI_FILTER_LABELS[REDERI_FILTER_ALLA]},
+  ].concat(rederier.map(r=>({value:r,label:r})));
   sel.innerHTML = options.map(o=>`<option value="${esc(o.value)}">${esc(o.label)}</option>`).join('');
-  if(!options.some(o=>o.value===pendingRederi)) pendingRederi = 'alla';
-  if(!options.some(o=>o.value===valtRederi)) valtRederi = 'alla';
+  if(!options.some(o=>o.value===pendingRederi)) pendingRederi = REDERI_FILTER_UTAN_KORTLINJER;
+  if(!options.some(o=>o.value===valtRederi)) valtRederi = REDERI_FILTER_UTAN_KORTLINJER;
   sel.value = pendingRederi;
 }
 
 function filtreraPåRederi(rader){
-  if(valtRederi === 'alla') return rader.slice();
+  if(valtRederi === REDERI_FILTER_ALLA) return rader.slice();
+  if(valtRederi === REDERI_FILTER_UTAN_KORTLINJER) return rader.filter(r=>!ärStandarddoltRederi(r.rederi));
   return rader.filter(r=>r.rederi === valtRederi);
 }
 function filtreraPåAktualitet(rader){
@@ -2420,7 +2445,7 @@ function exportExcel(){
   const datum = dStr(valdDat);
   const vyTxt = VIEW_LABELS[viewMode] || 'Lista';
   const vdagTxt = VDL[valdDat.getDay()];
-  const rederiTxt = valtRederi === 'alla' ? 'Alla rederier' : valtRederi;
+  const rederiTxt = rederiFilterLabel(valtRederi);
   const statusTxt = visaEndastKommande ? 'Bara kommande' : 'Alla turer';
   const uppdaterad = DATA?.meta?.uppdaterad || '';
 
@@ -2510,7 +2535,7 @@ function exportExcel(){
   const bladnamn = vyTxt.replace(/[:\\/?*\[\]]/g,'').slice(0,31);
   XLSX.utils.book_append_sheet(wb, ws, bladnamn);
 
-  const rederiDel = valtRederi === 'alla' ? 'alla' : valtRederi.toLowerCase().replace(/[^a-z0-9åäöéè]+/gi,'_');
+  const rederiDel = rederiFilterFilnamnsdel(valtRederi);
   const filnamn = `farjor_${datum}_${viewMode}_${rederiDel}.xlsx`;
   XLSX.writeFile(wb, filnamn);
 }

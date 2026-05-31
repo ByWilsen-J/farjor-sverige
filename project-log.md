@@ -16,6 +16,8 @@ Stena Line `Grenaa/Grenå ↔ Halmstad` är rättad till nedlagd och ska inte pu
 
 Sidan behåller den nya högerpanelen, rederifiltret och den gemensamma tabellvyn, men visar nu också källchippar för live-/datumrader. Dynamiska källor kan bära med sig källmeta och statuskommentarer ända fram till info-rutan per avgång. `farjor.html` är fortsatt redirect till startsidan.
 
+Rederifiltret har nu ett standardval som visar alla publicerade rader utom `Bornholmslinjen`, `Øresundslinjen/Öresundslinjen` och `Sundbusserne`. Dessa kortlinjer finns fortfarande kvar i datan och kan visas genom att välja `Alla rederier (inkl. Bornholmslinjen, Öresundslinjen, Sundbusserne)`.
+
 Automationen är nu uppdelad i faktisk driftmodell: timvis uppdatering för dynamiska datumkällor och daglig backfill för hela publiceringsfönstret. Kvarvarande större luckor gäller främst separat trafikbevakning från särskilda rederi-sidor, Viking Lines blockerade server-side-källa och full separering av `Polferries`/`Unity Line` under `Polsca`.
 
 TT-Lines dynamiska källa fungerar åter i GitHub Actions efter en smal transportfallback i [ttline_scraper.py](/Users/jane/Documents/Claude/Projects/Weblänksida/ttline_scraper.py): senaste manuella körningen `26434933146` på `2026-05-26` hämtade `237` TT-Line-avgångar trots att runnern fortfarande misslyckas med vanlig certifikatverifiering mot `www.ttline.com`.
@@ -27,6 +29,12 @@ TT-Lines tidigare fallbackluckor i grundschemat för `Travemünde ↔ Trelleborg
 Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: när officiell livekälla finns för en Stena-rutt på ett visst datum rensas motsvarande veckofallback bort från samma datum/rutt i `avgangsinstanser`.
 
 ## Senaste ändringar
+
+- 2026-05-31: Lade till standardfilter för kortlinjer i tabellvyn.
+  - Uppdaterade [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) så rederidropdownen startar på `Visa alla utom: Bornholmslinjen, Öresundslinjen, Sundbusserne`.
+  - `Alla rederier` betyder nu uttryckligen att dessa tre kortlinjer inkluderas igen.
+  - Exportens filtertext och filnamn speglar det valda rederifiltret.
+  - Lokal verifiering visade att standardvyn för dagens `Mot Sverige` döljer kortlinjerna (`44` rader) och att `Alla rederier` visar dem igen (`85` rader).
 
 - 2026-05-31: Slutförde aktiv-rutt- och fartygsrevision med en primärkälla per rutt.
   - Lade till [route_registry.py](/Users/jane/Documents/Claude/Projects/Weblänksida/route_registry.py) som central registry för aktiva rutter, nedlagda rutter och dubblettregler.
