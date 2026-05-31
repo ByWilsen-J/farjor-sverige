@@ -34,7 +34,7 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
   - Uppdaterade [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) så rederidropdownen startar på `Visa alla utom: Bornholmslinjen, Öresundslinjen, Sundbusserne`.
   - `Alla rederier` betyder nu uttryckligen att dessa tre kortlinjer inkluderas igen.
   - Exportens filtertext och filnamn speglar det valda rederifiltret.
-  - Lokal verifiering visade att standardvyn för dagens `Mot Sverige` döljer kortlinjerna (`44` rader) och att `Alla rederier` visar dem igen (`85` rader).
+  - Lokal verifiering visade att standardvyn för dagens `Mot Sverige` har `0` synliga rader från kortlinjerna och att `Alla rederier` visar dem igen.
 
 - 2026-05-31: Slutförde aktiv-rutt- och fartygsrevision med en primärkälla per rutt.
   - Lade till [route_registry.py](/Users/jane/Documents/Claude/Projects/Weblänksida/route_registry.py) som central registry för aktiva rutter, nedlagda rutter och dubblettregler.
