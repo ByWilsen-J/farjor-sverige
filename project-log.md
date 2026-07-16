@@ -32,6 +32,13 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Senaste ändringar
 
+- 2026-07-16: Rättade regressionsfel efter Polferries Gdańsk-Karlshamn-ändringen.
+  - Orsak: lokal körning av [update_fartyg.py](/Users/jane/Documents/Claude/Projects/Weblänksida/update_fartyg.py) skedde när TT-Line livekällan gav timeout/403, vilket gjorde att publicerad [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json) föll tillbaka till TT-veckoscheman utan fartygsnamn.
+  - Åtgärd: återställde TT-Lines senaste fungerande dynamiska fartygsrader från föregående auto-data och lade in verifierade TT-ruttrotationer i både frontend och veckofallback så reservscheman inte blir namnblanka.
+  - Lade till [polferries_scraper.py](/Users/jane/Documents/Claude/Projects/Weblänksida/polferries_scraper.py) som hämtar Polferries officiella datumtabell för `Ystad ↔ Świnoujście`; den rutten använder nu `date_table` som primärkälla i [route_registry.py](/Users/jane/Documents/Claude/Projects/Weblänksida/route_registry.py).
+  - Resultat: `Ystad ↔ Świnoujście` ersätts av `719` exakta datumrader med fartygsnamn från Polferries-tabellen, och den gamla felaktiga `22:55`-dubbletten på `Świnoujście -> Ystad` finns inte längre.
+  - Verifiering: [check_route_coverage.py](/Users/jane/Documents/Claude/Projects/Weblänksida/check_route_coverage.py) passerar med `67/67` aktiva rutter, TT-Line har `0` namnblanka rutter i tabellunderlaget, och Polferries/POLSCA har `0` exakta/nära dubbletter i kontrollen.
+
 - 2026-07-16: Lade till ny Polferries/POLSCA-linje `Gdańsk ↔ Karlshamn`.
   - Verifierade linjen mot Polferries officiella tidtabell `code=gh` och använde den publicerade datumtabellen som kanonisk källa för avgångsdatum, tider och fartyg.
   - Unity Line/POLSCA-sidan användes som stöd för giltighetsperioden `2026-07-06` till `2026-08-16`.

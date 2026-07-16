@@ -52,6 +52,18 @@ TTLINE_ROUTE_VALIDITY = {
     ("Karlshamn", "Travemünde"): ("2026-07-06", "2026-08-16"),
 }
 
+TTLINE_ROUTE_FLEETS = {
+    ("Travemünde", "Trelleborg"): "Nils Holgersson / Nils Dacke / Peter Pan / Tom Sawyer / Tinker Bell / Huckleberry Finn / Robin Hood / Marco Polo",
+    ("Trelleborg", "Travemünde"): "Nils Holgersson / Nils Dacke / Peter Pan / Tom Sawyer / Tinker Bell / Huckleberry Finn / Robin Hood / Marco Polo",
+    ("Rostock", "Trelleborg"): "Huckleberry Finn / Peter Pan / Tom Sawyer / Tinker Bell / Nils Holgersson / Robin Hood / Nils Dacke / Marco Polo",
+    ("Trelleborg", "Rostock"): "Huckleberry Finn / Peter Pan / Tom Sawyer / Tinker Bell / Nils Holgersson / Robin Hood / Nils Dacke / Marco Polo",
+    ("Świnoujście", "Trelleborg"): "Tinker Bell / Tom Sawyer / Peter Pan / Huckleberry Finn / Robin Hood / Nils Dacke / Nils Holgersson",
+    ("Trelleborg", "Świnoujście"): "Tinker Bell / Tom Sawyer / Peter Pan / Huckleberry Finn / Robin Hood / Nils Dacke / Nils Holgersson",
+    ("Travemünde", "Karlshamn"): "Nils Dacke / Nils Holgersson / Robin Hood",
+    ("Karlshamn", "Travemünde"): "Nils Dacke / Nils Holgersson / Robin Hood",
+    ("Rostock", "Karlshamn"): "Nils Dacke / Nils Holgersson / Robin Hood",
+}
+
 TTLINE_ROUTE_TIMETABLES = {
     ("Trelleborg", "Travemünde"): {
         "Mån": [("16:00", "00:45+1"), ("22:00", "07:30+1")],
@@ -356,6 +368,7 @@ def _build_ttline_rows() -> list[dict]:
         source_url = TTLINE_ROUTE_SOURCES[(avghamn, ankhamn)]
         validity = TTLINE_ROUTE_VALIDITY.get((avghamn, ankhamn), ("", ""))
         source_detail = "TT-Line Summer Timetable 2026 Karlshamn Routes" if validity[0] else ""
+        fleet = TTLINE_ROUTE_FLEETS.get((avghamn, ankhamn), "")
         for veckodag, sailings in weekday_map.items():
             for avgtid, anktid in sailings:
                 rows.append(_make_row(
@@ -367,6 +380,7 @@ def _build_ttline_rows() -> list[dict]:
                     anktid,
                     source_url,
                     TTLINE_STANDARD_NOTE,
+                    fartyg=fleet,
                     giltig_from=validity[0],
                     giltig_to=validity[1],
                     source_detail=source_detail,
@@ -488,12 +502,26 @@ def _build_sundbusserne_rows() -> list[dict]:
     return rows
 
 
+def _is_removed_legacy_schema_row(row: dict) -> bool:
+    rederi = normalize_operator(row.get("rederi"))
+    avghamn = str(row.get("avghamn") or "").strip()
+    ankhamn = str(row.get("ankhamn") or "").strip()
+    avgtid = str(row.get("avgtid_raw") or row.get("avgtid") or "").strip()
+    return (
+        rederi == "Polferries (POLSCA)"
+        and avghamn == "Świnoujście"
+        and ankhamn == "Ystad"
+        and avgtid == "22:55"
+    )
+
+
 def apply_verified_schema_overrides(schema: list[dict]) -> list[dict]:
     route_keys = override_route_keys()
     preserved = [
         deepcopy(row)
         for row in schema
-        if (row.get("rederi"), row.get("avghamn"), row.get("ankhamn")) not in route_keys
+        if not _is_removed_legacy_schema_row(row)
+        and (row.get("rederi"), row.get("avghamn"), row.get("ankhamn")) not in route_keys
         and (normalize_operator(row.get("rederi")), row.get("avghamn"), row.get("ankhamn")) not in DISCONTINUED_BY_ROUTE
         and (normalize_operator(row.get("rederi")), row.get("avghamn"), row.get("ankhamn")) not in SUPPRESSED_BY_ROUTE
     ]

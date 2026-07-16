@@ -28,6 +28,7 @@ import finnlines_scraper    as finn
 import stena_line_scraper   as stena
 import ttline_scraper       as ttline
 import molslinjen_scraper   as molslinjen
+import polferries_scraper   as polferries
 from route_registry import filter_instances_to_primary_sources
 from schedule_instances import build_base_instances, merge_dynamic_sailings, parse_time_minutes, public_window
 
@@ -546,6 +547,11 @@ def main():
     log.info("=== TT-Line ===")
     ttline_sailings = ttline.fetch_all(dynamic_start, dynamic_end)
     lägg_till(ttline_sailings)
+
+    # ── Polferries / POLSCA ──
+    log.info("=== Polferries (POLSCA) ===")
+    polferries_sailings = polferries.fetch_all()
+    lägg_till(polferries_sailings)
 
     # ── Bornholmslinjen / Øresundslinjen ──
     log.info("=== Molslinjen family ===")

@@ -69,6 +69,11 @@ FINNLINES_API = ("dynamic_schedule", "Finnlines GraphQL timetable API", "https:/
 STENA_API = ("dynamic_schedule", "Stena Freight LiveView", "https://stenalinefreight.com/timetable/")
 TTLINE_API = ("dynamic_schedule", "TT-Line timetable endpoint", "https://www.ttline.com/en/timetables/")
 POLSCA_WEEKLY = ("weekly_schedule", None, "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html")
+POLSCA_YS_TIMETABLE = (
+    "date_table",
+    "Polferries Świnoujście-Ystad timetable",
+    "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ys",
+)
 POLSCA_GDANSK_KARLSHAMN = (
     "weekly_schedule",
     "Polferries Gdańsk-Karlshamn timetable",
@@ -140,7 +145,7 @@ ACTIVE_ROUTES: tuple[RouteSource, ...] = (
     ),
 
     # Polferries / POLSCA
-    *two_way("Polferries (POLSCA)", "Świnoujście", "Ystad", POLSCA_WEEKLY),
+    *two_way("Polferries (POLSCA)", "Świnoujście", "Ystad", POLSCA_YS_TIMETABLE),
     *two_way("Polferries (POLSCA)", "Świnoujście", "Trelleborg", POLSCA_WEEKLY),
     *two_way("Polferries (POLSCA)", "Gdańsk", "Nynäshamn", POLSCA_WEEKLY),
     *two_way("Polferries (POLSCA)", "Gdańsk", "Karlshamn", POLSCA_GDANSK_KARLSHAMN),
