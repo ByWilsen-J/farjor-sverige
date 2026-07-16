@@ -101,7 +101,7 @@ def fetch_route(route: dict) -> list[dict]:
             BASE_URL,
             params={"language": "da", "line": line, "routeId": route_id},
             headers=headers_for(line),
-            timeout=30,
+            timeout=(10, 20),
         )
         response.raise_for_status()
         payload = response.json()

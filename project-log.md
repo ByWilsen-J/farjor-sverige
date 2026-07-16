@@ -10,7 +10,7 @@ Tallinks Tallinn–Stockholm-rutt är nu åter inkopplad i kodbasen för den dyn
 
 Stena Line `Nynäshamn ↔ Ventspils` är nu återlagd både som verifierad veckofallback och som dynamisk live-rutt i Stena-kedjan. Rutten finns därmed i hela publiceringsfönstret i `avgangsinstanser`, inte bara när livefönstret råkar täcka den.
 
-Större ankomstrevision 2026-05-31 är genomförd med [route_registry.py](/Users/jane/Documents/Claude/Projects/Weblänksida/route_registry.py) som körbar källa för aktiva rutter, borttagna rutter och dubblettregler. Kontrollskriptet [check_route_coverage.py](/Users/jane/Documents/Claude/Projects/Weblänksida/check_route_coverage.py) passerar med `65` aktiva publicerade Sverige-rutter i `farjor_data.json`.
+Större ankomstrevision 2026-05-31 är genomförd med [route_registry.py](/Users/jane/Documents/Claude/Projects/Weblänksida/route_registry.py) som körbar källa för aktiva rutter, borttagna rutter och dubblettregler. Kontrollskriptet [check_route_coverage.py](/Users/jane/Documents/Claude/Projects/Weblänksida/check_route_coverage.py) passerar per 2026-07-16 med `67` aktiva publicerade Sverige-rutter i `farjor_data.json`.
 
 Stena Line `Grenaa/Grenå ↔ Halmstad` är rättad till nedlagd och ska inte publiceras. `TT-Line Klaipėda ↔ Karlshamn/Trelleborg` och `Tallink Paldiski ↔ Kapellskär` hålls borta som separata sekundärkällor när samma trafik har en utsedd primärkälla (`DFDS`). Kortlinjerna `Bornholmslinjen Ystad ↔ Rønne`, `Øresundslinjen Helsingør ↔ Helsingborg` och `Sundbusserne Helsingborg ↔ Helsingør` är nu med i data/källrapport; `Color Line Strömstad ↔ Sandefjord` finns fortfarande bara som länkvisare tills exakt datumimport är säker.
 
@@ -20,7 +20,7 @@ Rederifiltret har nu ett standardval som visar alla publicerade rader utom `Born
 
 Excel-exporten har två lägen: en detaljerad rapportexport och en enklare checklist-export som följer sidans kolumnordning, använder aktuellt datum/filter och lägger till kolumner för avbockning och anteckning.
 
-Automationen är nu uppdelad i faktisk driftmodell: timvis uppdatering för dynamiska datumkällor och daglig backfill för hela publiceringsfönstret. Kvarvarande större luckor gäller främst separat trafikbevakning från särskilda rederi-sidor, Viking Lines blockerade server-side-källa och full separering av `Polferries`/`Unity Line` under `Polsca`.
+Automationen är nu uppdelad i faktisk driftmodell: timvis uppdatering för dynamiska datumkällor och daglig backfill för hela publiceringsfönstret. Kvarvarande större bevakningspunkter gäller främst separat trafikbevakning från särskilda rederi-sidor, Viking Lines blockerade server-side-källa, `Color Line Strömstad ↔ Sandefjord` som ännu bara är länkvisare och TT-Lines livekälla som ibland nekar/timeoutar i lokal miljö. När en primär livekälla saknas helt för en körning får verifierad reservkälla ligga kvar, men kontrollskriptet varnar om det.
 
 TT-Lines dynamiska källa fungerar åter i GitHub Actions efter en smal transportfallback i [ttline_scraper.py](/Users/jane/Documents/Claude/Projects/Weblänksida/ttline_scraper.py): senaste manuella körningen `26434933146` på `2026-05-26` hämtade `237` TT-Line-avgångar trots att runnern fortfarande misslyckas med vanlig certifikatverifiering mot `www.ttline.com`.
 
@@ -31,6 +31,15 @@ TT-Lines tidigare fallbackluckor i grundschemat för `Travemünde ↔ Trelleborg
 Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: när officiell livekälla finns för en Stena-rutt på ett visst datum rensas motsvarande veckofallback bort från samma datum/rutt i `avgangsinstanser`.
 
 ## Senaste ändringar
+
+- 2026-07-16: Lade till ny Polferries/POLSCA-linje `Gdańsk ↔ Karlshamn`.
+  - Verifierade linjen mot Polferries officiella tidtabell `code=gh` och använde den publicerade datumtabellen som kanonisk källa för avgångsdatum, tider och fartyg.
+  - Unity Line/POLSCA-sidan användes som stöd för giltighetsperioden `2026-07-06` till `2026-08-16`.
+  - Lade in `69` exakta datumrader i [verified_schema_overrides.py](/Users/jane/Documents/Claude/Projects/Weblänksida/verified_schema_overrides.py): `35` avgångar `Gdańsk -> Karlshamn` och `34` avgångar `Karlshamn -> Gdańsk`, med fartygen `Copernicus` och `Skania`.
+  - Uppdaterade [route_registry.py](/Users/jane/Documents/Claude/Projects/Weblänksida/route_registry.py), [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html), [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json) och [docs/farjelinjer-kallor.md](/Users/jane/Documents/Claude/Projects/Weblänksida/docs/farjelinjer-kallor.md).
+  - Hårdnade primär-/reservkällereglerna så verifierad fallback behålls när en utsedd livekälla saknas helt i en körning; annars kan en tillfällig API-timeout radera aktiva rutter.
+  - Lokal körning 2026-07-16: TT-Line livekälla timeoutade vid tokenhämtning, men verifierade TT-reservscheman låg kvar och [check_route_coverage.py](/Users/jane/Documents/Claude/Projects/Weblänksida/check_route_coverage.py) passerade med varningar i stället för att sakna rutter.
+  - Verifierat med `generera_json.py`, `update_fartyg.py 2026-07-16`, `check_route_coverage.py`, Python `py_compile`, JavaScript `node --check` och regenererad källrapport.
 
 - 2026-05-31: Lade till ny Excel-preset för checklista.
   - Uppdaterade [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) med en separat knapp `Exportera checklista` bredvid den detaljerade Excel-exporten.

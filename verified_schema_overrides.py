@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from datetime import date
 
 from route_registry import DISCONTINUED_BY_ROUTE, SUPPRESSED_BY_ROUTE, normalize_operator
 
@@ -25,6 +26,12 @@ POLSCA_TRELLEBORG_NOTE = (
     "Rader med Epsilon/Jantar följer tabellens jämn/udda vecka-markering."
 )
 
+POLSCA_GDANSK_KARLSHAMN_NOTE = (
+    "Verifierat 2026-07-16 mot Polferries officiella tidtabell för Gdańsk–Karlshamn "
+    "med publicerade avgångsdatum i juli/augusti 2026. Unity Line/POLSCA anger samma "
+    "linje som giltig 2026-07-06 till 2026-08-16."
+)
+
 SUNDBUSSERNE_NOTE = (
     "Verifierat 2026-05-31 mot Sundbussernes officiella sejlplan-bild "
     "gällande från 2026-03-20. Restiden anges till cirka 18 minuter."
@@ -35,7 +42,14 @@ TTLINE_ROUTE_SOURCES = {
     ("Travemünde", "Trelleborg"): "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_tra.pdf",
     ("Trelleborg", "Świnoujście"): "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_swi.pdf",
     ("Świnoujście", "Trelleborg"): "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_swi.pdf",
+    ("Travemünde", "Karlshamn"): "https://www.ttline.com/globalassets/pdf/standard-timetable-2026_karcon3.pdf",
+    ("Karlshamn", "Travemünde"): "https://www.ttline.com/globalassets/pdf/standard-timetable-2026_karcon3.pdf",
     ("Rostock", "Karlshamn"): "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026-karcon.pdf",
+}
+
+TTLINE_ROUTE_VALIDITY = {
+    ("Travemünde", "Karlshamn"): ("2026-07-06", "2026-08-16"),
+    ("Karlshamn", "Travemünde"): ("2026-07-06", "2026-08-16"),
 }
 
 TTLINE_ROUTE_TIMETABLES = {
@@ -74,6 +88,14 @@ TTLINE_ROUTE_TIMETABLES = {
         "Fre": [("06:30", "14:00"), ("15:00", "22:15")],
         "Lör": [("00:30", "07:45")],
         "Sön": [("00:30", "07:30"), ("16:00", "22:00")],
+    },
+    ("Travemünde", "Karlshamn"): {
+        "Ons": [("02:20", "19:30")],
+        "Fre": [("21:05", "21:30+1")],
+    },
+    ("Karlshamn", "Travemünde"): {
+        "Ons": [("08:25", "00:45+1")],
+        "Sön": [("07:55", "01:00+1")],
     },
     ("Rostock", "Karlshamn"): {
         "Fre": [("23:45", "17:30+1")],
@@ -135,6 +157,7 @@ FINNLINES_ROUTE_TIMETABLES = {
 POLSCA_TRELLEBORG_SOURCE = "https://polagent.com/en/sailing-schedule/"
 POLSCA_TRELLEBORG_VALID_FROM = "2026-05-04"
 POLSCA_TRELLEBORG_VALID_TO = "2026-06-20"
+POLSCA_GDANSK_KARLSHAMN_SOURCE = "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gh"
 SUNDBUSSERNE_SOURCE = "https://sundbusserne.dk/fartplan/"
 
 POLSCA_TRELLEBORG_ROWS = [
@@ -172,6 +195,78 @@ POLSCA_TRELLEBORG_ROWS = [
     ("Sön", "Jantar Unity", "odd", "20:30", "03:00+1", "", ""),
 ]
 
+POLSCA_GDANSK_KARLSHAMN_ROWS = [
+    ("2026-07-06", "Gdańsk", "Karlshamn", "21:00", "11:30+1", "Copernicus"),
+    ("2026-07-08", "Gdańsk", "Karlshamn", "21:00", "11:30+1", "Skania"),
+    ("2026-07-08", "Karlshamn", "Gdańsk", "18:00", "08:00+1", "Copernicus"),
+    ("2026-07-09", "Karlshamn", "Gdańsk", "17:00", "08:00+1", "Skania"),
+    ("2026-07-10", "Gdańsk", "Karlshamn", "07:30", "20:00", "Copernicus"),
+    ("2026-07-10", "Gdańsk", "Karlshamn", "21:00", "11:30+1", "Skania"),
+    ("2026-07-10", "Karlshamn", "Gdańsk", "22:00", "10:30+1", "Copernicus"),
+    ("2026-07-12", "Gdańsk", "Karlshamn", "21:00", "10:30+1", "Copernicus"),
+    ("2026-07-12", "Karlshamn", "Gdańsk", "17:30", "08:00+1", "Skania"),
+    ("2026-07-13", "Gdańsk", "Karlshamn", "21:00", "11:30+1", "Skania"),
+    ("2026-07-13", "Karlshamn", "Gdańsk", "18:00", "08:00+1", "Copernicus"),
+    ("2026-07-14", "Gdańsk", "Karlshamn", "21:00", "10:30+1", "Copernicus"),
+    ("2026-07-14", "Karlshamn", "Gdańsk", "17:00", "08:00+1", "Skania"),
+    ("2026-07-15", "Gdańsk", "Karlshamn", "21:00", "11:30+1", "Skania"),
+    ("2026-07-15", "Karlshamn", "Gdańsk", "18:00", "08:00+1", "Copernicus"),
+    ("2026-07-16", "Karlshamn", "Gdańsk", "17:00", "08:00+1", "Skania"),
+    ("2026-07-17", "Gdańsk", "Karlshamn", "07:30", "20:00", "Copernicus"),
+    ("2026-07-17", "Gdańsk", "Karlshamn", "21:00", "11:30+1", "Skania"),
+    ("2026-07-17", "Karlshamn", "Gdańsk", "22:00", "10:30+1", "Copernicus"),
+    ("2026-07-19", "Gdańsk", "Karlshamn", "21:00", "10:30+1", "Copernicus"),
+    ("2026-07-19", "Karlshamn", "Gdańsk", "17:30", "08:00+1", "Skania"),
+    ("2026-07-20", "Gdańsk", "Karlshamn", "21:00", "11:30+1", "Skania"),
+    ("2026-07-20", "Karlshamn", "Gdańsk", "18:00", "08:00+1", "Copernicus"),
+    ("2026-07-21", "Gdańsk", "Karlshamn", "21:00", "10:30+1", "Copernicus"),
+    ("2026-07-21", "Karlshamn", "Gdańsk", "17:00", "08:00+1", "Skania"),
+    ("2026-07-22", "Gdańsk", "Karlshamn", "21:00", "11:30+1", "Skania"),
+    ("2026-07-22", "Karlshamn", "Gdańsk", "18:00", "08:00+1", "Copernicus"),
+    ("2026-07-23", "Karlshamn", "Gdańsk", "17:00", "08:00+1", "Skania"),
+    ("2026-07-24", "Gdańsk", "Karlshamn", "07:30", "20:00", "Copernicus"),
+    ("2026-07-24", "Gdańsk", "Karlshamn", "21:00", "11:30+1", "Skania"),
+    ("2026-07-24", "Karlshamn", "Gdańsk", "22:00", "10:30+1", "Copernicus"),
+    ("2026-07-26", "Gdańsk", "Karlshamn", "21:00", "10:30+1", "Copernicus"),
+    ("2026-07-26", "Karlshamn", "Gdańsk", "17:30", "08:00+1", "Skania"),
+    ("2026-07-27", "Gdańsk", "Karlshamn", "21:00", "11:30+1", "Skania"),
+    ("2026-07-27", "Karlshamn", "Gdańsk", "18:00", "08:00+1", "Copernicus"),
+    ("2026-07-28", "Gdańsk", "Karlshamn", "21:00", "10:30+1", "Copernicus"),
+    ("2026-07-28", "Karlshamn", "Gdańsk", "17:00", "08:00+1", "Skania"),
+    ("2026-07-29", "Gdańsk", "Karlshamn", "21:00", "11:30+1", "Skania"),
+    ("2026-07-29", "Karlshamn", "Gdańsk", "18:00", "08:00+1", "Copernicus"),
+    ("2026-07-30", "Karlshamn", "Gdańsk", "17:00", "08:00+1", "Skania"),
+    ("2026-07-31", "Gdańsk", "Karlshamn", "07:30", "20:00", "Copernicus"),
+    ("2026-07-31", "Gdańsk", "Karlshamn", "21:00", "11:30+1", "Skania"),
+    ("2026-07-31", "Karlshamn", "Gdańsk", "22:00", "10:30+1", "Copernicus"),
+    ("2026-08-02", "Gdańsk", "Karlshamn", "21:00", "10:30+1", "Copernicus"),
+    ("2026-08-02", "Karlshamn", "Gdańsk", "17:30", "08:00+1", "Skania"),
+    ("2026-08-03", "Gdańsk", "Karlshamn", "21:00", "11:30+1", "Skania"),
+    ("2026-08-03", "Karlshamn", "Gdańsk", "18:00", "08:00+1", "Copernicus"),
+    ("2026-08-04", "Gdańsk", "Karlshamn", "21:00", "10:30+1", "Copernicus"),
+    ("2026-08-04", "Karlshamn", "Gdańsk", "17:00", "08:00+1", "Skania"),
+    ("2026-08-05", "Gdańsk", "Karlshamn", "21:00", "11:30+1", "Skania"),
+    ("2026-08-05", "Karlshamn", "Gdańsk", "18:00", "08:00+1", "Copernicus"),
+    ("2026-08-06", "Karlshamn", "Gdańsk", "17:00", "08:00+1", "Skania"),
+    ("2026-08-07", "Gdańsk", "Karlshamn", "07:30", "20:00", "Copernicus"),
+    ("2026-08-07", "Gdańsk", "Karlshamn", "21:00", "11:30+1", "Skania"),
+    ("2026-08-07", "Karlshamn", "Gdańsk", "22:00", "10:30+1", "Copernicus"),
+    ("2026-08-09", "Gdańsk", "Karlshamn", "21:00", "10:30+1", "Copernicus"),
+    ("2026-08-09", "Karlshamn", "Gdańsk", "17:30", "08:00+1", "Skania"),
+    ("2026-08-10", "Gdańsk", "Karlshamn", "21:00", "11:30+1", "Skania"),
+    ("2026-08-10", "Karlshamn", "Gdańsk", "18:00", "08:00+1", "Copernicus"),
+    ("2026-08-11", "Gdańsk", "Karlshamn", "21:00", "10:30+1", "Copernicus"),
+    ("2026-08-11", "Karlshamn", "Gdańsk", "17:00", "08:00+1", "Skania"),
+    ("2026-08-12", "Gdańsk", "Karlshamn", "21:00", "11:30+1", "Skania"),
+    ("2026-08-12", "Karlshamn", "Gdańsk", "18:00", "08:00+1", "Copernicus"),
+    ("2026-08-13", "Karlshamn", "Gdańsk", "17:00", "08:00+1", "Skania"),
+    ("2026-08-14", "Gdańsk", "Karlshamn", "07:30", "20:00", "Copernicus"),
+    ("2026-08-14", "Gdańsk", "Karlshamn", "21:00", "11:30+1", "Skania"),
+    ("2026-08-14", "Karlshamn", "Gdańsk", "22:00", "10:30+1", "Copernicus"),
+    ("2026-08-16", "Gdańsk", "Karlshamn", "21:00", "10:30+1", "Copernicus"),
+    ("2026-08-16", "Karlshamn", "Gdańsk", "17:30", "08:00+1", "Skania"),
+]
+
 
 def override_route_keys() -> set[tuple[str, str, str]]:
     route_keys = {("TT-Line", avghamn, ankhamn) for avghamn, ankhamn in TTLINE_ROUTE_TIMETABLES}
@@ -184,6 +279,8 @@ def override_route_keys() -> set[tuple[str, str, str]]:
     route_keys.update({
         ("Polferries (POLSCA)", "Świnoujście", "Trelleborg"),
         ("Polferries (POLSCA)", "Trelleborg", "Świnoujście"),
+        ("Polferries (POLSCA)", "Gdańsk", "Karlshamn"),
+        ("Polferries (POLSCA)", "Karlshamn", "Gdańsk"),
     })
     return route_keys
 
@@ -257,9 +354,23 @@ def _build_ttline_rows() -> list[dict]:
     rows: list[dict] = []
     for (avghamn, ankhamn), weekday_map in TTLINE_ROUTE_TIMETABLES.items():
         source_url = TTLINE_ROUTE_SOURCES[(avghamn, ankhamn)]
+        validity = TTLINE_ROUTE_VALIDITY.get((avghamn, ankhamn), ("", ""))
+        source_detail = "TT-Line Summer Timetable 2026 Karlshamn Routes" if validity[0] else ""
         for veckodag, sailings in weekday_map.items():
             for avgtid, anktid in sailings:
-                rows.append(_make_row("TT-Line", avghamn, ankhamn, veckodag, avgtid, anktid, source_url, TTLINE_STANDARD_NOTE))
+                rows.append(_make_row(
+                    "TT-Line",
+                    avghamn,
+                    ankhamn,
+                    veckodag,
+                    avgtid,
+                    anktid,
+                    source_url,
+                    TTLINE_STANDARD_NOTE,
+                    giltig_from=validity[0],
+                    giltig_to=validity[1],
+                    source_detail=source_detail,
+                ))
     return rows
 
 
@@ -320,6 +431,27 @@ def _build_polsca_trelleborg_rows() -> list[dict]:
     return rows
 
 
+def _build_polsca_gdansk_karlshamn_rows() -> list[dict]:
+    rows: list[dict] = []
+    for dep_date, avghamn, ankhamn, avgtid, anktid, fartyg in POLSCA_GDANSK_KARLSHAMN_ROWS:
+        weekday = ["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"][date.fromisoformat(dep_date).weekday()]
+        rows.append(_make_row(
+            "Polferries (POLSCA)",
+            avghamn,
+            ankhamn,
+            weekday,
+            avgtid,
+            anktid,
+            POLSCA_GDANSK_KARLSHAMN_SOURCE,
+            POLSCA_GDANSK_KARLSHAMN_NOTE,
+            fartyg=fartyg,
+            giltig_from=dep_date,
+            giltig_to=dep_date,
+            source_detail="Polferries Gdańsk-Karlshamn timetable",
+        ))
+    return rows
+
+
 def _build_sundbusserne_rows() -> list[dict]:
     rows: list[dict] = []
     weekday_times = {
@@ -371,6 +503,7 @@ def apply_verified_schema_overrides(schema: list[dict]) -> list[dict]:
         + _build_stena_rows()
         + _build_finnlines_rows()
         + _build_polsca_trelleborg_rows()
+        + _build_polsca_gdansk_karlshamn_rows()
         + _build_sundbusserne_rows()
     )
     for idx, row in enumerate(merged, start=1):

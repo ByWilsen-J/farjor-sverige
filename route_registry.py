@@ -69,6 +69,11 @@ FINNLINES_API = ("dynamic_schedule", "Finnlines GraphQL timetable API", "https:/
 STENA_API = ("dynamic_schedule", "Stena Freight LiveView", "https://stenalinefreight.com/timetable/")
 TTLINE_API = ("dynamic_schedule", "TT-Line timetable endpoint", "https://www.ttline.com/en/timetables/")
 POLSCA_WEEKLY = ("weekly_schedule", None, "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html")
+POLSCA_GDANSK_KARLSHAMN = (
+    "weekly_schedule",
+    "Polferries Gdańsk-Karlshamn timetable",
+    "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gh",
+)
 MOLSLINJEN_BORNHOLM_API = ("dynamic_schedule", "Molslinjen AI schedule catalog", "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2")
 MOLSLINJEN_ORESUND_API = ("dynamic_schedule", "Molslinjen AI schedule catalog", "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7")
 SUNDBUSSERNE_WEEKLY = ("weekly_schedule", "Sundbusserne sejlplan 2026-03-20", "https://sundbusserne.dk/fartplan/")
@@ -138,6 +143,7 @@ ACTIVE_ROUTES: tuple[RouteSource, ...] = (
     *two_way("Polferries (POLSCA)", "Świnoujście", "Ystad", POLSCA_WEEKLY),
     *two_way("Polferries (POLSCA)", "Świnoujście", "Trelleborg", POLSCA_WEEKLY),
     *two_way("Polferries (POLSCA)", "Gdańsk", "Nynäshamn", POLSCA_WEEKLY),
+    *two_way("Polferries (POLSCA)", "Gdańsk", "Karlshamn", POLSCA_GDANSK_KARLSHAMN),
 )
 
 
@@ -202,8 +208,21 @@ def source_identity(inst: dict) -> tuple[str, str, str, str]:
 
 
 def filter_instances_to_primary_sources(instances_by_date: dict[str, list[dict]]) -> Counter:
-    """Mutera avgangsinstanser så endast ruttens utsedda primärkälla återstår."""
+    """Mutera avgangsinstanser så endast ruttens utsedda primärkälla återstår.
+
+    Om primärkällan saknas helt för en rutt i en körning behålls verifierad
+    fallbackdata, annars kan en tillfällig API-blockering radera aktiva linjer.
+    """
     removed: Counter = Counter()
+    primary_present_routes: set[tuple[str, str, str]] = set()
+
+    for entries in instances_by_date.values():
+        for inst in entries or []:
+            key = route_key_from_instance(inst)
+            route = ACTIVE_BY_ROUTE.get(key)
+            if route and source_matches(inst, route):
+                primary_present_routes.add(key)
+
     for dep_date, entries in list(instances_by_date.items()):
         kept: list[dict] = []
         for inst in entries or []:
@@ -215,7 +234,7 @@ def filter_instances_to_primary_sources(instances_by_date: dict[str, list[dict]]
                 removed["suppressed_duplicate_route"] += 1
                 continue
             route = ACTIVE_BY_ROUTE.get(key)
-            if route and not source_matches(inst, route):
+            if route and key in primary_present_routes and not source_matches(inst, route):
                 removed["non_primary_source"] += 1
                 continue
             kept.append(inst)

@@ -58,6 +58,7 @@ def main() -> int:
     today_iso = date.today().isoformat()
 
     route_counts: Counter = Counter()
+    route_primary_counts: Counter = Counter()
     route_sources: dict[tuple[str, str, str], Counter] = defaultdict(Counter)
     event_counts: Counter = Counter()
     wrong_sources: Counter = Counter()
@@ -74,8 +75,11 @@ def main() -> int:
         event_counts[event_key(inst)] += 1
 
         route = ACTIVE_BY_ROUTE.get(key)
-        if route and not source_matches(inst, route):
-            wrong_sources[(key, source_identity(inst), route.source_type, route.source_detail or "*")] += 1
+        if route:
+            if source_matches(inst, route):
+                route_primary_counts[key] += 1
+            else:
+                wrong_sources[(key, source_identity(inst), route.source_type, route.source_detail or "*")] += 1
 
         vessel = str(inst.get("fartyg") or "").strip()
         if vessel.lower() in INVALID_VESSEL_NAMES or vessel.lower().startswith("okant fartyg"):
@@ -104,10 +108,16 @@ def main() -> int:
             )
 
     for (key, identity, expected_type, expected_detail), count in sorted(wrong_sources.items()):
-        issues.append(
-            f"Fel källa: {key[0]} {key[1]} -> {key[2]} har {count} rader från {identity}, "
-            f"men primärkälla är {expected_type}/{expected_detail}."
-        )
+        if route_primary_counts[key] > 0:
+            issues.append(
+                f"Fel källa: {key[0]} {key[1]} -> {key[2]} har {count} rader från {identity}, "
+                f"men primärkälla är {expected_type}/{expected_detail}."
+            )
+        else:
+            warnings.append(
+                f"Primärkälla saknas i aktuell data för {key[0]} {key[1]} -> {key[2]}; "
+                f"verifierad reservkälla används ({count} rader från {identity})."
+            )
 
     for row in data.get("schema") or []:
         key = schema_route_key(row)
@@ -165,7 +175,7 @@ def main() -> int:
             print(f"  - ... {len(issues) - 80} fler")
         return 1
 
-    print("\nOK: alla aktiva rutter finns, borttagna rutter saknas och varje registrerad rutt har en primärkälla.")
+    print("\nOK: alla aktiva rutter finns, borttagna rutter saknas och inga otillåtna dubbletter hittades.")
     return 0
 
 
