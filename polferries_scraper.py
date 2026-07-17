@@ -10,6 +10,8 @@ import requests
 
 SOURCE_URL_YS = "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ys"
 SOURCE_DETAIL_YS = "Polferries Świnoujście-Ystad timetable"
+SOURCE_URL_ST = "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=st"
+SOURCE_DETAIL_ST = "Polferries Świnoujście-Trelleborg timetable"
 SOURCE_LABEL = "Datumtabell"
 
 VESSEL_CODES = {
@@ -25,6 +27,8 @@ VESSEL_CODES = {
 ROUTE_PORTS = {
     "Ystad - Świnoujście": ("Ystad", "Świnoujście"),
     "Świnoujście - Ystad": ("Świnoujście", "Ystad"),
+    "Świnoujście - Trelleborg": ("Świnoujście", "Trelleborg"),
+    "Trelleborg - Świnoujście": ("Trelleborg", "Świnoujście"),
 }
 
 log = logging.getLogger("polferries")
@@ -68,7 +72,7 @@ def _arrival_date(dep_date: date, next_day_marker: str) -> str:
     return ""
 
 
-def _parse_table(month: int, year: int, table_html: str) -> list[dict]:
+def _parse_table(month: int, year: int, table_html: str, source_url: str, source_detail: str) -> list[dict]:
     table_rows = re.findall(r"<tr[^>]*>(.*?)</tr>", table_html, flags=re.S)
     if len(table_rows) < 3:
         return []
@@ -94,7 +98,7 @@ def _parse_table(month: int, year: int, table_html: str) -> list[dict]:
             continue
         for day_number, vessel_code in zip(day_numbers, row[1:]):
             vessel_code = vessel_code.strip()
-            if not vessel_code:
+            if not vessel_code or vessel_code in {"-", "–", "—"}:
                 continue
             try:
                 dep_date = date(year, month, day_number)
@@ -110,29 +114,45 @@ def _parse_table(month: int, year: int, table_html: str) -> list[dict]:
                 "anktid": arrival_time,
                 "ankomstdatum": _arrival_date(dep_date, next_day_marker),
                 "fartyg": vessel,
-                "kalla": SOURCE_URL_YS,
+                "kalla": source_url,
                 "source_label": SOURCE_LABEL,
-                "source_detail": SOURCE_DETAIL_YS,
+                "source_detail": source_detail,
                 "source_type": "date_table",
                 "is_exact": True,
             })
     return sailings
 
 
-def fetch_ystad_swinoujscie() -> list[dict]:
+def _fetch_timetable(source_url: str, source_detail: str) -> list[dict]:
     try:
-        response = requests.get(SOURCE_URL_YS, timeout=(10, 25))
+        response = requests.get(source_url, timeout=(10, 25))
         response.raise_for_status()
     except Exception as exc:
-        log.error("Kunde inte hämta Polferries Ystad-Świnoujście-tabell: %s", exc)
+        log.error("Kunde inte hämta %s: %s", source_detail, exc)
         return []
 
     sailings: list[dict] = []
     for month, year, table_html in _table_blocks(response.text):
-        sailings.extend(_parse_table(month, year, table_html))
-    log.info("Hämtade %d Polferries Ystad/Świnoujście-avgångar.", len(sailings))
+        sailings.extend(_parse_table(month, year, table_html, source_url, source_detail))
+    log.info("Hämtade %d rader från %s.", len(sailings), source_detail)
     return sailings
 
 
+def fetch_ystad_swinoujscie() -> list[dict]:
+    return _fetch_timetable(SOURCE_URL_YS, SOURCE_DETAIL_YS)
+
+
+def fetch_swinoujscie_trelleborg() -> list[dict]:
+    sailings = _fetch_timetable(SOURCE_URL_ST, SOURCE_DETAIL_ST)
+    return [
+        sailing
+        for sailing in sailings
+        if {sailing.get("avghamn"), sailing.get("ankhamn")} == {"Świnoujście", "Trelleborg"}
+    ]
+
+
 def fetch_all() -> list[dict]:
-    return fetch_ystad_swinoujscie()
+    sailings: list[dict] = []
+    sailings.extend(fetch_ystad_swinoujscie())
+    sailings.extend(fetch_swinoujscie_trelleborg())
+    return sailings

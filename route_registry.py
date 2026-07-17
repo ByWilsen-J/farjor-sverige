@@ -74,6 +74,11 @@ POLSCA_YS_TIMETABLE = (
     "Polferries Świnoujście-Ystad timetable",
     "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ys",
 )
+POLSCA_ST_TIMETABLE = (
+    "date_table",
+    "Polferries Świnoujście-Trelleborg timetable",
+    "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=st",
+)
 POLSCA_GDANSK_KARLSHAMN = (
     "weekly_schedule",
     "Polferries Gdańsk-Karlshamn timetable",
@@ -146,7 +151,7 @@ ACTIVE_ROUTES: tuple[RouteSource, ...] = (
 
     # Polferries / POLSCA
     *two_way("Polferries (POLSCA)", "Świnoujście", "Ystad", POLSCA_YS_TIMETABLE),
-    *two_way("Polferries (POLSCA)", "Świnoujście", "Trelleborg", POLSCA_WEEKLY),
+    *two_way("Polferries (POLSCA)", "Świnoujście", "Trelleborg", POLSCA_ST_TIMETABLE),
     *two_way("Polferries (POLSCA)", "Gdańsk", "Nynäshamn", POLSCA_WEEKLY),
     *two_way("Polferries (POLSCA)", "Gdańsk", "Karlshamn", POLSCA_GDANSK_KARLSHAMN),
 )

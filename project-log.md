@@ -32,6 +32,12 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Senaste ändringar
 
+- 2026-07-17: Lade till saknad `Mazovia` på Polferries/POLSCA `Świnoujście ↔ Trelleborg`.
+  - Utökade [polferries_scraper.py](/Users/jane/Documents/Claude/Projects/Weblänksida/polferries_scraper.py) så den även hämtar Polferries officiella datumtabell `code=st` för `Świnoujście ↔ Trelleborg`.
+  - Bytte primärkälla i [route_registry.py](/Users/jane/Documents/Claude/Projects/Weblänksida/route_registry.py) från den gamla POL-AGENT-fallbacken till Polferries datumtabell för Trelleborg-linjen.
+  - Resultat i [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json): `Mazovia` finns nu med `67` avgångar `Świnoujście -> Trelleborg` och `39` avgångar `Trelleborg -> Świnoujście`, utan dubbletter.
+  - Verifiering: [check_route_coverage.py](/Users/jane/Documents/Claude/Projects/Weblänksida/check_route_coverage.py) passerar med `67/67` aktiva rutter, Polferries/POLSCA har `0` exakta/nära dubbletter och `0` ogiltiga fartygsnamn.
+
 - 2026-07-16: Rättade regressionsfel efter Polferries Gdańsk-Karlshamn-ändringen.
   - Orsak: lokal körning av [update_fartyg.py](/Users/jane/Documents/Claude/Projects/Weblänksida/update_fartyg.py) skedde när TT-Line livekällan gav timeout/403, vilket gjorde att publicerad [farjor_data.json](/Users/jane/Documents/Claude/Projects/Weblänksida/farjor_data.json) föll tillbaka till TT-veckoscheman utan fartygsnamn.
   - Åtgärd: återställde TT-Lines senaste fungerande dynamiska fartygsrader från föregående auto-data och lade in verifierade TT-ruttrotationer i både frontend och veckofallback så reservscheman inte blir namnblanka.
