@@ -32,6 +32,11 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Senaste ändringar
 
+- 2026-07-17: Tog bort den GitHub-baserade felsanmälan.
+  - Rensade [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) från sidopanelruta, modal, GitHub Issue-länk och tillhörande JavaScript eftersom besökare annars behöver GitHub-konto.
+  - Tog bort den oanvända GitHub-labeln `felsanmälan`.
+  - Planerat nytt upplägg: skapa en separat mailadress för felanmälningar och därefter lägga in en enklare kontaktväg på sidan.
+
 - 2026-07-17: Lade till felsanmälan på sidan utan synlig mailadress.
   - Uppdaterade [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) med en ny sidopanelruta `Felsanmälan` och ett modalformulär för saknade turer, fel fartygsnamn, fel tider, dubbletter, fel källa och övriga fel.
   - Formuläret bygger en förifylld GitHub Issue-länk till `ByWilsen-J/farjor-sverige` med aktuell vy, datum, rederifilter, antal visade rader, datauppdatering och användarens beskrivning.
