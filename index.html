@@ -254,6 +254,45 @@
     .sb-sek-hdr{padding:9px 18px;background:var(--yta-dämpad);border-top:1px solid var(--linje-mjuk);border-bottom:1px solid var(--linje-mjuk);font-size:.66rem;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.10em}
 
     /* ──────────────────────────────────────────────
+       Felsanmälan
+       ────────────────────────────────────────────── */
+    .report-intro{font-size:.82rem;color:var(--text-mjuk);line-height:1.6;margin-bottom:12px}
+    .report-note{font-size:.73rem;color:var(--dim);line-height:1.55;margin-top:10px}
+    .report-btn{width:100%;padding:11px 14px;border-radius:var(--r);border:1px solid var(--blå);background:var(--blå);color:var(--vit);font-size:.86rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s,box-shadow .15s}
+    .report-btn:hover{background:var(--blå-ljus);border-color:var(--blå-ljus)}
+    .report-btn:focus-visible{box-shadow:0 0 0 3px var(--blå-ring)}
+    .report-modal[hidden]{display:none!important}
+    .report-modal{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(11,18,32,.44);backdrop-filter:blur(2px)}
+    .report-panel{width:min(620px,100%);max-height:calc(100vh - 36px);overflow:auto;background:var(--vit);border:1px solid var(--linje-stark);border-radius:var(--r-lg);box-shadow:0 24px 70px -24px rgba(15,23,42,.55)}
+    .report-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:18px 20px;border-bottom:1px solid var(--linje-mjuk);background:var(--yta-svag)}
+    .report-title{font-size:1.02rem;font-weight:700;color:var(--text);letter-spacing:-.01em}
+    .report-sub{font-size:.82rem;color:var(--text-mjuk);line-height:1.55;margin-top:3px}
+    .report-close{width:32px;height:32px;border-radius:var(--r);border:1px solid var(--linje);background:var(--vit);color:var(--dim);font-size:1.1rem;line-height:1;cursor:pointer;font-family:inherit}
+    .report-close:hover{background:var(--blå);border-color:var(--blå);color:var(--vit)}
+    .report-form{padding:18px 20px 20px;display:grid;gap:14px}
+    .report-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .report-field label{display:block;font-size:.68rem;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px}
+    .report-field input,.report-field select,.report-field textarea{width:100%;border:1px solid var(--linje);border-radius:var(--r);padding:10px 12px;background:var(--vit);color:var(--text);font:inherit;font-size:.9rem}
+    .report-field textarea{min-height:130px;resize:vertical}
+    .report-field input:focus,.report-field select:focus,.report-field textarea:focus{outline:none;border-color:var(--blå);box-shadow:0 0 0 3px var(--blå-ring)}
+    .report-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end;border-top:1px solid var(--linje-mjuk);padding-top:14px}
+    .report-secondary,.report-primary{border-radius:var(--r);padding:10px 14px;font-size:.84rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s,color .15s,box-shadow .15s}
+    .report-secondary{border:1px solid var(--linje-stark);background:var(--vit);color:var(--text)}
+    .report-secondary:hover{background:var(--yta-svag);border-color:var(--linje-stark)}
+    .report-primary{border:1px solid var(--blå);background:var(--blå);color:var(--vit)}
+    .report-primary:hover{background:var(--blå-ljus);border-color:var(--blå-ljus)}
+    .report-feedback{font-size:.78rem;color:var(--text-mjuk);line-height:1.5;margin-right:auto}
+    .report-feedback a{color:var(--blå);font-weight:600;text-decoration:none}
+    .report-feedback a:hover{text-decoration:underline;text-underline-offset:2px}
+    @media(max-width:620px){
+      .report-modal{align-items:flex-start;padding:10px}
+      .report-row{grid-template-columns:1fr}
+      .report-actions{justify-content:stretch}
+      .report-secondary,.report-primary{width:100%}
+      .report-feedback{width:100%;order:3}
+    }
+
+    /* ──────────────────────────────────────────────
        Footer
        ────────────────────────────────────────────── */
     footer{text-align:center;padding:22px 16px;font-size:.74rem;color:var(--dim);border-top:1px solid var(--linje);margin-top:14px;background:var(--vit);font-weight:400;letter-spacing:.005em}
@@ -372,6 +411,15 @@
     </div>
 
     <div class="sb-kort">
+      <div class="sb-hdr">Felsanmälan</div>
+      <div class="sb-block">
+        <p class="report-intro">Ser du en saknad tur, fel fartyg eller en konstig dubblett? Skicka en rapport utan att någon mailadress visas på sidan.</p>
+        <button type="button" class="report-btn" id="open-report">Rapportera fel</button>
+        <p class="report-note">Rapporten öppnas som ett förifyllt GitHub-ärende med aktuell vy och datum. Undvik personuppgifter; kopiering finns som fallback.</p>
+      </div>
+    </div>
+
+    <div class="sb-kort">
       <div class="sb-hdr">Rederiöversikt</div>
       <div id="rederi-oversikt"></div>
     </div>
@@ -427,6 +475,50 @@
     </div>
   </aside>
 </div>
+<div class="report-modal" id="report-modal" role="dialog" aria-modal="true" aria-labelledby="report-title" hidden>
+  <div class="report-panel">
+    <div class="report-head">
+      <div>
+        <div class="report-title" id="report-title">Rapportera fel i tidtabellen</div>
+        <div class="report-sub">Beskriv vad som ser fel ut. Inga mailadresser visas eller behövs, och skriv helst inga personuppgifter.</div>
+      </div>
+      <button type="button" class="report-close" id="report-close" aria-label="Stäng felsanmälan">&times;</button>
+    </div>
+    <form class="report-form" id="report-form">
+      <div class="report-row">
+        <div class="report-field">
+          <label for="report-type">Typ av fel</label>
+          <select id="report-type" required>
+            <option value="Saknad färja/rutt">Saknad färja/rutt</option>
+            <option value="Fel fartygsnamn">Fel fartygsnamn</option>
+            <option value="Fel tid">Fel tid</option>
+            <option value="Dubblett">Dubblett</option>
+            <option value="Fel källa">Fel källa</option>
+            <option value="Annat">Annat</option>
+          </select>
+        </div>
+        <div class="report-field">
+          <label for="report-date">Datum</label>
+          <input type="date" id="report-date">
+        </div>
+      </div>
+      <div class="report-field">
+        <label for="report-route">Rederi / rutt / färja</label>
+        <input type="text" id="report-route" maxlength="140" placeholder="Ex. Polferries, Trelleborg - Świnoujście, Mazovia">
+      </div>
+      <div class="report-field">
+        <label for="report-details">Beskriv felet</label>
+        <textarea id="report-details" maxlength="1800" required placeholder="Vad saknas eller verkar fel? Skriv gärna vilken tid, riktning och källa du jämför med."></textarea>
+      </div>
+      <div class="report-actions">
+        <span class="report-feedback" id="report-feedback" aria-live="polite"></span>
+        <button type="button" class="report-secondary" id="report-copy">Kopiera rapport</button>
+        <button type="button" class="report-secondary" id="report-cancel">Avbryt</button>
+        <button type="submit" class="report-primary">Öppna felrapport</button>
+      </div>
+    </form>
+  </div>
+</div>
 <footer>Färjor Sverige · Källdata: officiella rederikällor · Dynamiska källor uppdateras varje timme</footer>
 
 <script>
@@ -441,6 +533,7 @@ const VIEW_LABELS = {
   ankomst:'Ankomster till Sverige',
   fran:'Avgår från Sverige',
 };
+const FELANMALAN_ISSUE_URL = 'https://github.com/ByWilsen-J/farjor-sverige/issues/new';
 // Sektionsklass per vy — styr färgad övre rand i sektionen
 const VIEW_SEKTION_CLASS = {
   alla:'sek-blandad',
@@ -2020,6 +2113,7 @@ async function init(){
   document.getElementById('show-upcoming-btn').addEventListener('click', ()=>sättKommandeFilter(true));
   document.getElementById('apply-controls').addEventListener('click', tillämpaVal);
   synkaKommandeKnappar();
+  initFelanmälan();
 
   await hämtaFartyg(dStr(nu));
   rendera();
@@ -2437,6 +2531,157 @@ function bygTr(rad){
     <td class="info-c">${ih}</td>
   `;
   return tr;
+}
+
+// ── Felsanmälan ──
+let reportPreviousOverflow = '';
+
+function initFelanmälan(){
+  const openBtn = document.getElementById('open-report');
+  const modal = document.getElementById('report-modal');
+  const form = document.getElementById('report-form');
+  if(!openBtn || !modal || !form) return;
+
+  openBtn.addEventListener('click', öppnaFelanmälan);
+  document.getElementById('report-close')?.addEventListener('click', stängFelanmälan);
+  document.getElementById('report-cancel')?.addEventListener('click', stängFelanmälan);
+  document.getElementById('report-copy')?.addEventListener('click', kopieraFelrapport);
+  modal.addEventListener('click', event=>{
+    if(event.target === modal) stängFelanmälan();
+  });
+  document.addEventListener('keydown', event=>{
+    if(event.key === 'Escape' && !modal.hidden) stängFelanmälan();
+  });
+  form.addEventListener('submit', event=>{
+    event.preventDefault();
+    öppnaFelrapportIssue();
+  });
+}
+
+function öppnaFelanmälan(){
+  const modal = document.getElementById('report-modal');
+  if(!modal) return;
+  const datum = document.getElementById('report-date');
+  const rutt = document.getElementById('report-route');
+  const detaljer = document.getElementById('report-details');
+  const feedback = document.getElementById('report-feedback');
+  if(datum) datum.value = pendingDateStr || dStr(valdDat);
+  if(rutt) rutt.value = föreslagenRapportRutt();
+  if(detaljer) detaljer.value = '';
+  if(feedback) feedback.textContent = '';
+  reportPreviousOverflow = document.body.style.overflow || '';
+  document.body.style.overflow = 'hidden';
+  modal.hidden = false;
+  setTimeout(()=>document.getElementById('report-type')?.focus(), 0);
+}
+
+function stängFelanmälan(){
+  const modal = document.getElementById('report-modal');
+  if(!modal) return;
+  modal.hidden = true;
+  document.body.style.overflow = reportPreviousOverflow;
+  document.getElementById('open-report')?.focus();
+}
+
+function föreslagenRapportRutt(){
+  if(visadeRader.length === 1){
+    const r = visadeRader[0];
+    return `${r.rederi}: ${r.avghamn} - ${r.ankhamn}${r.fartyg ? ' · ' + r.fartyg : ''}`;
+  }
+  if(valtRederi && valtRederi !== REDERI_FILTER_ALLA && valtRederi !== REDERI_FILTER_UTAN_KORTLINJER){
+    return valtRederi;
+  }
+  return '';
+}
+
+function rapportFält(id){
+  return String(document.getElementById(id)?.value || '').trim();
+}
+
+function aktuellSidUrl(){
+  try{
+    const url = new URL(window.location.href);
+    url.hash = '';
+    return url.toString();
+  }catch(e){
+    return window.location.href;
+  }
+}
+
+function byggFelrapportMarkdown(){
+  const typ = rapportFält('report-type') || 'Annat';
+  const datum = rapportFält('report-date') || dStr(valdDat);
+  const rutt = rapportFält('report-route') || 'Ej angivet';
+  const detaljer = rapportFält('report-details') || 'Ej angivet';
+  const dataUppdaterad = formatMetaTimestampLocal(DATA?.meta?.uppdaterad || '') || DATA?.meta?.uppdaterad || 'Okänt';
+  const statusTxt = visaEndastKommande ? 'Endast aktuella' : 'Hela dygnet';
+  return [
+    '## Beskrivning',
+    detaljer,
+    '',
+    '## Gäller',
+    `- Typ av fel: ${typ}`,
+    `- Datum: ${datum}`,
+    `- Rederi/rutt/färja: ${rutt}`,
+    '',
+    '## Sidkontext',
+    `- Visad vy: ${VIEW_LABELS[viewMode] || viewMode}`,
+    `- Rederifilter: ${rederiFilterLabel(valtRederi)}`,
+    `- Aktualitet: ${statusTxt}`,
+    `- Antal rader i aktuell lista: ${visadeRader.length}`,
+    `- Källdata uppdaterad: ${dataUppdaterad}`,
+    `- Sida: ${aktuellSidUrl()}`,
+    `- Rapport skapad: ${new Date().toLocaleString('sv-SE')}`,
+  ].join('\n');
+}
+
+function byggFelrapportUrl(){
+  const typ = rapportFält('report-type') || 'Annat';
+  const rutt = rapportFält('report-route');
+  const titelRutt = rutt ? ` - ${rutt.slice(0, 70)}` : '';
+  const params = new URLSearchParams({
+    title: `Felrapport: ${typ}${titelRutt}`,
+    body: byggFelrapportMarkdown(),
+    labels: 'felsanmälan',
+  });
+  return `${FELANMALAN_ISSUE_URL}?${params.toString()}`;
+}
+
+function öppnaFelrapportIssue(){
+  const form = document.getElementById('report-form');
+  const feedback = document.getElementById('report-feedback');
+  if(form && !form.reportValidity()) return;
+  const url = byggFelrapportUrl();
+  const popup = window.open(url, '_blank');
+  if(popup){
+    popup.opener = null;
+    if(feedback) feedback.textContent = 'Felrapporten öppnades i en ny flik.';
+  }else if(feedback){
+    feedback.innerHTML = `Popup blockerad. <a href="${esc(url)}" target="_blank" rel="noopener">Öppna felrapporten här</a>.`;
+  }
+}
+
+async function kopieraFelrapport(){
+  const feedback = document.getElementById('report-feedback');
+  const text = byggFelrapportMarkdown();
+  try{
+    if(navigator.clipboard?.writeText){
+      await navigator.clipboard.writeText(text);
+    }else{
+      const tmp = document.createElement('textarea');
+      tmp.value = text;
+      tmp.setAttribute('readonly', '');
+      tmp.style.position = 'fixed';
+      tmp.style.left = '-9999px';
+      document.body.appendChild(tmp);
+      tmp.select();
+      document.execCommand('copy');
+      tmp.remove();
+    }
+    if(feedback) feedback.textContent = 'Rapporten är kopierad.';
+  }catch(e){
+    if(feedback) feedback.textContent = 'Kunde inte kopiera automatiskt. Markera texten och prova igen.';
+  }
 }
 
 // ── Excel-export ──

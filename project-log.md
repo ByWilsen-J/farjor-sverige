@@ -32,6 +32,12 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Senaste ändringar
 
+- 2026-07-17: Lade till felsanmälan på sidan utan synlig mailadress.
+  - Uppdaterade [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) med en ny sidopanelruta `Felsanmälan` och ett modalformulär för saknade turer, fel fartygsnamn, fel tider, dubbletter, fel källa och övriga fel.
+  - Formuläret bygger en förifylld GitHub Issue-länk till `ByWilsen-J/farjor-sverige` med aktuell vy, datum, rederifilter, antal visade rader, datauppdatering och användarens beskrivning.
+  - Skapade GitHub-labeln `felsanmälan` så inkommande rapporter kan sorteras direkt.
+  - Ingen mailadress visas eller används i HTML/JS; som fallback kan rapporttexten kopieras.
+
 - 2026-07-17: Lade till saknad `Mazovia` på Polferries/POLSCA `Świnoujście ↔ Trelleborg`.
   - Utökade [polferries_scraper.py](/Users/jane/Documents/Claude/Projects/Weblänksida/polferries_scraper.py) så den även hämtar Polferries officiella datumtabell `code=st` för `Świnoujście ↔ Trelleborg`.
   - Bytte primärkälla i [route_registry.py](/Users/jane/Documents/Claude/Projects/Weblänksida/route_registry.py) från den gamla POL-AGENT-fallbacken till Polferries datumtabell för Trelleborg-linjen.
