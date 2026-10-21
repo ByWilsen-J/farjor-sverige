@@ -65,10 +65,15 @@ def classify_status(status, api=False):
     return "needs_review"
 
 
+def placeholder_destination(url):
+    path = urlsplit(url).path.lower().replace("_", "-")
+    return any(word in path for word in ("under-construction", "underconstruction", "maintenance", "coming-soon", "placeholder"))
+
+
 def safe_redirect(original, final, chain, content_type):
     """Never infer a replacement from a 302, domain move, landing page, or API."""
     old, new = urlsplit(original), urlsplit(final)
-    if original == final or is_api_url(original):
+    if original == final or is_api_url(original) or placeholder_destination(final):
         return False
     if not chain or any(code not in {301, 308} for code in chain):
         return False
@@ -97,6 +102,9 @@ def check_url(url, previous=None, get=requests.get, pause=time.sleep):
         content_type = response.headers.get("Content-Type", "")
         response.close()
         classification = classify_status(status, result["api_endpoint"])
+        if classification == "ok" and placeholder_destination(final):
+            classification = "needs_review"
+            result["reason"] = "destination_placeholder"
         # A one-off CDN response must never be called a confirmed dead link.
         if classification == "broken":
             pause(0.3)
@@ -141,7 +149,7 @@ def apply_redirects(root, results):
     data = json.loads(path.read_text())
     updated = replace_data_urls(data, mapping)
     if updated != data:
-        path.write_text(json.dumps(updated, ensure_ascii=False, indent=2) + "\n")
+        path.write_text(json.dumps(updated, ensure_ascii=False, separators=(",", ":")) + "\n")
     for path in root.glob("*.html"):
         text = path.read_text()
         # Match entire quoted literals only. Never replace part of an API URL.

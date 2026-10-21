@@ -4,7 +4,7 @@ GitHub-sida/statisk webbsida för färjetidtabeller till och från Sverige. Huvu
 
 ## Aktuell status
 
-**2026-10-21 – klart:** revision av tidtabellsbortfall, källor och automatisk kontroll. 67/67 registrerade ruttriktningar publiceras i kandidatdata; 18 661 avgångsinstanser i perioden 2026-09-21–2027-01-21. 35 regressionstester passerar utan överhoppning, liksom rutttäckning, JavaScript och datahälsa (två redovisade källvarningar).
+**2026-10-21 – klart:** revision av tidtabellsbortfall, källor och automatisk kontroll. 67/67 registrerade ruttriktningar publiceras i kandidatdata; 18 661 avgångsinstanser i perioden 2026-09-21–2027-01-21. 36 regressionstester passerar utan överhoppning, liksom rutttäckning, JavaScript och datahälsa (två redovisade källvarningar).
 
 Polferries datumimport omfattar nu samtliga fyra ruttpar. Eckerö, Wasaline, Finnlines och TT-Line har rättade verifierade reservscheman; Sundbussernes saknade 18:30-turer mån–tors är återlagda. Primärkälla väljs per rutt/datum, cache bevaras vid nätfel och officiellt tomma datum återskapar inte fallbackturer.
 
@@ -14,12 +14,14 @@ Timvis uppdatering och daglig backfill har nu kvalitetsgrind. Ny daglig felsökn
 
 ## Senaste ändringar
 
+- 2026-10-21 22:50: Publicering och schemalagd felsökning verifierade i drift. Provkörningen visade en permanent redirect till Wallenius-SOL:s sida under uppbyggnad i äldre oanvänt intervallunderlag. Autoersättningen återförd med bibehållen proveniens; sådana mål markeras nu för manuell granskning och får aldrig automatisk rättning. Separat regressionstest tillagt. JSON-format behålls kompakt vid länkrättning.
+
 - 2026-10-21: Slutförd innehålls- och driftrevision med tre subagenter.
   - Rättade global källfiltrering, gammal cache vid ändrade avgångstider, datumöverskridande ankomstgissning, begränsade Mols-svar och persistens för verifierade tomma datum.
   - Rättade Polferries flikparser/årsskifte, Gdańsk-rutter, fartygskoder; periodbundna Eckerö/Wasaline- och TT-reserver, Finnlines ankomster samt Sundbussernes sena turer.
   - Rättade POLSCA/VesselFinder-länkar, frontendladdning och visning av okänd ankomst. Cache/hämttid syns i avgångens info; datum utanför publicerad period ger tydlig information.
   - Införde daglig länk-/driftkontroll, automatisk säker återhämtning, publiceringsgrindar och löpande källrapport. 74 aktuella URL:er kontrollerade, inga bekräftade 404/410.
-  - Validerat: 35/35 tester, Python/JavaScript, 67/67 riktningar och datahälsa. Finnlines/TT-Line redovisas som begränsningar; inga påhittade avgångar eller källbyten.
+  - Validerat: 36/36 tester, Python/JavaScript, 67/67 riktningar och datahälsa. Finnlines/TT-Line redovisas som begränsningar; inga påhittade avgångar eller källbyten.
 
 - 2026-10-21: Revision av bortfall, källor och driftkontroll påbörjad (slutförd ovan).
   - Bekräftat datumövergripande källfilter, Polferries parserfel för tvåsiffriga tabellavsnitt och utgången Gdańsk–Karlshamn-import.
@@ -369,12 +371,13 @@ Timvis uppdatering och daglig backfill har nu kvalitetsgrind. Ny daglig felsökn
 
 ## Pågående arbete
 
-Slutlig publicering och kontroll av GitHub Actions/Pages vid revisionens leverans. Senaste verkliga driftskontroll finns i docs/site-health-checks.json.
+Inget pågående implementationsarbete. Publicering 9af2444 verifierad: Pages-körning 39673473786 och den nya dagliga felsökningens provkörning 39673510467 passerade. Publicerad JSON matchade 18 661 verifierade avgångar. Senaste verkliga driftskontroll finns i docs/site-health-checks.json.
 
 ## Problem / blockerare
 
 - Finnlines GraphQL och TT-Line livekälla gav 403 vid senaste hämtning; verifierade reservscheman används. Viking Line har fortsatt maskinell åtkomstbegränsning och använder veckoschema.
 - Molslinjens officiella katalog täcker endast kommande avgångar, inte hela fyramånadersperioden. Tidigare datumdata och dokumenterad fallback bevaras där uppgifter saknas; inga nya tider gissas.
+- Wallenius-SOL:s äldre intervallkälla omdirigerar till en sida under uppbyggnad. Den oanvända intervallpostens proveniens behålls och länken är markerad för manuell granskning.
 - Tre äldre laevagraafik.ee-källhänvisningar ger nätfel. Proveniens bevaras tills underlagets tider har verifierats mot ersättningskälla; aktuella exakta DFDS/Tallink-rader har officiella källor.
 - Color Line är fortsatt länkvisare. Separata trafikmeddelanden/inställda turer utanför importernas tillgängliga källor kräver vidare arbete.
 - TT-Lines Karlshamn-reserv gäller endast 2026; ny årsutgåva behövs före 2027. Perioder för Eckerö/Wasaline respekteras. HTTP 200 bevisar inte att innehållet är aktuellt eller komplett.

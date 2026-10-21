@@ -42,7 +42,7 @@ def importer(route):
     if route.source_type == "link_only":
         return "index.html (länkvisare; ingen tidtabellsimport)"
     if route.source_type == "weekly_schedule":
-        return "generera_json.py + verified_schema_overrides.py (verifierat reservschema; inte ny livehämtning)"
+        return "farjor_data.json:schema + verified_schema_overrides.py → update_fartyg.py (verifierat reservschema)"
     return IMPORTERS.get(route.operator, "update_fartyg.py") + " → update_fartyg.py"
 
 
@@ -84,7 +84,7 @@ def main() -> None:
         "",
         "Länkkontrollens datum kommer endast från verkliga HTTP-försök i `source-link-checks.json`; rapportgenerering flyttar aldrig fram dem. HTTP 200 visar åtkomst, inte att tidtabellens innehåll är korrekt. API-GET utan rätt parametrar och 403/429 är kontrollbegränsningar, inte bekräftade trasiga länkar. En datagenerering förnyar heller inte ett gammalt reservschemas verifieringsdatum.",
         "",
-        "Regel: varje rutt ska ha exakt en publicerad primärkälla. Om källan saknar exakt fartygsnamn används ingen gissning, förutom dokumenterad ruttfallback där detta markeras som fallback.",
+        "Regel: en primärkälla väljs per rutt och avgångsdatum; reservschema får användas på andra datum där primärkällan saknar uppgifter. Om källan saknar exakt fartygsnamn används ingen gissning, förutom dokumenterad ruttfallback där detta markeras som fallback.",
         "",
         "| Rederi | Rutt | Avgångar | Datum | Fartyg i publicerad data | Primär källa | Kommentar |",
         "|---|---|---:|---|---|---|---|",

@@ -423,10 +423,11 @@
     },
     "https://wallenius-sol.com/en/timetable": {
       "url": "https://wallenius-sol.com/en/timetable",
-      "checked_at": "2026-10-21T20:49:02+00:00",
+      "checked_at": "2026-10-21T20:52:12+00:00",
       "method": "GET",
       "api_endpoint": false,
-      "status": "ok",
+      "reason": "destination_placeholder",
+      "status": "needs_review",
       "http_status": 200,
       "final_url": "https://wallenius-sol.com/en/wallenius-sol-route-network-page-under-construction-if-you-have-questions-about-our-route-network",
       "redirect_statuses": [
@@ -435,9 +436,8 @@
         301
       ],
       "content_type": "text/html; charset=UTF-8",
-      "safe_redirect": true,
-      "last_ok_at": "2026-10-21T20:49:02+00:00",
-      "auto_replaced_with": "https://wallenius-sol.com/en/wallenius-sol-route-network-page-under-construction-if-you-have-questions-about-our-route-network"
+      "safe_redirect": false,
+      "last_ok_at": "2026-10-21T20:49:02+00:00"
     },
     "https://www.bornholmslinjen.dk/fartplan": {
       "url": "https://www.bornholmslinjen.dk/fartplan",
@@ -999,10 +999,11 @@
     },
     "https://wallenius-sol.com/en/wallenius-sol-route-network-page-under-construction-if-you-have-questions-about-our-route-network": {
       "url": "https://wallenius-sol.com/en/wallenius-sol-route-network-page-under-construction-if-you-have-questions-about-our-route-network",
-      "checked_at": "2026-10-21T20:49:11+00:00",
+      "checked_at": "2026-10-21T20:52:13+00:00",
       "method": "GET",
       "api_endpoint": false,
-      "status": "ok",
+      "reason": "destination_placeholder",
+      "status": "needs_review",
       "http_status": 200,
       "final_url": "https://wallenius-sol.com/en/wallenius-sol-route-network-page-under-construction-if-you-have-questions-about-our-route-network",
       "redirect_statuses": [],
@@ -1087,7 +1088,12 @@
     "https://www.wasaline.com/en/timetable/",
     "https://www.wasaline.com/tidtabell/"
   ],
-  "applied_redirects": {
-    "https://wallenius-sol.com/en/timetable": "https://wallenius-sol.com/en/wallenius-sol-route-network-page-under-construction-if-you-have-questions-about-our-route-network"
+  "applied_redirects": {},
+  "reviewed_rejections": {
+    "https://wallenius-sol.com/en/timetable": {
+      "target": "https://wallenius-sol.com/en/wallenius-sol-route-network-page-under-construction-if-you-have-questions-about-our-route-network",
+      "reason": "destination_placeholder",
+      "action": "Automatic replacement reverted; original provenance retained"
+    }
   }
 }

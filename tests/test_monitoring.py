@@ -42,6 +42,14 @@ class LinkTests(unittest.TestCase):
         self.assertFalse(safe_redirect(old, "https://ferry.example:8443/schedule/", [301], "text/html"))
         self.assertFalse(safe_redirect(old, "https://user@ferry.example/schedule/", [301], "text/html"))
 
+    def test_construction_page_is_not_a_verified_timetable_replacement(self):
+        old = "https://ferry.example/timetable"
+        target = "https://ferry.example/en/route-network-page-under-construction"
+        self.assertFalse(safe_redirect(old, target, [301], "text/html"))
+        result = check_url(old, get=lambda *a, **kw: Response(200, target, [301]))
+        self.assertEqual(result["status"], "needs_review")
+        self.assertFalse(result["safe_redirect"])
+
     def test_link_replacement_never_alters_times_or_free_text(self):
         old, new = "https://ferry.example/old", "https://ferry.example/new"
         data = {"datum": "2026-10-21", "avgtid": "09:00", "kalla": old, "note": old, "nested": [{"source_url": old}]}
