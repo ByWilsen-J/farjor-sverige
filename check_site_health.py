@@ -59,6 +59,35 @@ def check_data(data, now=None, baseline=None, max_age_hours=48):
     return errors, warnings
 
 
+LIVE_SOURCE_NAMES = ("Viking Line", "Tallink Silja", "DFDS", "Finnlines", "Stena Line", "TT-Line", "Polferries (POLSCA)", "Molslinjen")
+
+
+def live_source_issues(data, now=None):
+    """Track live collection separately from whether fallback data can publish."""
+    now = now or datetime.now(timezone.utc)
+    refresh = data.get("meta", {}).get("source_refresh", {})
+    issues = []
+    for name in LIVE_SOURCE_NAMES:
+        entry = refresh.get(name, {})
+        status = entry.get("status", "not_checked")
+        checked = entry.get("checked_at")
+        reason = None
+        if status == "disabled":
+            reason = "Livehämtning avstängd; behöver återverifieras. Avstängning bevisar ingen blockering."
+        elif status != "ok" or not entry.get("accepted_rows", entry.get("received_rows", 0)):
+            reason = "Ingen fullständigt godkänd livehämtning; fortsatt felsökning behövs."
+        else:
+            try:
+                age = (now - datetime.fromisoformat(checked.replace("Z", "+00:00"))).total_seconds() / 3600
+                if age > 26 or age < -1:
+                    reason = "Livekällans kontroll är äldre än 26 timmar eller har ogiltig framtidstid."
+            except (AttributeError, TypeError, ValueError):
+                reason = "Livekällan saknar en giltig kontrolltid."
+        if reason:
+            issues.append({"source": name, "status": status, "checked_at": checked, "reason": reason})
+    return issues
+
+
 class Scripts(HTMLParser):
     def __init__(self):
         super().__init__()
@@ -131,7 +160,14 @@ def main():
     parser.add_argument("--max-age-hours", type=int, default=48)
     parser.add_argument("--skip-javascript", action="store_true")
     parser.add_argument("--published-only", action="store_true", help="Kontrollera den verkliga publicerade sidan separat från kandidatens publiceringsgrind.")
+    parser.add_argument("--live-sources-only", action="store_true", help="Markera otillgängliga eller oprövade livekällor som fortsatt arbete, separat från publiceringsgrinden.")
     args = parser.parse_args()
+    if args.live_sources_only:
+        issues = live_source_issues(json.loads((ROOT / "farjor_data.json").read_text()))
+        (ROOT / "docs/live-source-status.json").write_text(json.dumps({"assessed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "issues": issues}, ensure_ascii=False, indent=2) + "\n")
+        for item in issues:
+            print(f"ÖPPEN LIVEKÄLLA: {item['source']}: {item['reason']}")
+        return bool(issues)
     if args.published_only:
         errors, observations = check_published()
         (ROOT / "docs/site-health-checks.json").write_text(json.dumps({"checks": observations, "errors": errors}, ensure_ascii=False, indent=2) + "\n")

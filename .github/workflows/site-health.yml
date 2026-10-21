@@ -55,6 +55,12 @@ jobs:
           python3 check_route_coverage.py
           python3 check_site_health.py --baseline "$RUNNER_TEMP/farjor-baseline.json"
 
+      - name: Kontrollera att livekällor faktiskt fungerar
+        id: live_before
+        if: github.event_name != 'pull_request'
+        continue-on-error: true
+        run: python3 check_site_health.py --live-sources-only
+
       - name: Kontrollera den publicerade webbplatsen
         id: published
         if: github.event_name != 'pull_request'
@@ -62,7 +68,7 @@ jobs:
         run: python3 check_site_health.py --published-only
 
       - name: Försök återhämta saknad eller gammal tidtabellsdata
-        if: github.event_name != 'pull_request' && (steps.before.outcome == 'failure' || steps.links.outcome == 'failure' || steps.published.outcome == 'failure')
+        if: github.event_name != 'pull_request' && (steps.before.outcome == 'failure' || steps.links.outcome == 'failure' || steps.published.outcome == 'failure' || steps.live_before.outcome == 'failure')
         run: python3 update_fartyg.py
 
       - name: Slutlig publiceringsgrind
@@ -70,6 +76,12 @@ jobs:
         run: |
           python3 check_route_coverage.py
           python3 check_site_health.py --baseline "$RUNNER_TEMP/farjor-baseline.json"
+
+      - name: Följ upp livekällor efter återhämtningsförsöket
+        id: live_after
+        if: always() && github.event_name != 'pull_request'
+        continue-on-error: true
+        run: python3 check_site_health.py --live-sources-only
 
       - name: Skriv tydlig källsammanställning
         if: always()
@@ -85,6 +97,7 @@ jobs:
             docs/source-inventory.json
             docs/source-link-checks.json
             docs/site-health-checks.json
+            docs/live-source-status.json
           retention-days: 30
 
       - name: Publicera enbart godkända säkra ändringar
@@ -92,7 +105,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add farjor_data.json index.html farjor.html docs/farjelinjer-kallor.md docs/source-inventory.json docs/source-link-checks.json
+          git add farjor_data.json index.html farjor.html docs/farjelinjer-kallor.md docs/source-inventory.json docs/source-link-checks.json docs/live-source-status.json
           if ! git diff --staged --quiet; then
             git commit -m 'Auto: verifierad källkontroll och säker återhämtning [skip ci]'
             git push
@@ -103,6 +116,7 @@ jobs:
         env:
           LINK_OUTCOME: ${{ steps.links.outcome }}
           HEALTH_OUTCOME: ${{ steps.gate.outcome }}
+          LIVE_OUTCOME: ${{ steps.live_after.outcome }}
           PUBLISHED_OUTCOME: ${{ steps.published.outcome }}
         run: |
           echo '## Automatisk kontroll av färjesidan' >> "$GITHUB_STEP_SUMMARY"
@@ -111,6 +125,10 @@ jobs:
           echo 'Detaljer, verkliga kontrolltider och slutadresser finns i rapportartefakten.' >> "$GITHUB_STEP_SUMMARY"
           if [ "$LINK_OUTCOME" = 'failure' ]; then
             echo 'Bekräftad trasig länk kräver källgranskning; inga tider eller nya källdomäner gissas.' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          if [ "$LIVE_OUTCOME" = 'failure' ]; then
+            echo 'Livehämtning återstår att lösa; reservschema räknas inte som återställd livekälla. Se live-source-status.json.' >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
           if [ "$PUBLISHED_OUTCOME" = 'failure' ]; then

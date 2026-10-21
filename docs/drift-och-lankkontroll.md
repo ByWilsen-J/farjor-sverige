@@ -47,3 +47,13 @@ python3 generate_route_source_report.py
 ```
 
 Länkaudit behöver nätåtkomst och `requests`; JavaScript-kontrollen behöver Node.js. För explicit säker redirect-rättning: `python3 audit_source_links.py --apply-safe-redirects`, följt av samtliga publiceringskontroller.
+
+## Livekällor ska återställas
+
+Stående användarbeslut 2026-10-21: aktuella officiella live-/datumtabeller prioriteras. Reservscheman upprätthåller visningen medan fortsatt felsökning pågår. Tillgänglig webbplats och fungerande livehämtning följs därför upp separat.
+
+Den dagliga kontrollen granskar nu även `meta.source_refresh` med `check_site_health.py --live-sources-only`. Avstängd, oprövad, misslyckad, ofullständig eller över 26 timmar gammal hämtning hålls öppen i `docs/live-source-status.json`. Rapportens bedömningstid förnyar aldrig själva källans senaste kontrolltid. Avstängd hämtning beskrivs som oprövad, inte som bekräftad blockering.
+
+En sådan punkt utlöser ett nytt försök med befintliga importer även när sidan och reservschemana fungerar. Efteråt kontrolleras källorna igen. Godkänd reservdata kan fortfarande publiceras, men den dagliga felsökningen markeras som misslyckad tills liveproblemen har följts upp. GitHubs vanliga inställningar avgör om misslyckade jobb ger en avisering.
+
+Detta återprovar befintlig kod. Det utvecklar inte automatiskt nya anropsmetoder. Fortsatt utredning ska följa AGENTS.md: jämför tidigare fungerande lösningar, aktuella officiella källor och alternativa fungerande importer; dokumentera nästa försök och verifiera resultaten före publicering.

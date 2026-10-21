@@ -34,3 +34,9 @@ temp/*
 !temp/.gitkeep
 exports/*
 !exports/.gitkeep
+
+# Stående projektinstruktioner
+!AGENTS.md
+
+# Lokala arbetsfiler
+work/

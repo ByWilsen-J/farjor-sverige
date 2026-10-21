@@ -4,6 +4,8 @@ GitHub-sida/statisk webbsida för färjetidtabeller till och från Sverige. Huvu
 
 ## Aktuell status
 
+**Stående användarbeslut 2026-10-21:** Live-/datumtabeller prioriteras i största möjliga mån. Blockerade källor ska fortsatt felsökas och alternativa fungerande lösningar eftersträvas. Reservscheman avslutar inte en öppen liveuppgift. Viking Line var avstängd i senaste fullkörningen och är därför inte nyverifierad där; TT-Line/Finnlines senaste anrop nekades, men alla alternativa lösningar är inte uttömda. Se AGENTS.md.
+
 **2026-10-21 – klart:** revision av tidtabellsbortfall, källor och automatisk kontroll. 67/67 registrerade ruttriktningar publiceras i kandidatdata; 18 661 avgångsinstanser i perioden 2026-09-21–2027-01-21. 36 regressionstester passerar utan överhoppning, liksom rutttäckning, JavaScript och datahälsa (två redovisade källvarningar).
 
 Polferries datumimport omfattar nu samtliga fyra ruttpar. Eckerö, Wasaline, Finnlines och TT-Line har rättade verifierade reservscheman; Sundbussernes saknade 18:30-turer mån–tors är återlagda. Primärkälla väljs per rutt/datum, cache bevaras vid nätfel och officiellt tomma datum återskapar inte fallbackturer.
@@ -13,6 +15,8 @@ Huvudrapport: [docs/farjelinjer-kallor.md](docs/farjelinjer-kallor.md). Daterad 
 Timvis uppdatering och daglig backfill har nu kvalitetsgrind. Ny daglig felsökning 05:45 UTC kontrollerar länkar och publicerad sida, återhämtar data och kan rätta snävt verifierade permanenta omdirigeringar. Alla skrivjobb delar kö.
 
 ## Senaste ändringar
+
+- 2026-10-21: Sparade användarens prioritering av livekällor i AGENTS.md, driftbeskrivning och logg. Daglig kontroll återprovar nu importer även vid kvarstående livefel, och håller avstängda/otillgängliga källor öppna separat från reservdatans publiceringsgrind. 39 tester passerar; aktuell bedömning identifierar Viking Line, Finnlines och TT-Line som öppna. Ingen ny fungerande livehämtning har påståtts eller verifierats i denna ändring.
 
 - 2026-10-21 22:50: Publicering och schemalagd felsökning verifierade i drift. Provkörningen visade en permanent redirect till Wallenius-SOL:s sida under uppbyggnad i äldre oanvänt intervallunderlag. Autoersättningen återförd med bibehållen proveniens; sådana mål markeras nu för manuell granskning och får aldrig automatisk rättning. Separat regressionstest tillagt. JSON-format behålls kompakt vid länkrättning.
 
@@ -383,6 +387,8 @@ Inget pågående implementationsarbete. Publicering 9af2444 verifierad: Pages-k�
 - TT-Lines Karlshamn-reserv gäller endast 2026; ny årsutgåva behövs före 2027. Perioder för Eckerö/Wasaline respekteras. HTTP 200 bevisar inte att innehållet är aktuellt eller komplett.
 
 ## Nästa steg
+
+1. Prioriterat: återverifiera Viking Lines API och återställa liveimport för TT-Line/Finnlines genom fortsatt utredning av officiella källor/anropsvägar. Dokumentera faktiska försök och resultat; reservscheman är driftstöd under tiden.
 
 - Följ rapportartefakter och misslyckade GitHub-jobb. Kvarvarande osäkra källändringar kräver verifiering; ingen automatisk gissning av tider/domäner.
 - Återvalidera blockerade källor och ersätt äldre tredjepartsunderlag först efter innehållsjämförelse.

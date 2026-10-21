@@ -1,0 +1,23 @@
+{
+  "assessed_at": "2026-10-21T21:02:43+00:00",
+  "issues": [
+    {
+      "source": "Viking Line",
+      "status": "disabled",
+      "checked_at": null,
+      "reason": "Livehämtning avstängd; behöver återverifieras. Avstängning bevisar ingen blockering."
+    },
+    {
+      "source": "Finnlines",
+      "status": "empty",
+      "checked_at": "2026-10-21T20:45:45Z",
+      "reason": "Ingen fullständigt godkänd livehämtning; fortsatt felsökning behövs."
+    },
+    {
+      "source": "TT-Line",
+      "status": "empty",
+      "checked_at": "2026-10-21T20:45:57Z",
+      "reason": "Ingen fullständigt godkänd livehämtning; fortsatt felsökning behövs."
+    }
+  ]
+}

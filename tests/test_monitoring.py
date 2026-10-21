@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime, timezone
 
 from audit_source_links import check_url, classify_status, replace_data_urls, safe_redirect
-from check_site_health import check_data, check_published
+from check_site_health import LIVE_SOURCE_NAMES, check_data, check_published, live_source_issues
 
 
 class Response:
@@ -101,3 +101,25 @@ class PublicationTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LiveSourceTests(unittest.TestCase):
+    now = datetime(2026, 10, 21, 12, tzinfo=timezone.utc)
+
+    def healthy(self):
+        return {"meta": {"source_refresh": {name: {"status": "ok", "accepted_rows": 10, "checked_at": "2026-10-21T11:00:00Z"} for name in LIVE_SOURCE_NAMES}}}
+
+    def test_fallback_does_not_close_failed_or_disabled_live_collection(self):
+        data = self.healthy()
+        data["meta"]["source_refresh"]["TT-Line"]["status"] = "empty"
+        data["meta"]["source_refresh"]["Viking Line"]["status"] = "disabled"
+        self.assertEqual({row["source"] for row in live_source_issues(data, self.now)}, {"TT-Line", "Viking Line"})
+
+    def test_fresh_success_closes_the_followup(self):
+        self.assertEqual(live_source_issues(self.healthy(), self.now), [])
+
+    def test_stale_or_unchecked_collection_remains_open(self):
+        data = self.healthy()
+        data["meta"]["source_refresh"]["Finnlines"]["checked_at"] = "2026-10-19T11:00:00Z"
+        del data["meta"]["source_refresh"]["DFDS"]
+        self.assertEqual({row["source"] for row in live_source_issues(data, self.now)}, {"Finnlines", "DFDS"})
