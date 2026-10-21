@@ -1,0 +1,282 @@
+[
+  {
+    "source": "dfds_scraper",
+    "checked_at": "2026-10-21T20:37:59.976432+00:00",
+    "date_from": "2026-10-21",
+    "date_to": "2026-10-28",
+    "count": 71,
+    "routes": [
+      {
+        "departure": "Brevik",
+        "arrival": "Göteborg",
+        "count": 2
+      },
+      {
+        "departure": "Ghent",
+        "arrival": "Göteborg",
+        "count": 6
+      },
+      {
+        "departure": "Göteborg",
+        "arrival": "Brevik",
+        "count": 1
+      },
+      {
+        "departure": "Göteborg",
+        "arrival": "Ghent",
+        "count": 5
+      },
+      {
+        "departure": "Göteborg",
+        "arrival": "Immingham",
+        "count": 5
+      },
+      {
+        "departure": "Göteborg",
+        "arrival": "Zeebrugge",
+        "count": 4
+      },
+      {
+        "departure": "Immingham",
+        "arrival": "Göteborg",
+        "count": 6
+      },
+      {
+        "departure": "Kapellskär",
+        "arrival": "Paldiski",
+        "count": 7
+      },
+      {
+        "departure": "Karlshamn",
+        "arrival": "Klaipėda",
+        "count": 11
+      },
+      {
+        "departure": "Klaipėda",
+        "arrival": "Karlshamn",
+        "count": 10
+      },
+      {
+        "departure": "Klaipėda",
+        "arrival": "Trelleborg",
+        "count": 2
+      },
+      {
+        "departure": "Paldiski",
+        "arrival": "Kapellskär",
+        "count": 6
+      },
+      {
+        "departure": "Trelleborg",
+        "arrival": "Klaipėda",
+        "count": 2
+      },
+      {
+        "departure": "Zeebrugge",
+        "arrival": "Göteborg",
+        "count": 4
+      }
+    ],
+    "first_date": "2026-10-21",
+    "last_date": "2026-10-28",
+    "status": "ok"
+  },
+  {
+    "source": "tallink_scraper",
+    "checked_at": "2026-10-21T20:37:59.976797+00:00",
+    "date_from": "2026-10-21",
+    "date_to": "2026-10-28",
+    "count": 64,
+    "routes": [
+      {
+        "departure": "Helsingfors",
+        "arrival": "Stockholm",
+        "count": 13
+      },
+      {
+        "departure": "Stockholm",
+        "arrival": "Helsingfors",
+        "count": 13
+      },
+      {
+        "departure": "Stockholm",
+        "arrival": "Tallinn",
+        "count": 6
+      },
+      {
+        "departure": "Stockholm",
+        "arrival": "Åbo",
+        "count": 14
+      },
+      {
+        "departure": "Tallinn",
+        "arrival": "Stockholm",
+        "count": 7
+      },
+      {
+        "departure": "Åbo",
+        "arrival": "Stockholm",
+        "count": 11
+      }
+    ],
+    "first_date": "2026-10-21",
+    "last_date": "2026-11-03",
+    "status": "ok"
+  },
+  {
+    "source": "finnlines_scraper",
+    "checked_at": "2026-10-21T20:37:59.976938+00:00",
+    "date_from": "2026-10-21",
+    "date_to": "2026-10-28",
+    "count": 0,
+    "routes": [],
+    "status": "blocked",
+    "reason": "403 WAFForbiddenException; official current booking client uses same public GraphQL endpoint/configuration"
+  },
+  {
+    "source": "molslinjen_scraper",
+    "checked_at": "2026-10-21T20:37:59.977517+00:00",
+    "date_from": "2026-10-21",
+    "date_to": "2026-10-28",
+    "count": 54,
+    "routes": [
+      {
+        "departure": "Helsingborg",
+        "arrival": "Helsingør",
+        "count": 23
+      },
+      {
+        "departure": "Helsingør",
+        "arrival": "Helsingborg",
+        "count": 23
+      },
+      {
+        "departure": "Rønne",
+        "arrival": "Ystad",
+        "count": 4
+      },
+      {
+        "departure": "Ystad",
+        "arrival": "Rønne",
+        "count": 4
+      }
+    ],
+    "first_date": "2026-10-21",
+    "last_date": "2026-10-22",
+    "status": "ok"
+  },
+  {
+    "source": "stena_line_scraper",
+    "checked_at": "2026-10-21T20:37:59.977659+00:00",
+    "date_from": "2026-10-21",
+    "date_to": "2026-10-28",
+    "count": 181,
+    "routes": [
+      {
+        "departure": "Frederikshavn",
+        "arrival": "Göteborg",
+        "count": 30
+      },
+      {
+        "departure": "Gdynia",
+        "arrival": "Karlskrona",
+        "count": 19
+      },
+      {
+        "departure": "Göteborg",
+        "arrival": "Frederikshavn",
+        "count": 30
+      },
+      {
+        "departure": "Göteborg",
+        "arrival": "Kiel",
+        "count": 8
+      },
+      {
+        "departure": "Karlskrona",
+        "arrival": "Gdynia",
+        "count": 20
+      },
+      {
+        "departure": "Kiel",
+        "arrival": "Göteborg",
+        "count": 8
+      },
+      {
+        "departure": "Nynäshamn",
+        "arrival": "Ventspils",
+        "count": 10
+      },
+      {
+        "departure": "Rostock",
+        "arrival": "Trelleborg",
+        "count": 23
+      },
+      {
+        "departure": "Trelleborg",
+        "arrival": "Rostock",
+        "count": 23
+      },
+      {
+        "departure": "Ventspils",
+        "arrival": "Nynäshamn",
+        "count": 10
+      }
+    ],
+    "first_date": "2026-10-21",
+    "last_date": "2026-10-28",
+    "status": "ok"
+  },
+  {
+    "source": "polferries_scraper",
+    "checked_at": "2026-10-21T20:37:59.977816+00:00",
+    "date_from": "2026-10-21",
+    "date_to": "2026-10-28",
+    "count": 1318,
+    "routes": [
+      {
+        "departure": "Gdańsk",
+        "arrival": "Karlshamn",
+        "count": 77
+      },
+      {
+        "departure": "Gdańsk",
+        "arrival": "Nynäshamn",
+        "count": 78
+      },
+      {
+        "departure": "Karlshamn",
+        "arrival": "Gdańsk",
+        "count": 77
+      },
+      {
+        "departure": "Nynäshamn",
+        "arrival": "Gdańsk",
+        "count": 78
+      },
+      {
+        "departure": "Trelleborg",
+        "arrival": "Świnoujście",
+        "count": 228
+      },
+      {
+        "departure": "Ystad",
+        "arrival": "Świnoujście",
+        "count": 276
+      },
+      {
+        "departure": "Świnoujście",
+        "arrival": "Trelleborg",
+        "count": 228
+      },
+      {
+        "departure": "Świnoujście",
+        "arrival": "Ystad",
+        "count": 276
+      }
+    ],
+    "first_date": "2026-10-01",
+    "last_date": "2027-01-11",
+    "status": "ok"
+  }
+]

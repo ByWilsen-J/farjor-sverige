@@ -1,0 +1,118 @@
+name: Daglig felsökning och säker länkreparation
+
+on:
+  schedule:
+    - cron: '45 5 * * *'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '*.py'
+      - '*.html'
+      - 'farjor_data.json'
+      - '.github/workflows/**'
+      - 'tests/**'
+
+concurrency:
+  group: ferry-data-writer-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  TZ: Europe/Stockholm
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: pip install requests
+
+      - name: Kontrollera Python och regressionstester
+        run: |
+          python3 -m compileall -q .
+          python3 -m unittest discover -s tests
+          cp farjor_data.json "$RUNNER_TEMP/farjor-baseline.json"
+
+      - name: Kontrollera alla käll- och sidlänkar
+        id: links
+        continue-on-error: true
+        env:
+          REPAIR: ${{ github.event_name != 'pull_request' && '--apply-safe-redirects' || '' }}
+        run: python3 audit_source_links.py $REPAIR
+
+      - name: Kontrollera hälsa och rutttäckning
+        id: before
+        continue-on-error: true
+        run: |
+          python3 check_route_coverage.py
+          python3 check_site_health.py --baseline "$RUNNER_TEMP/farjor-baseline.json"
+
+      - name: Kontrollera den publicerade webbplatsen
+        id: published
+        if: github.event_name != 'pull_request'
+        continue-on-error: true
+        run: python3 check_site_health.py --published-only
+
+      - name: Försök återhämta saknad eller gammal tidtabellsdata
+        if: github.event_name != 'pull_request' && (steps.before.outcome == 'failure' || steps.links.outcome == 'failure' || steps.published.outcome == 'failure')
+        run: python3 update_fartyg.py
+
+      - name: Slutlig publiceringsgrind
+        id: gate
+        run: |
+          python3 check_route_coverage.py
+          python3 check_site_health.py --baseline "$RUNNER_TEMP/farjor-baseline.json"
+
+      - name: Skriv tydlig källsammanställning
+        if: always()
+        run: python3 generate_route_source_report.py
+
+      - name: Spara rapporter även när publicering stoppas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-and-health-diagnostics
+          path: |
+            docs/farjelinjer-kallor.md
+            docs/source-inventory.json
+            docs/source-link-checks.json
+            docs/site-health-checks.json
+          retention-days: 30
+
+      - name: Publicera enbart godkända säkra ändringar
+        if: steps.gate.outcome == 'success' && github.event_name != 'pull_request'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add farjor_data.json index.html farjor.html docs/farjelinjer-kallor.md docs/source-inventory.json docs/source-link-checks.json
+          if ! git diff --staged --quiet; then
+            git commit -m 'Auto: verifierad källkontroll och säker återhämtning [skip ci]'
+            git push
+          fi
+
+      - name: Sammanfattning och uppmärksamma kvarvarande brutna länkar
+        if: always()
+        env:
+          LINK_OUTCOME: ${{ steps.links.outcome }}
+          HEALTH_OUTCOME: ${{ steps.gate.outcome }}
+          PUBLISHED_OUTCOME: ${{ steps.published.outcome }}
+        run: |
+          echo '## Automatisk kontroll av färjesidan' >> "$GITHUB_STEP_SUMMARY"
+          echo "Länkkontroll: $LINK_OUTCOME. Publiceringsgrind: $HEALTH_OUTCOME." >> "$GITHUB_STEP_SUMMARY"
+          echo "Publicerad webbplats: $PUBLISHED_OUTCOME. Eventuell ny Pages-publicering kan fortfarande pågå." >> "$GITHUB_STEP_SUMMARY"
+          echo 'Detaljer, verkliga kontrolltider och slutadresser finns i rapportartefakten.' >> "$GITHUB_STEP_SUMMARY"
+          if [ "$LINK_OUTCOME" = 'failure' ]; then
+            echo 'Bekräftad trasig länk kräver källgranskning; inga tider eller nya källdomäner gissas.' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          if [ "$PUBLISHED_OUTCOME" = 'failure' ]; then
+            exit 1
+          fi

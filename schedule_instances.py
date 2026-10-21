@@ -379,7 +379,8 @@ def make_dynamic_instance(sailing: dict, fallback: dict | None = None) -> dict:
     status = sailing.get("status", "") or ""
     traffic_comment = sailing.get("traffic_comment", "") or ""
     if not arr_date_iso and dep_date_iso:
-        arr_date_iso = infer_arrival_date(dep_date_iso, dep_time, arr_time, False)
+        if arr_time:
+            arr_date_iso = infer_arrival_date(dep_date_iso, dep_time, arr_time, False)
     base = {
         "rederi": rederi,
         "display_group": norm_rederi(rederi),
@@ -401,13 +402,15 @@ def make_dynamic_instance(sailing: dict, fallback: dict | None = None) -> dict:
         "kalla": sailing.get("kalla", "") or sailing.get("source", "") or (fallback or {}).get("kalla", ""),
         "fartyg": sailing.get("fartyg", "") or sailing.get("ship_name", "") or sailing.get("ship", ""),
         "source_type": source_type,
-        "source_priority": SOURCE_PRIORITIES["dynamic_schedule"],
+        "source_priority": SOURCE_PRIORITIES.get(source_type, SOURCE_PRIORITIES["dynamic_schedule"]),
         "source_label": source_label,
         "source_detail": source_detail,
         "is_live": bool(sailing.get("is_live", True)),
         "is_exact": bool(sailing.get("is_exact", True)),
         "status": status,
         "traffic_comment": traffic_comment,
+        "source_checked_at": sailing.get("source_checked_at", ""),
+        "source_cached": bool(sailing.get("source_cached", False)),
         "template_id": (fallback or {}).get("template_id"),
     }
     if base["mot_sverige"] is None:

@@ -4,33 +4,27 @@ GitHub-sida/statisk webbsida för färjetidtabeller till och från Sverige. Huvu
 
 ## Aktuell status
 
-Genomförd huvudombyggnad 2026-05-21. `farjor_data.json` bygger nu ett publiceringsfönster på `idag - 1 månad` till `idag + 3 månader` som `avgangsinstanser`, och `index.html` renderar dessa instanser först när de finns. Veckoschema används därmed som fallback-datakälla i backend i stället för som primär renderkälla i frontend.
+**2026-10-21 – klart:** revision av tidtabellsbortfall, källor och automatisk kontroll. 67/67 registrerade ruttriktningar publiceras i kandidatdata; 18 661 avgångsinstanser i perioden 2026-09-21–2027-01-21. 35 regressionstester passerar utan överhoppning, liksom rutttäckning, JavaScript och datahälsa (två redovisade källvarningar).
 
-Tallinks Tallinn–Stockholm-rutt är nu åter inkopplad i kodbasen för den dynamiska Tallink-hämtningen. `tallink_scraper.py` hämtar nu även `tal ↔ sto`, och UI-fallbacken visar `Baltic Queen` för `Stockholm ↔ Tallinn` även när exakt fartygsrad saknas i en enskild avgång.
+Polferries datumimport omfattar nu samtliga fyra ruttpar. Eckerö, Wasaline, Finnlines och TT-Line har rättade verifierade reservscheman; Sundbussernes saknade 18:30-turer mån–tors är återlagda. Primärkälla väljs per rutt/datum, cache bevaras vid nätfel och officiellt tomma datum återskapar inte fallbackturer.
 
-Stena Line `Nynäshamn ↔ Ventspils` är nu återlagd både som verifierad veckofallback och som dynamisk live-rutt i Stena-kedjan. Rutten finns därmed i hela publiceringsfönstret i `avgangsinstanser`, inte bara när livefönstret råkar täcka den.
+Huvudrapport: [docs/farjelinjer-kallor.md](docs/farjelinjer-kallor.md). Daterad innehållsrevision: [docs/kallrevision-2026-10-21.md](docs/kallrevision-2026-10-21.md). Drift/körschema: [docs/drift-och-lankkontroll.md](docs/drift-och-lankkontroll.md). Kontrolltider hämtas från verkliga länk-/API-försök, inte rapportgenerering.
 
-Större ankomstrevision 2026-05-31 är genomförd med [route_registry.py](/Users/jane/Documents/Claude/Projects/Weblänksida/route_registry.py) som körbar källa för aktiva rutter, borttagna rutter och dubblettregler. Kontrollskriptet [check_route_coverage.py](/Users/jane/Documents/Claude/Projects/Weblänksida/check_route_coverage.py) passerar per 2026-07-16 med `67` aktiva publicerade Sverige-rutter i `farjor_data.json`.
-
-Stena Line `Grenaa/Grenå ↔ Halmstad` är rättad till nedlagd och ska inte publiceras. `TT-Line Klaipėda ↔ Karlshamn/Trelleborg` och `Tallink Paldiski ↔ Kapellskär` hålls borta som separata sekundärkällor när samma trafik har en utsedd primärkälla (`DFDS`). Kortlinjerna `Bornholmslinjen Ystad ↔ Rønne`, `Øresundslinjen Helsingør ↔ Helsingborg` och `Sundbusserne Helsingborg ↔ Helsingør` är nu med i data/källrapport; `Color Line Strömstad ↔ Sandefjord` finns fortfarande bara som länkvisare tills exakt datumimport är säker.
-
-Sidan behåller den nya högerpanelen, rederifiltret och den gemensamma tabellvyn, men visar nu också källchippar för live-/datumrader. Dynamiska källor kan bära med sig källmeta och statuskommentarer ända fram till info-rutan per avgång. `farjor.html` är fortsatt redirect till startsidan.
-
-Rederifiltret har nu ett standardval som visar alla publicerade rader utom `Bornholmslinjen`, `Øresundslinjen/Öresundslinjen` och `Sundbusserne`. Dessa kortlinjer finns fortfarande kvar i datan och kan visas genom att välja `Alla rederier (inkl. Bornholmslinjen, Öresundslinjen, Sundbusserne)`.
-
-Excel-exporten har två lägen: en detaljerad rapportexport och en enklare checklist-export som följer sidans kolumnordning, använder aktuellt datum/filter och lägger till kolumner för avbockning och anteckning.
-
-Automationen är nu uppdelad i faktisk driftmodell: timvis uppdatering för dynamiska datumkällor och daglig backfill för hela publiceringsfönstret. Kvarvarande större bevakningspunkter gäller främst separat trafikbevakning från särskilda rederi-sidor, Viking Lines blockerade server-side-källa, `Color Line Strömstad ↔ Sandefjord` som ännu bara är länkvisare och TT-Lines livekälla som ibland nekar/timeoutar i lokal miljö. När en primär livekälla saknas helt för en körning får verifierad reservkälla ligga kvar, men kontrollskriptet varnar om det.
-
-TT-Lines dynamiska källa fungerar åter i GitHub Actions efter en smal transportfallback i [ttline_scraper.py](/Users/jane/Documents/Claude/Projects/Weblänksida/ttline_scraper.py): senaste manuella körningen `26434933146` på `2026-05-26` hämtade `237` TT-Line-avgångar trots att runnern fortfarande misslyckas med vanlig certifikatverifiering mot `www.ttline.com`.
-
-Efter innehållsrevisionen 2026-05-21 visar UI:t tydligare skillnad mellan exakt fartyg och verifierad ruttrotation, mer konsekventa källetiketter (`Live`, `Datum`, `Veckoschema`) och renare info-rutor utan generiska `Källa`- eller revisionsrester i tooltip-text.
-
-TT-Lines tidigare fallbackluckor i grundschemat för `Travemünde ↔ Trelleborg`, `Świnoujście ↔ Trelleborg` och `Klaipėda ↔ Trelleborg` är nu kompletterade i själva genereringskedjan, så att rutterna finns i publiceringsfönstret även utanför det dynamiska 14-dagarsfönstret.
-
-Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: när officiell livekälla finns för en Stena-rutt på ett visst datum rensas motsvarande veckofallback bort från samma datum/rutt i `avgangsinstanser`.
+Timvis uppdatering och daglig backfill har nu kvalitetsgrind. Ny daglig felsökning 05:45 UTC kontrollerar länkar och publicerad sida, återhämtar data och kan rätta snävt verifierade permanenta omdirigeringar. Alla skrivjobb delar kö.
 
 ## Senaste ändringar
+
+- 2026-10-21: Slutförd innehålls- och driftrevision med tre subagenter.
+  - Rättade global källfiltrering, gammal cache vid ändrade avgångstider, datumöverskridande ankomstgissning, begränsade Mols-svar och persistens för verifierade tomma datum.
+  - Rättade Polferries flikparser/årsskifte, Gdańsk-rutter, fartygskoder; periodbundna Eckerö/Wasaline- och TT-reserver, Finnlines ankomster samt Sundbussernes sena turer.
+  - Rättade POLSCA/VesselFinder-länkar, frontendladdning och visning av okänd ankomst. Cache/hämttid syns i avgångens info; datum utanför publicerad period ger tydlig information.
+  - Införde daglig länk-/driftkontroll, automatisk säker återhämtning, publiceringsgrindar och löpande källrapport. 74 aktuella URL:er kontrollerade, inga bekräftade 404/410.
+  - Validerat: 35/35 tester, Python/JavaScript, 67/67 riktningar och datahälsa. Finnlines/TT-Line redovisas som begränsningar; inga påhittade avgångar eller källbyten.
+
+- 2026-10-21: Revision av bortfall, källor och driftkontroll påbörjad (slutförd ovan).
+  - Bekräftat datumövergripande källfilter, Polferries parserfel för tvåsiffriga tabellavsnitt och utgången Gdańsk–Karlshamn-import.
+  - Tre subagenter granskar datakedjan, officiella källor och övervakningen; huvudagenten granskar frontend och samordnar verifiering/publicering.
+  - Timuppdateringarna kör men saknar kvalitetsgrind. Finnlines och TT-Line ger 403 i GitHub Actions; reservscheman och tydlig källstatus behövs.
 
 - 2026-07-17: Tog bort den GitHub-baserade felsanmälan.
   - Rensade [index.html](/Users/jane/Documents/Claude/Projects/Weblänksida/index.html) från sidopanelruta, modal, GitHub Issue-länk och tillhörande JavaScript eftersom besökare annars behöver GitHub-konto.
@@ -375,42 +369,26 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 
 ## Pågående arbete
 
-- Granska [docs/farjelinjer-kallor.md](/Users/jane/Documents/Claude/Projects/Weblänksida/docs/farjelinjer-kallor.md) mot användarens manuella källbedömning.
-- Slutlig visuell QA av den nya instansrenderingen i riktig browser när lokal browser-runtime finns tillgänglig igen.
-- Nästa utbyggnad av trafikinformationsspåret så att separata rederisidor kan generera explicita `traffic_notices`, inte bara kommentarer från livekällornas statusfält.
-- Separat källa för `Unity Line`/`Polferries` så att `Polsca` kan vara rent visningsnamn och inte lookup-nyckel.
-- Viking Lines server-side-källa behöver fortfarande återvalideras eftersom den fortsatt gav `403 Forbidden` i senaste verifierade GitHub Actions-körningen `26434933146`.
+Slutlig publicering och kontroll av GitHub Actions/Pages vid revisionens leverans. Senaste verkliga driftskontroll finns i docs/site-health-checks.json.
 
 ## Problem / blockerare
 
-- `Color Line Strömstad ↔ Sandefjord` är fortsatt länkvisare, inte datuminstanser. Den ska inte flyttas in i huvudtabellen förrän vi har en säker officiell datumkälla eller en verifierad statisk tabell som inte riskerar fel tider.
-- `update-timetables.yml` kraschar inte längre på legacy-formatet och TT-Line fungerar åter, men `Viking Line` svarar fortsatt `403 Forbidden` på nuvarande server-side API-anrop.
-- TT-Line fungerar i GitHub Actions först efter en smal fallback utan certifikatverifiering när runnern inte kan validera `www.ttline.com`-kedjan. Det är en avgränsad driftmitigering men fortfarande en extern transport-risk om TT-Line ändrar sitt upplägg igen.
-- Dedikerade collectors för rederiernas separata trafikinformationssidor finns ännu inte. Nuvarande version kan bära status/kommentar från de livekällor som redan innehåller sådan information, men inte bevaka alla externa trafikbloggar/bulletinsidor.
-- `Viking Line` kan fortfarande inte verifieras fullt server-side i denna kedja eftersom senaste bekräftade produktionsbeteende i GitHub Actions fortfarande var `403 Forbidden`.
-- Lokal headless-browserautomation kunde inte återanvändas fullt i denna session eftersom Playwright saknar installerad browser-binary i miljön. Innehållsrevisionen verifierades därför via officiella webbkällor, JSON-audit, funktionsprov av tooltip-normalisering och tidigare lokal preview.
-- `polsca_datum` är en separat specialkedja med egen period (`2026-05-01` till `2026-11-30`) och innehåller bara `Świnoujście ↔ Trelleborg`, medan `Ystad ↔ Świnoujście` och `Gdańsk ↔ Nynäshamn` fortfarande ligger i statiskt schema.
-- `intervall`-datan i JSON är i praktiken oanvänd i rendering och hjälper därför inte dagens tidtabellsvisning trots att den finns i datalagret.
-- Veckoschemat innehåller fortfarande vissa manuellt inlagda undantag och parallella varianter. Frontenden deduperar nu de uppenbara fallen, men datalagret kan fortfarande behöva en separat städning senare.
-- Vissa schemaundantag ligger fortfarande som veckorader med anmärkning i datalagret. Den här omgången säkrade Viking-specialtiden, men fler undantag kan på sikt behöva samma typ av datumstyrning.
-- Unity Line finns inte som egen datumkälla i nuvarande JSON, så full separering eller exakt avgångsimport kräver ny importkedja.
-- Exakt dagsdata kan fortfarande saknas för vissa enskilda datum i slutet av det deklarerade dynamiska fönstret även när route-day-prioritering finns på plats. Då återstår veckofallback tills källfönster eller scraper-horisont justeras.
-- `route_registry.py` täcker nu publicerade aktiva rutter, men nya eller ändrade färjelinjer kräver fortsatt manuell source-of-truth-kontroll innan de läggs till.
+- Finnlines GraphQL och TT-Line livekälla gav 403 vid senaste hämtning; verifierade reservscheman används. Viking Line har fortsatt maskinell åtkomstbegränsning och använder veckoschema.
+- Molslinjens officiella katalog täcker endast kommande avgångar, inte hela fyramånadersperioden. Tidigare datumdata och dokumenterad fallback bevaras där uppgifter saknas; inga nya tider gissas.
+- Tre äldre laevagraafik.ee-källhänvisningar ger nätfel. Proveniens bevaras tills underlagets tider har verifierats mot ersättningskälla; aktuella exakta DFDS/Tallink-rader har officiella källor.
+- Color Line är fortsatt länkvisare. Separata trafikmeddelanden/inställda turer utanför importernas tillgängliga källor kräver vidare arbete.
+- TT-Lines Karlshamn-reserv gäller endast 2026; ny årsutgåva behövs före 2027. Perioder för Eckerö/Wasaline respekteras. HTTP 200 bevisar inte att innehållet är aktuellt eller komplett.
 
 ## Nästa steg
 
-- Låt användaren granska [docs/farjelinjer-kallor.md](/Users/jane/Documents/Claude/Projects/Weblänksida/docs/farjelinjer-kallor.md) och särskilt bekräfta om `Color Line` ska byggas som tabellrad när säker källa hittats.
-- Återvalidera eller ersätt Viking Lines nuvarande API-kedja eftersom den fortfarande ger `403 Forbidden` i GitHub Actions.
-- Övervaka ett par kommande schemalagda körningar så att TT-Lines nya transportfallback fortsätter leverera stabilt även utan manuell trigger.
-- Kör en ny full browser-QA när lokal browser-runtime fungerar igen och kontrollera särskilt tooltipar, rotationsfartyg och källchippar i `In & Ut`-vyn.
-- Lägg till separat `traffic_notices`-collector per rederi där officiella trafikmeddelandesidor finns.
-- Bygg ut `source_registry` från dokumenterad matris till körbar konfiguration om kommande skript ska styras route-för-route.
-- Planera dubbel bevakning för `Polsca` där både `Polferries` och `Unity Line` bevakas separat och sammanfogas först före visning.
-- Bygg eller hitta en riktig importkälla för Unity Line/POLSCA-datum så `Świnoujście ↔ Ystad` och `Świnoujście ↔ Trelleborg` inte behöver förlita sig på blandade schema-/fallbackkällor.
-- Återupptäck Viking Lines aktuella API eller lägg till en robust server-side fallback.
-- Överväg att slå ihop eller avveckla legacy-fälten `fartyg_datum` och `avgangar_datum` när full parity mot `avgangsinstanser` är verifierad.
+- Följ rapportartefakter och misslyckade GitHub-jobb. Kvarvarande osäkra källändringar kräver verifiering; ingen automatisk gissning av tider/domäner.
+- Återvalidera blockerade källor och ersätt äldre tredjepartsunderlag först efter innehållsjämförelse.
+- Granska nya års-/säsongstidtabeller innan reservscheman löper ut; utöka med officiella trafikmeddelanden och säker Color Line-import.
 
 ## TODO / backlog
+
+- [x] 2026-10-21: Rätta bekräftade tidtabellsbortfall och skapa automatiska kvalitetsgrindar.
+- [x] 2026-10-21: Löpande källrapport och daglig schemalagd länk-/driftkontroll med säker automatisk återhämtning.
 
 - [x] Besluta och dokumentera ny källhierarki per rederi/rutt: `live datumkälla` -> `statisk datumtabell` -> `veckoschema` -> `ingen visning`.
 - [x] Bygg om datamodellen så att avgångar lagras som datuminstanser och inte primärt som veckomönster.
@@ -441,6 +419,78 @@ Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: 
 - [ ] Kontrollera GitHub Actions efter att fler skrapare kopplats in.
 
 ## Historik
+
+### Status och planering före revisionen 2026-10-21
+
+#### Aktuell status
+
+
+Genomförd huvudombyggnad 2026-05-21. `farjor_data.json` bygger nu ett publiceringsfönster på `idag - 1 månad` till `idag + 3 månader` som `avgangsinstanser`, och `index.html` renderar dessa instanser först när de finns. Veckoschema används därmed som fallback-datakälla i backend i stället för som primär renderkälla i frontend.
+
+Tallinks Tallinn–Stockholm-rutt är nu åter inkopplad i kodbasen för den dynamiska Tallink-hämtningen. `tallink_scraper.py` hämtar nu även `tal ↔ sto`, och UI-fallbacken visar `Baltic Queen` för `Stockholm ↔ Tallinn` även när exakt fartygsrad saknas i en enskild avgång.
+
+Stena Line `Nynäshamn ↔ Ventspils` är nu återlagd både som verifierad veckofallback och som dynamisk live-rutt i Stena-kedjan. Rutten finns därmed i hela publiceringsfönstret i `avgangsinstanser`, inte bara när livefönstret råkar täcka den.
+
+Större ankomstrevision 2026-05-31 är genomförd med [route_registry.py](/Users/jane/Documents/Claude/Projects/Weblänksida/route_registry.py) som körbar källa för aktiva rutter, borttagna rutter och dubblettregler. Kontrollskriptet [check_route_coverage.py](/Users/jane/Documents/Claude/Projects/Weblänksida/check_route_coverage.py) passerar per 2026-07-16 med `67` aktiva publicerade Sverige-rutter i `farjor_data.json`.
+
+Stena Line `Grenaa/Grenå ↔ Halmstad` är rättad till nedlagd och ska inte publiceras. `TT-Line Klaipėda ↔ Karlshamn/Trelleborg` och `Tallink Paldiski ↔ Kapellskär` hålls borta som separata sekundärkällor när samma trafik har en utsedd primärkälla (`DFDS`). Kortlinjerna `Bornholmslinjen Ystad ↔ Rønne`, `Øresundslinjen Helsingør ↔ Helsingborg` och `Sundbusserne Helsingborg ↔ Helsingør` är nu med i data/källrapport; `Color Line Strömstad ↔ Sandefjord` finns fortfarande bara som länkvisare tills exakt datumimport är säker.
+
+Sidan behåller den nya högerpanelen, rederifiltret och den gemensamma tabellvyn, men visar nu också källchippar för live-/datumrader. Dynamiska källor kan bära med sig källmeta och statuskommentarer ända fram till info-rutan per avgång. `farjor.html` är fortsatt redirect till startsidan.
+
+Rederifiltret har nu ett standardval som visar alla publicerade rader utom `Bornholmslinjen`, `Øresundslinjen/Öresundslinjen` och `Sundbusserne`. Dessa kortlinjer finns fortfarande kvar i datan och kan visas genom att välja `Alla rederier (inkl. Bornholmslinjen, Öresundslinjen, Sundbusserne)`.
+
+Excel-exporten har två lägen: en detaljerad rapportexport och en enklare checklist-export som följer sidans kolumnordning, använder aktuellt datum/filter och lägger till kolumner för avbockning och anteckning.
+
+Automationen är nu uppdelad i faktisk driftmodell: timvis uppdatering för dynamiska datumkällor och daglig backfill för hela publiceringsfönstret. Kvarvarande större bevakningspunkter gäller främst separat trafikbevakning från särskilda rederi-sidor, Viking Lines blockerade server-side-källa, `Color Line Strömstad ↔ Sandefjord` som ännu bara är länkvisare och TT-Lines livekälla som ibland nekar/timeoutar i lokal miljö. När en primär livekälla saknas helt för en körning får verifierad reservkälla ligga kvar, men kontrollskriptet varnar om det.
+
+TT-Lines dynamiska källa fungerar åter i GitHub Actions efter en smal transportfallback i [ttline_scraper.py](/Users/jane/Documents/Claude/Projects/Weblänksida/ttline_scraper.py): senaste manuella körningen `26434933146` på `2026-05-26` hämtade `237` TT-Line-avgångar trots att runnern fortfarande misslyckas med vanlig certifikatverifiering mot `www.ttline.com`.
+
+Efter innehållsrevisionen 2026-05-21 visar UI:t tydligare skillnad mellan exakt fartyg och verifierad ruttrotation, mer konsekventa källetiketter (`Live`, `Datum`, `Veckoschema`) och renare info-rutor utan generiska `Källa`- eller revisionsrester i tooltip-text.
+
+TT-Lines tidigare fallbackluckor i grundschemat för `Travemünde ↔ Trelleborg`, `Świnoujście ↔ Trelleborg` och `Klaipėda ↔ Trelleborg` är nu kompletterade i själva genereringskedjan, så att rutterna finns i publiceringsfönstret även utanför det dynamiska 14-dagarsfönstret.
+
+Stena Line prioriteras nu konsekvent route-day-first i det dynamiska fönstret: när officiell livekälla finns för en Stena-rutt på ett visst datum rensas motsvarande veckofallback bort från samma datum/rutt i `avgangsinstanser`.
+
+#### Pågående arbete
+
+
+- Granska [docs/farjelinjer-kallor.md](/Users/jane/Documents/Claude/Projects/Weblänksida/docs/farjelinjer-kallor.md) mot användarens manuella källbedömning.
+- Slutlig visuell QA av den nya instansrenderingen i riktig browser när lokal browser-runtime finns tillgänglig igen.
+- Nästa utbyggnad av trafikinformationsspåret så att separata rederisidor kan generera explicita `traffic_notices`, inte bara kommentarer från livekällornas statusfält.
+- Separat källa för `Unity Line`/`Polferries` så att `Polsca` kan vara rent visningsnamn och inte lookup-nyckel.
+- Viking Lines server-side-källa behöver fortfarande återvalideras eftersom den fortsatt gav `403 Forbidden` i senaste verifierade GitHub Actions-körningen `26434933146`.
+
+#### Problem / blockerare
+
+
+- `Color Line Strömstad ↔ Sandefjord` är fortsatt länkvisare, inte datuminstanser. Den ska inte flyttas in i huvudtabellen förrän vi har en säker officiell datumkälla eller en verifierad statisk tabell som inte riskerar fel tider.
+- `update-timetables.yml` kraschar inte längre på legacy-formatet och TT-Line fungerar åter, men `Viking Line` svarar fortsatt `403 Forbidden` på nuvarande server-side API-anrop.
+- TT-Line fungerar i GitHub Actions först efter en smal fallback utan certifikatverifiering när runnern inte kan validera `www.ttline.com`-kedjan. Det är en avgränsad driftmitigering men fortfarande en extern transport-risk om TT-Line ändrar sitt upplägg igen.
+- Dedikerade collectors för rederiernas separata trafikinformationssidor finns ännu inte. Nuvarande version kan bära status/kommentar från de livekällor som redan innehåller sådan information, men inte bevaka alla externa trafikbloggar/bulletinsidor.
+- `Viking Line` kan fortfarande inte verifieras fullt server-side i denna kedja eftersom senaste bekräftade produktionsbeteende i GitHub Actions fortfarande var `403 Forbidden`.
+- Lokal headless-browserautomation kunde inte återanvändas fullt i denna session eftersom Playwright saknar installerad browser-binary i miljön. Innehållsrevisionen verifierades därför via officiella webbkällor, JSON-audit, funktionsprov av tooltip-normalisering och tidigare lokal preview.
+- `polsca_datum` är en separat specialkedja med egen period (`2026-05-01` till `2026-11-30`) och innehåller bara `Świnoujście ↔ Trelleborg`, medan `Ystad ↔ Świnoujście` och `Gdańsk ↔ Nynäshamn` fortfarande ligger i statiskt schema.
+- `intervall`-datan i JSON är i praktiken oanvänd i rendering och hjälper därför inte dagens tidtabellsvisning trots att den finns i datalagret.
+- Veckoschemat innehåller fortfarande vissa manuellt inlagda undantag och parallella varianter. Frontenden deduperar nu de uppenbara fallen, men datalagret kan fortfarande behöva en separat städning senare.
+- Vissa schemaundantag ligger fortfarande som veckorader med anmärkning i datalagret. Den här omgången säkrade Viking-specialtiden, men fler undantag kan på sikt behöva samma typ av datumstyrning.
+- Unity Line finns inte som egen datumkälla i nuvarande JSON, så full separering eller exakt avgångsimport kräver ny importkedja.
+- Exakt dagsdata kan fortfarande saknas för vissa enskilda datum i slutet av det deklarerade dynamiska fönstret även när route-day-prioritering finns på plats. Då återstår veckofallback tills källfönster eller scraper-horisont justeras.
+- `route_registry.py` täcker nu publicerade aktiva rutter, men nya eller ändrade färjelinjer kräver fortsatt manuell source-of-truth-kontroll innan de läggs till.
+
+#### Nästa steg
+
+
+- Låt användaren granska [docs/farjelinjer-kallor.md](/Users/jane/Documents/Claude/Projects/Weblänksida/docs/farjelinjer-kallor.md) och särskilt bekräfta om `Color Line` ska byggas som tabellrad när säker källa hittats.
+- Återvalidera eller ersätt Viking Lines nuvarande API-kedja eftersom den fortfarande ger `403 Forbidden` i GitHub Actions.
+- Övervaka ett par kommande schemalagda körningar så att TT-Lines nya transportfallback fortsätter leverera stabilt även utan manuell trigger.
+- Kör en ny full browser-QA när lokal browser-runtime fungerar igen och kontrollera särskilt tooltipar, rotationsfartyg och källchippar i `In & Ut`-vyn.
+- Lägg till separat `traffic_notices`-collector per rederi där officiella trafikmeddelandesidor finns.
+- Bygg ut `source_registry` från dokumenterad matris till körbar konfiguration om kommande skript ska styras route-för-route.
+- Planera dubbel bevakning för `Polsca` där både `Polferries` och `Unity Line` bevakas separat och sammanfogas först före visning.
+- Bygg eller hitta en riktig importkälla för Unity Line/POLSCA-datum så `Świnoujście ↔ Ystad` och `Świnoujście ↔ Trelleborg` inte behöver förlita sig på blandade schema-/fallbackkällor.
+- Återupptäck Viking Lines aktuella API eller lägg till en robust server-side fallback.
+- Överväg att slå ihop eller avveckla legacy-fälten `fartyg_datum` och `avgangar_datum` när full parity mot `avgangsinstanser` är verifierad.
+
 
 - 2026-05-31 01:15 CEST: Aktiv-rutt-revision slutförd; `check_route_coverage.py` passerar med 65 aktiva publicerade Sverige-rutter, `Stena Line Grenaa/Grenå ↔ Halmstad` är borttagen som nedlagd, Molslinjen/Sundbusserne-linjerna är tillagda och källrapporten `docs/farjelinjer-kallor.md` är genererad.
 - 2026-05-26 07:59 CEST: TT-Line slutverifierades i GitHub Actions; commit `87b5e00` lade till smal TLS-fallback i `ttline_scraper.py`, körning `26434933146` hämtade 237 TT-Line-avgångar trots runnerns certifikatfel och workflowen skrev tillbaka ny data i auto-commit `ab0d639`.

@@ -301,6 +301,7 @@
 <div class="layout">
   <main>
     <div id="laddare"><div class="spinner"></div>Hämtar tidtabellsdata…</div>
+    <p id="datastatus" role="status" style="display:none;padding:12px 16px;background:#fff8e6;border:1px solid #e8c978;border-radius:8px;margin-bottom:16px"></p>
 
     <!-- VY: Alla ankomster / avgångar -->
     <div id="view-alla" style="display:none">
@@ -403,14 +404,14 @@
       <div class="sb-linje"><a class="sb-lnk" href="https://stenalinefreight.com/timetable/" target="_blank">Stena Line &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.ttline.com/en/timetables/" target="_blank">TT-Line &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.dfds.com/sv-se/fraktfarjor-och-logistik/rutter-och-tidtabeller" target="_blank">DFDS &#8594;</a></div>
-      <div class="sb-linje"><a class="sb-lnk" href="https://www.polsca.com/schedule" target="_blank">POLSCA &#8594;</a></div>
+      <div class="sb-linje"><a class="sb-lnk" href="https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html" target="_blank">POLSCA &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.wasaline.com/tidtabell/" target="_blank">Wasaline &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.eckerolinjen.se/turlista" target="_blank">Eckerö Linjen &#8594;</a></div>
       <div class="sb-sek-hdr">Live AIS-spårning</div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.marinetraffic.com/en/ais/home/centerx:18/centery:59/zoom:7" target="_blank" rel="noopener">MarineTraffic — Östersjön &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.marinetraffic.com/en/ais/home/centerx:11.97/centery:57.7/zoom:10" target="_blank" rel="noopener">MarineTraffic — Göteborg &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.marinetraffic.com/en/ais/home/centerx:13.15/centery:55.55/zoom:10" target="_blank" rel="noopener">MarineTraffic — Trelleborg/Ystad &#8594;</a></div>
-      <div class="sb-linje"><a class="sb-lnk" href="https://www.vesseltracker.com/en/Ships.html" target="_blank" rel="noopener">VesselFinder — Östersjön &#8594;</a></div>
+      <div class="sb-linje"><a class="sb-lnk" href="https://www.vesselfinder.com/vessels" target="_blank" rel="noopener">VesselFinder — fartygssökning &#8594;</a></div>
       <div class="sb-sek-hdr">Hamnar — liveinformation</div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.stockholmshamnar.se/fartygsanloep/" target="_blank" rel="noopener">Stockholms Hamnar &#8594;</a></div>
       <div class="sb-linje"><a class="sb-lnk" href="https://www.portofgothenburg.com/maritime/arrivals-departures/" target="_blank" rel="noopener">Port of Gothenburg &#8594;</a></div>
@@ -523,7 +524,7 @@ const LANK = {
   'Finnlines':'https://www.finnlines.com/freight/schedules/',
   'Stena Line':'https://stenalinefreight.com/timetable/',
   'TT-Line':'https://www.ttline.com/en/timetables/',
-  'Polsca':'https://www.polsca.com/schedule',
+  'Polsca':'https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html',
   'Wasaline':'https://www.wasaline.com/tidtabell/',
   'Eckerö Linjen':'https://www.eckerolinjen.se/turlista',
 };
@@ -1090,13 +1091,13 @@ function byggFallbackAnkomst(raw){
   return {
     text:förenklaTidtext(raw) || '—',
     dayOffset:nästaDag,
-    sortAbs:Number.MAX_SAFE_INTEGER,
+    sortAbs:null,
     duration:'—',
   };
 }
 function normaliseraAnkomsttid(raw, depInfo, depVdag, arrPort){
   if(!raw){
-    return {text:'—',dayOffset:0,sortAbs:Number.MAX_SAFE_INTEGER,duration:'—'};
+    return {text:'—',dayOffset:0,sortAbs:null,duration:'—'};
   }
   return byggFrånVaraktighet(raw, depInfo)
     || byggFrånSammaDag(raw, depInfo, depVdag, arrPort)
@@ -1334,6 +1335,8 @@ function normaliseraAvgangsinstans(raw, ctx = {}){
     länk: String(förstaIckeTommaVärde(källor, ['lank','länk','link','href','timetable_url','timetableUrl']) || '').trim(),
     fartyg,
     ankomstdatum,
+    source_cached: ärSann(förstaDefinieradeVärde(källor, ['source_cached'])),
+    source_checked_at: String(förstaIckeTommaVärde(källor, ['source_checked_at']) || '').trim(),
     source_type: String(förstaIckeTommaVärde(källor, ['source_type','sourceType','kalltyp','källa_typ','kalla_typ']) || '').trim(),
     source_label: String(förstaIckeTommaVärde(källor, ['source_label','sourceLabel','kalllabel','källa_label','kalla_label']) || '').trim(),
     source_detail: String(förstaIckeTommaVärde(källor, ['source_detail','sourceDetail','kalldetalj','källa_detalj','kalla_detalj']) || '').trim(),
@@ -1395,102 +1398,10 @@ function normaliseraAvgangsinstanser(instanser){
       .map(([datum, rader])=>[datum, rader])
   );
 }
-function instansTidNyckel(rad){
-  return `${ruttNyckel(rad.rederi, rad.avghamn, rad.ankhamn)}|${rad.avgtid_raw || rad.avgtid || ''}`;
-}
-function väljVanligasteAnkomst(kandidater){
-  const counts = new Map();
-  let best = null;
-  let bestCount = -1;
-  (kandidater || []).forEach(kandidat=>{
-    if(!kandidat?.anktid) return;
-    const key = `${kandidat.anktid}||${kandidat.ankomstdatum || ''}`;
-    const next = (counts.get(key) || 0) + 1;
-    counts.set(key, next);
-    if(
-      next > bestCount
-      || (next === bestCount && (kandidat.source_priority || 0) > ((best && best.source_priority) || 0))
-    ){
-      best = kandidat;
-      bestCount = next;
-    }
-  });
-  return best;
-}
-function formatVaraktighetsIntervall(minuterLista){
-  const minuter = (minuterLista || [])
-    .filter(v=>Number.isFinite(v) && v > 0 && v < (72 * 60))
-    .sort((a,b)=>a-b);
-  if(!minuter.length) return '';
-  const minH = Math.max(1, Math.floor(minuter[0] / 60));
-  const maxH = Math.max(minH, Math.ceil(minuter[minuter.length - 1] / 60));
-  return minH === maxH ? `+${minH} h` : `+${minH}–${maxH} h`;
-}
-function berikaOfullständigaAvgangsinstanser(perDatum){
-  const tidKandidater = new Map();
-  const ruttVaraktigheter = new Map();
-  Object.values(perDatum || {}).forEach(rader=>{
-    (rader || []).forEach(rad=>{
-      const routeKey = ruttNyckel(rad.rederi, rad.avghamn, rad.ankhamn);
-      const timeKey = instansTidNyckel(rad);
-      if(rad.anktid){
-        if(!tidKandidater.has(timeKey)) tidKandidater.set(timeKey, []);
-        tidKandidater.get(timeKey).push({
-          anktid: rad.anktid,
-          ankomstdatum: rad.ankomstdatum || '',
-          source_priority: rad.source_priority || 0,
-        });
-      }
-      const depDate = parseDate(rad._depDate || '');
-      if(!depDate || !rad.anktid) return;
-      const depInfo = normaliseraAvgangstid(rad.avgtid_raw || rad.avgtid || '', rad.avghamn || '', rad.avgtid || '');
-      const avgMeta = normaliseraAvgangsMeta(rad._avgMeta || {});
-      const ankInfo = byggExaktAnkomst(avgMeta, depInfo, depDate, rad.ankhamn || '')
-        || normaliseraAnkomsttid(rad.anktid || '', depInfo, VD[depDate.getDay()], rad.ankhamn || '');
-      const durationMinutes = Number.isFinite(ankInfo?.sortAbs) && Number.isFinite(depInfo?.absSw)
-        ? ankInfo.sortAbs - depInfo.absSw
-        : null;
-      if(!Number.isFinite(durationMinutes) || durationMinutes <= 0) return;
-      if(!ruttVaraktigheter.has(routeKey)) ruttVaraktigheter.set(routeKey, []);
-      ruttVaraktigheter.get(routeKey).push(durationMinutes);
-    });
-  });
-
-  const bästaAnkomster = new Map(
-    [...tidKandidater.entries()].map(([key, kandidater])=>[key, väljVanligasteAnkomst(kandidater)])
-  );
-  const ruttIntervall = new Map(
-    [...ruttVaraktigheter.entries()].map(([key, minuter])=>[key, formatVaraktighetsIntervall(minuter)])
-  );
-
-  Object.values(perDatum || {}).forEach(rader=>{
-    (rader || []).forEach(rad=>{
-      if(rad.anktid) return;
-      const routeKey = ruttNyckel(rad.rederi, rad.avghamn, rad.ankhamn);
-      const timeKey = instansTidNyckel(rad);
-      const exakt = bästaAnkomster.get(timeKey);
-      const extra = EXTRA_ROUTE_INFO[routeKey];
-      const routeFallback = ruttIntervall.get(routeKey);
-      if(exakt?.anktid){
-        rad.anktid = exakt.anktid;
-        if(!rad.ankomstdatum && exakt.ankomstdatum) rad.ankomstdatum = exakt.ankomstdatum;
-      } else if(extra?.anktid){
-        rad.anktid = extra.anktid;
-      } else if(routeFallback){
-        rad.anktid = routeFallback;
-      }
-      if(!rad.verifiering && extra?.verifiering) rad.verifiering = extra.verifiering;
-      if(!rad.kalla && extra?.kalla) rad.kalla = extra.kalla;
-      if(rad._avgMeta && !rad._avgMeta.anktid && rad.anktid) rad._avgMeta.anktid = rad.anktid;
-      if(rad._avgMeta && !rad._avgMeta.ankomstdatum && rad.ankomstdatum) rad._avgMeta.ankomstdatum = rad.ankomstdatum;
-    });
-  });
-  return perDatum;
-}
 function initAvgangsinstanser(){
   HAR_AVGANGSINSTANSER = !!(DATA && harEgenNyckel(DATA, 'avgangsinstanser'));
   AVGANGSINSTANSER_PER_DATUM = HAR_AVGANGSINSTANSER
-    ? berikaOfullständigaAvgangsinstanser(normaliseraAvgangsinstanser(DATA.avgangsinstanser))
+    ? normaliseraAvgangsinstanser(DATA.avgangsinstanser)
     : {};
 }
 function avgangsinstanserFörDatum(depDs){
@@ -1918,6 +1829,14 @@ function normaliseraOperatörText(rad){
   return `${operator} (visas som ${display})`;
 }
 
+// Begränsa externa anrop så en långsam källa inte låser datumvalet.
+async function fetchMedTimeout(url, options = {}){
+  const controller = new AbortController();
+  const timeout = setTimeout(()=>controller.abort(), 5000);
+  try { return await fetch(url, {...options, signal:controller.signal}); }
+  finally { clearTimeout(timeout); }
+}
+
 // ── Viking Line live-hämtning ──
 async function hämtaVLFartyg(dateStr){
   if(vlHämtadDatum === dateStr) return;
@@ -1928,7 +1847,7 @@ async function hämtaVLFartyg(dateStr){
     try{
       const p = {searchDate:dateStr,departurePort:dep,arrivalPort:arr,numberOfAdults:1,childrenAges:[],vehicle:{code:'NONE',quantity:1},club:'NONE'};
       const enc = btoa(JSON.stringify(p));
-      const r = await fetch(BASE+enc, {headers:{Accept:'application/json'}});
+      const r = await fetchMedTimeout(BASE+enc, {headers:{Accept:'application/json'}});
       if(!r.ok) continue;
       const data = await r.json();
       for(const dh of data.result?.dateHits||[]){
@@ -1962,7 +1881,7 @@ async function hämtaDFDSFartyg(dateStr){
   for(const [pol,pod] of DFDS_RUTTER){
     try{
       const url = `https://www.dfds.com/api/timetable?portOfLoading=${pol}&portOfDischarge=${pod}&dateFrom=${dFran}&dateTo=${dTill}`;
-      const r = await fetch(url, {headers:{Accept:'application/json'}});
+      const r = await fetchMedTimeout(url, {headers:{Accept:'application/json'}});
       if(!r.ok) continue;
       const arr = await r.json();
       if(!Array.isArray(arr)) continue;
@@ -2021,8 +1940,8 @@ async function init(){
   document.getElementById('apply-controls').addEventListener('click', tillämpaVal);
   synkaKommandeKnappar();
 
-  await hämtaFartyg(dStr(nu));
   rendera();
+  hämtaFartyg(dStr(nu)).then(()=>rendera()).catch(()=>{});
 }
 
 function parseDate(s){
@@ -2156,8 +2075,8 @@ async function tillämpaVal(){
   valtRederi = pendingRederi;
   sättDatum(nästaDat);
   synkaVyKnappar();
-  if(datumBytt) await hämtaFartyg(nästaStr);
   rendera();
+  if(datumBytt) hämtaFartyg(nästaStr).then(()=>rendera()).catch(()=>{});
 }
 function uppdateraSorteringUI(){
   const aktiv = viewMode === 'ankomst' ? 'ank' : 'avg';
@@ -2185,6 +2104,21 @@ function tidsCellState(rad){
     avgAktuellPasserad: rad.passerad && (riktning === 'utgaende' || riktning === 'motsverige'),
     ankAktuellPasserad: rad.passerad && riktning === 'inkommande',
   };
+}
+
+function uppdateraDatastatus(){
+  const status = document.getElementById('datastatus');
+  const ds = dStr(valdDat);
+  const dagar = Object.keys(AVGANGSINSTANSER_PER_DATUM || {}).sort();
+  const uppdaterad = Date.parse(DATA.meta?.uppdaterad || '');
+  let meddelande = '';
+  if(HAR_AVGANGSINSTANSER && dagar.length && (ds < dagar[0] || ds > dagar[dagar.length-1])){
+    meddelande = `Datumet ligger utanför tidtabellens publicerade period (${dagar[0]}–${dagar[dagar.length-1]}). Välj ett datum inom perioden eller följ rederiets tidtabellslänk.`;
+  } else if(Number.isFinite(uppdaterad) && Date.now() - uppdaterad > 48*60*60*1000){
+    meddelande = 'Tidtabellsdatan har inte uppdaterats på över två dygn. Kontrollera avgången hos rederiet.';
+  }
+  status.textContent = meddelande;
+  status.style.display = meddelande ? '' : 'none';
 }
 
 // ── Rendering ──
@@ -2238,6 +2172,7 @@ function kandidaterFörValtDatum(){
 function märk(rader, riktning){ rader.forEach(r=>uppdateraRadRiktning(r, riktning)); return rader; }
 function rendera(){
   if(!DATA) return;
+  uppdateraDatastatus();
   const ds = dStr(valdDat);
   const kandidater = kandidaterFörValtDatum();
   const tillSverige = kandidater.filter(o=>o._motSverige);
@@ -2311,7 +2246,8 @@ function bygRad(rad, r, länk, depDatum = valdDat){
     || normaliseraAnkomsttid(rad.anktid||'', depInfo, depVd, rad.ankhamn||'');
   const kallaChip = byggRadKallaChip(rad, avgMeta);
   const depDate = isoEfterOffset(depDatum, depInfo.dayOffset);
-  const arrDate = isoEfterOffset(depDatum, ankInfo.dayOffset);
+  const harAnkomsttid = Number.isFinite(ankInfo.sortAbs) && Number.isFinite(ankInfo.dayOffset);
+  const arrDate = harAnkomsttid ? isoEfterOffset(depDatum, ankInfo.dayOffset) : '';
   const motSverige = rad.mot_sverige===true || SVENSKA_HAMNAR.has(rad.ankhamn);
   const franSverige = rad.fran_sverige===true || SVENSKA_HAMNAR.has(rad.avghamn);
   const svenskTidpunkt = svenskTidpunktFörRad(depInfo, ankInfo, motSverige, franSverige);
@@ -2329,10 +2265,12 @@ function bygRad(rad, r, länk, depDatum = valdDat){
     grå:false,
     passerad:false,
     avVdag:veckodagEfterOffset(depDatum, depInfo.dayOffset),
-    ankVdag:veckodagEfterOffset(depDatum, ankInfo.dayOffset),
+    ankVdag:harAnkomsttid ? veckodagEfterOffset(depDatum, ankInfo.dayOffset) : '',
     källa:avgMeta?.kalla || rad.kalla||länk||'',
     verifiering:rad.verifiering||'',
     anm:rensaAnm(rad.anmarkning||''),
+    source_cached: !!rad.source_cached,
+    source_checked_at: rad.source_checked_at || '',
     operator:String(rad.source_operator || '').trim(),
     _fetKolumn:'avg',
     _passeradAvg:passeradAvg,
@@ -2416,6 +2354,8 @@ function bygTr(rad){
   if(verTxt) tooltipRader.push(`<strong>Verifiering:</strong> ${esc(verTxt)}`);
   if(rad._shipInfo?.hint) tooltipRader.push(`<strong>Fartyg:</strong> ${esc(rad._shipInfo.hint)}`);
   if(rad.anm) tooltipRader.push(`<strong>Kommentar:</strong> ${esc(rad.anm)}`);
+  if(rad.source_cached) tooltipRader.push('<strong>Källstatus:</strong> Tidigare hämtad datumtabell. Ingen ny uppgift för denna avgång vid senaste uppdateringen.');
+  if(rad.source_checked_at) tooltipRader.push(`<strong>Avgångsuppgift hämtad:</strong> ${esc(formatMetaTimestampLocal(rad.source_checked_at))}`);
   if(rad.källa) tooltipRader.push(`<strong>Källa:</strong> <a href="${esc(rad.källa)}" target="_blank" rel="noopener">${esc(rad.källa)}</a>`);
   const datakällaText = byggDatakällaText(rad) || rad._kallaChip?.titel || '';
   if(datakällaText) tooltipRader.push(`<strong>Datakälla:</strong> ${esc(datakällaText)}`);

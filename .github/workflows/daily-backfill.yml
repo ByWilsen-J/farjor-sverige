@@ -6,13 +6,16 @@ on:
   workflow_dispatch:
     inputs:
       anchor_date:
-        description: 'Ankardatum (YYYY-MM-DD). Tomt = dagens datum i UTC.'
+        description: 'Ankardatum (YYYY-MM-DD). Tomt = dagens datum i Sverige.'
         required: false
         default: ''
 
 concurrency:
-  group: daily-backfill-${{ github.ref }}
-  cancel-in-progress: true
+  group: ferry-data-writer-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  TZ: Europe/Stockholm
 
 jobs:
   backfill:
@@ -33,42 +36,64 @@ jobs:
       - name: Installera beroenden
         run: pip install requests
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Spara publicerade data för regressionskontroll
+        run: cp farjor_data.json "$RUNNER_TEMP/farjor-baseline.json"
+
       - name: Räkna ut publiceringsfönster
         id: window
         shell: bash
+        env:
+          REQUESTED_ANCHOR: ${{ inputs.anchor_date }}
         run: |
-          ANCHOR="${{ github.event.inputs.anchor_date }}"
-          if [ -z "$ANCHOR" ]; then
-            ANCHOR="$(date -u +%F)"
-          fi
-
-          START="$(date -u -d "$ANCHOR -1 month" +%F)"
-          END="$(date -u -d "$ANCHOR +3 month" +%F)"
-          START_EPOCH="$(date -u -d "$START" +%s)"
-          END_EPOCH="$(date -u -d "$END" +%s)"
-          FORWARD_DAYS="$(((END_EPOCH - START_EPOCH) / 86400))"
-
-          echo "anchor=$ANCHOR" >> "$GITHUB_OUTPUT"
-          echo "start=$START" >> "$GITHUB_OUTPUT"
-          echo "end=$END" >> "$GITHUB_OUTPUT"
-          echo "forward_days=$FORWARD_DAYS" >> "$GITHUB_OUTPUT"
-
-          echo "Ankardatum: $ANCHOR"
-          echo "Startdatum: $START"
-          echo "Slutdatum: $END"
-          echo "Forward days: $FORWARD_DAYS"
+          python3 - <<'PY'
+          from datetime import date
+          import os
+          from schedule_instances import public_window
+          requested = os.environ.get('REQUESTED_ANCHOR', '')
+          anchor = date.fromisoformat(requested) if requested else date.today()
+          start, end = public_window(anchor)
+          outputs = {'anchor': anchor.isoformat(), 'start': start.isoformat(), 'end': end.isoformat(), 'forward_days': (end - start).days}
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as handle:
+              for key, value in outputs.items():
+                  handle.write(f'{key}={value}\n')
+                  print(f'{key}: {value}')
+          PY
 
       - name: Kör update_fartyg.py för hela publiceringsfönstret
         env:
-          FERRY_DYNAMIC_FORWARD_DAYS: ${{ steps.window.outputs.forward_days }}
           FERRY_PUBLIC_ANCHOR_DATE: ${{ steps.window.outputs.anchor }}
         run: python3 update_fartyg.py "${{ steps.window.outputs.start }}"
+
+      - name: Stoppa tappade rutter, gammal data och syntaxfel
+        run: |
+          python3 -m unittest discover -s tests
+          python3 check_route_coverage.py
+          python3 check_site_health.py --baseline "$RUNNER_TEMP/farjor-baseline.json"
+
+      - name: Uppdatera källrapport även när data stoppas
+        if: always()
+        run: python3 generate_route_source_report.py
+
+      - name: Spara felsökningsunderlag
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-backfill-diagnostics
+          path: |
+            docs/farjelinjer-kallor.md
+            docs/source-inventory.json
+            docs/source-link-checks.json
+          retention-days: 14
 
       - name: Commit och push om farjor_data.json ändrats
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add farjor_data.json
+          git add farjor_data.json docs/farjelinjer-kallor.md docs/source-inventory.json
           if git diff --staged --quiet; then
             echo "Inga ändringar – inget commit behövs."
           else

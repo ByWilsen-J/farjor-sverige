@@ -33,7 +33,7 @@ POLSCA_GDANSK_KARLSHAMN_NOTE = (
 )
 
 SUNDBUSSERNE_NOTE = (
-    "Verifierat 2026-05-31 mot Sundbussernes officiella sejlplan-bild "
+    "Verifierat 2026-10-21 mot Sundbussernes officiella sejlplan-bild "
     "gällande från 2026-03-20. Restiden anges till cirka 18 minuter."
 )
 
@@ -42,14 +42,15 @@ TTLINE_ROUTE_SOURCES = {
     ("Travemünde", "Trelleborg"): "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_tra.pdf",
     ("Trelleborg", "Świnoujście"): "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_swi.pdf",
     ("Świnoujście", "Trelleborg"): "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_swi.pdf",
-    ("Travemünde", "Karlshamn"): "https://www.ttline.com/globalassets/pdf/standard-timetable-2026_karcon3.pdf",
-    ("Karlshamn", "Travemünde"): "https://www.ttline.com/globalassets/pdf/standard-timetable-2026_karcon3.pdf",
+    ("Travemünde", "Karlshamn"): "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026-karcon.pdf",
+    ("Karlshamn", "Travemünde"): "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026-karcon.pdf",
     ("Rostock", "Karlshamn"): "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026-karcon.pdf",
 }
 
 TTLINE_ROUTE_VALIDITY = {
-    ("Travemünde", "Karlshamn"): ("2026-07-06", "2026-08-16"),
-    ("Karlshamn", "Travemünde"): ("2026-07-06", "2026-08-16"),
+    ("Travemünde", "Karlshamn"): ("2026-01-01", "2026-12-31"),
+    ("Karlshamn", "Travemünde"): ("2026-01-01", "2026-12-31"),
+    ("Rostock", "Karlshamn"): ("2026-01-01", "2026-12-31"),
 }
 
 TTLINE_ROUTE_FLEETS = {
@@ -102,12 +103,10 @@ TTLINE_ROUTE_TIMETABLES = {
         "Sön": [("00:30", "07:30"), ("16:00", "22:00")],
     },
     ("Travemünde", "Karlshamn"): {
-        "Ons": [("02:20", "19:30")],
-        "Fre": [("21:05", "21:30+1")],
+        "Fre": [("22:20", "17:30+1")],
     },
     ("Karlshamn", "Travemünde"): {
-        "Ons": [("08:25", "00:45+1")],
-        "Sön": [("07:55", "01:00+1")],
+        "Mån": [("07:30", "20:15")],
     },
     ("Rostock", "Karlshamn"): {
         "Fre": [("23:45", "17:30+1")],
@@ -143,9 +142,41 @@ STENA_ROUTE_TIMETABLES = {
 FINNLINES_ROUTE_SOURCES = {
     ("Malmö", "Świnoujście"): "https://www.finnlines.com/sv/rutter/malmo-swinoujscie/",
     ("Świnoujście", "Malmö"): "https://www.finnlines.com/sv/rutter/malmo-swinoujscie/",
+    ("Malmö", "Travemünde"): "https://www.finnlines.com/sv/rutter/malmo-travemunde/",
+    ("Travemünde", "Malmö"): "https://www.finnlines.com/sv/rutter/malmo-travemunde/",
+    ("Kapellskär", "Naantali"): "https://www.finnlines.com/sv/rutter/kapellskar-langnas-nadendal/",
+    ("Naantali", "Kapellskär"): "https://www.finnlines.com/sv/rutter/kapellskar-langnas-nadendal/",
 }
 
 FINNLINES_ROUTE_TIMETABLES = {
+    ("Malmö", "Travemünde"): {
+        "Mån": [("16:00", "00:45+1"), ("22:00", "07:00+1")],
+        "Tis": [("10:00", "19:15"), ("16:00", "00:45+1"), ("22:00", "07:00+1")],
+        "Ons": [("10:00", "19:15"), ("16:00", "00:45+1"), ("22:00", "07:15+1")],
+        "Tor": [("10:00", "19:15"), ("16:00", "00:45+1"), ("22:00", "07:15+1")],
+        "Fre": [("10:00", "21:00"), ("16:00", "00:45+1"), ("22:00", "07:00+1")],
+        "Lör": [("10:00", "19:15"), ("13:30", "23:00"), ("22:30", "08:30+1")],
+        "Sön": [("16:00", "01:15+1"), ("22:00", "07:15+1")],
+    },
+    ("Travemünde", "Malmö"): {
+        "Mån": [("03:00", "11:45"), ("22:00", "07:15+1")],
+        "Tis": [("03:00", "11:45"), ("10:00", "19:15"), ("21:45", "07:15+1")],
+        "Ons": [("03:00", "11:45"), ("10:00", "19:15"), ("21:45", "07:15+1")],
+        "Tor": [("03:00", "11:45"), ("10:00", "19:15"), ("22:00", "07:15+1")],
+        "Fre": [("03:00", "11:45"), ("10:00", "19:15"), ("22:00", "07:15+1")],
+        "Lör": [("03:00", "12:00"), ("11:00", "20:00"), ("22:00", "07:30+1")],
+        "Sön": [("01:00", "10:30"), ("22:00", "07:30+1")],
+    },
+    ("Kapellskär", "Naantali"): {
+        day: [("10:30" if day in {"Mån", "Tis"} else "10:45", "19:55" if day in {"Mån", "Tis"} else "20:10"),
+              ("21:45", "07:15+1")]
+        for day in ("Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön")
+    },
+    ("Naantali", "Kapellskär"): {
+        day: [("10:45" if day in {"Mån", "Tis"} else "10:00", "18:30" if day in {"Mån", "Tis"} else "17:45"),
+              ("22:45", "06:30+1" if day in {"Fre", "Lör"} else "06:15+1")]
+        for day in ("Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön")
+    },
     ("Malmö", "Świnoujście"): {
         "Mån": [("10:15", "19:15")],
         "Tis": [("11:00", "19:15")],
@@ -285,6 +316,8 @@ def override_route_keys() -> set[tuple[str, str, str]]:
     route_keys.update({("Stena Line", avghamn, ankhamn) for avghamn, ankhamn in STENA_ROUTE_TIMETABLES})
     route_keys.update({("Finnlines", avghamn, ankhamn) for avghamn, ankhamn in FINNLINES_ROUTE_TIMETABLES})
     route_keys.update({
+        ("Wasaline", "Umeå", "Vasa"), ("Wasaline", "Vasa", "Umeå"),
+        ("Eckerö Linjen", "Grisslehamn", "Eckerö"), ("Eckerö Linjen", "Eckerö", "Grisslehamn"),
         ("Sundbusserne", "Helsingborg", "Helsingør"),
         ("Sundbusserne", "Helsingør", "Helsingborg"),
     })
@@ -367,7 +400,7 @@ def _build_ttline_rows() -> list[dict]:
     for (avghamn, ankhamn), weekday_map in TTLINE_ROUTE_TIMETABLES.items():
         source_url = TTLINE_ROUTE_SOURCES[(avghamn, ankhamn)]
         validity = TTLINE_ROUTE_VALIDITY.get((avghamn, ankhamn), ("", ""))
-        source_detail = "TT-Line Summer Timetable 2026 Karlshamn Routes" if validity[0] else ""
+        source_detail = "TT-Line Standard Timetable 2026 Karlshamn Routes" if validity[0] else ""
         fleet = TTLINE_ROUTE_FLEETS.get((avghamn, ankhamn), "")
         for veckodag, sailings in weekday_map.items():
             for avgtid, anktid in sailings:
@@ -404,7 +437,8 @@ def _build_finnlines_rows() -> list[dict]:
         source_url = FINNLINES_ROUTE_SOURCES[(avghamn, ankhamn)]
         for veckodag, sailings in weekday_map.items():
             for avgtid, anktid in sailings:
-                rows.append(_make_row("Finnlines", avghamn, ankhamn, veckodag, avgtid, anktid, source_url, FINNLINES_SWIMMA_NOTE))
+                rows.append(_make_row("Finnlines", avghamn, ankhamn, veckodag, avgtid, anktid, source_url,
+                    "Officiell ruttsidas veckotidtabell kontrollerad 2026-10-21. Alla tider lokala. Helgavvikelser kan förekomma; kontrollera rederiets bokning."))
     return rows
 
 
@@ -469,10 +503,10 @@ def _build_polsca_gdansk_karlshamn_rows() -> list[dict]:
 def _build_sundbusserne_rows() -> list[dict]:
     rows: list[dict] = []
     weekday_times = {
-        "Mån": _half_hour_times("10:00", "18:00"),
-        "Tis": _half_hour_times("10:00", "18:00"),
-        "Ons": _half_hour_times("10:00", "18:00"),
-        "Tor": _half_hour_times("10:00", "18:00"),
+        "Mån": _half_hour_times("10:00", "18:30"),
+        "Tis": _half_hour_times("10:00", "18:30"),
+        "Ons": _half_hour_times("10:00", "18:30"),
+        "Tor": _half_hour_times("10:00", "18:30"),
         "Fre": _half_hour_times("10:00", "20:30"),
         "Lör": _half_hour_times("10:00", "20:30"),
         "Sön": _half_hour_times("10:00", "17:30"),
@@ -499,6 +533,78 @@ def _build_sundbusserne_rows() -> list[dict]:
                     fartyg=vessel,
                     source_detail="Sundbusserne sejlplan 2026-03-20",
                 ))
+    return rows
+
+
+def _build_wasaline_rows() -> list[dict]:
+    """Officiella säsongsperioder kontrollerade 2026-10-21 (uppdaterade 13/10)."""
+    source = "https://www.wasaline.com/en/timetable/"
+    weekdays = ["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"]
+    # (weekday indices, departure port, departure, arrival). All times local.
+    base = [
+        ([0], "Umeå", "11:30", "17:00"), ([0], "Vasa", "20:00", "23:15"),
+        ([1], "Umeå", "08:00", "13:00"), ([1], "Vasa", "14:00", "17:15"),
+        ([1], "Umeå", "18:15", "23:00"), ([1], "Vasa", "23:45", "06:00+1"),
+        ([2], "Umeå", "08:00", "13:00"), ([2], "Vasa", "14:30", "17:30"),
+        ([2], "Umeå", "19:00", "00:00+1"),
+        ([6], "Vasa", "08:00", "11:15"), ([6], "Umeå", "13:00", "18:15"),
+        ([6], "Vasa", "20:00", "23:00"),
+    ]
+    def late_week(days):
+        return [(days, "Vasa", "08:00", "10:30"), (days, "Umeå", "11:15", "16:00"),
+                (days, "Vasa", "16:45", "19:15"), (days, "Umeå", "20:15", "01:00+1")]
+    saturday = [([5], "Vasa", "09:00", "12:00"), ([5], "Umeå", "17:00", "22:00")]
+    january = base + [
+        ([3], "Vasa", "08:00", "10:45"), ([3], "Umeå", "11:15", "16:30"),
+        ([3], "Vasa", "17:00", "20:00"), ([3], "Umeå", "20:45", "02:00+1"),
+        ([4], "Vasa", "16:00", "18:45"), ([4], "Umeå", "19:30", "00:30+1"),
+        ([5], "Vasa", "09:00", "12:15"), ([5], "Umeå", "17:00", "22:15"),
+    ]
+    periods = [
+        ("2026-09-01", "2026-11-08", base + late_week([3, 4]) + saturday),
+        ("2026-11-09", "2026-12-18", base + late_week([3, 4, 5])),
+        ("2026-12-19", "2026-12-23", [(list(range(7)), "Vasa", "09:00", "12:15"), (list(range(7)), "Umeå", "17:00", "22:15")]),
+        ("2026-12-26", "2026-12-30", [(list(range(7)), "Vasa", "09:00", "12:15"), (list(range(7)), "Umeå", "17:00", "22:15")]),
+        ("2026-12-31", "2026-12-31", [([3], "Vasa", "17:00", "20:00"), ([3], "Umeå", "20:30", "01:30+1")]),
+        ("2027-01-01", "2027-01-01", [([4], "Vasa", "11:00", "14:15"), ([4], "Umeå", "15:00", "20:15")]),
+        ("2027-01-02", "2027-03-25", january),
+    ]
+    rows = []
+    for start, end, entries in periods:
+        for days, departure, dep, arr in entries:
+            for weekday in days:
+                rows.append(_make_row("Wasaline", departure, "Vasa" if departure == "Umeå" else "Umeå",
+                    weekdays[weekday], dep, arr, source,
+                    "Officiell säsongstidtabell kontrollerad 2026-10-21. Alla tider är lokala; ingen trafik 24–25/12.",
+                    fartyg="Aurora Botnia", giltig_from=start, giltig_to=end))
+    return rows
+
+
+def _build_eckero_rows() -> list[dict]:
+    """Två timmars överfart och korrekt lokal ankomsttid (+1 timme i Finland)."""
+    source = "https://www.eckerolinjen.se/en/timetable"
+    full = [
+        ("Grisslehamn", "Eckerö", "10:00", "13:00"),
+        ("Grisslehamn", "Eckerö", "15:00", "18:00"),
+        ("Grisslehamn", "Eckerö", "20:00", "23:00"),
+        ("Eckerö", "Grisslehamn", "08:00", "09:00"),
+        ("Eckerö", "Grisslehamn", "13:30", "14:30"),
+        ("Eckerö", "Grisslehamn", "18:30", "19:30"),
+    ]
+    periods = [
+        ("2026-09-01", "2026-12-23", full),
+        ("2026-12-26", "2026-12-31", full),
+        ("2027-01-01", "2027-01-01", [row for row in full if row[2] not in {"08:00", "10:00"}]),
+        ("2027-01-02", "2027-01-06", full),
+        ("2027-01-29", "2027-03-31", full),
+    ]
+    rows = []
+    for start, end, entries in periods:
+        for origin, destination, dep, arr in entries:
+            for weekday in ["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"]:
+                rows.append(_make_row("Eckerö Linjen", origin, destination, weekday, dep, arr, source,
+                    "Officiell tidtabell kontrollerad 2026-10-21. Lokala tider. Ingen trafik 24–25/12 2026 eller 7–28/1 2027 (dockning).",
+                    fartyg="Eckerö", giltig_from=start, giltig_to=end))
     return rows
 
 
@@ -533,6 +639,8 @@ def apply_verified_schema_overrides(schema: list[dict]) -> list[dict]:
         + _build_polsca_trelleborg_rows()
         + _build_polsca_gdansk_karlshamn_rows()
         + _build_sundbusserne_rows()
+        + _build_wasaline_rows()
+        + _build_eckero_rows()
     )
     for idx, row in enumerate(merged, start=1):
         row["id"] = idx

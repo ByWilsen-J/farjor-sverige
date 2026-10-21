@@ -6,13 +6,16 @@ on:
   workflow_dispatch:
     inputs:
       from_date:
-        description: 'Startdatum (YYYY-MM-DD). Tomt = dagens datum i UTC.'
+        description: 'Startdatum (YYYY-MM-DD). Tomt = dagens datum i Sverige.'
         required: false
         default: ''
 
 concurrency:
-  group: dynamic-refresh-${{ github.ref }}
-  cancel-in-progress: true
+  group: ferry-data-writer-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  TZ: Europe/Stockholm
 
 jobs:
   update:
@@ -33,27 +36,56 @@ jobs:
       - name: Installera beroenden
         run: pip install requests
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Spara publicerade data för regressionskontroll
+        run: cp farjor_data.json "$RUNNER_TEMP/farjor-baseline.json"
+
       - name: Bestäm startdatum
         id: start
         shell: bash
+        env:
+          REQUESTED_FROM: ${{ inputs.from_date }}
         run: |
-          FROM="${{ github.event.inputs.from_date }}"
+          FROM="$REQUESTED_FROM"
           if [ -z "$FROM" ]; then
-            FROM="$(date -u +%F)"
+            FROM="$(date +%F)"
           fi
+          python3 -c 'import datetime,sys; datetime.date.fromisoformat(sys.argv[1])' "$FROM"
           echo "from=$FROM" >> "$GITHUB_OUTPUT"
           echo "Startdatum: $FROM"
 
       - name: Kör update_fartyg.py
-        env:
-          FERRY_DYNAMIC_FORWARD_DAYS: "14"
         run: python3 update_fartyg.py "${{ steps.start.outputs.from }}"
+
+      - name: Stoppa tappade rutter, gammal data och syntaxfel
+        run: |
+          python3 -m unittest discover -s tests
+          python3 check_route_coverage.py
+          python3 check_site_health.py --baseline "$RUNNER_TEMP/farjor-baseline.json"
+
+      - name: Uppdatera källrapport även när data stoppas
+        if: always()
+        run: python3 generate_route_source_report.py
+
+      - name: Spara felsökningsunderlag
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dynamic-refresh-diagnostics
+          path: |
+            docs/farjelinjer-kallor.md
+            docs/source-inventory.json
+            docs/source-link-checks.json
+          retention-days: 14
 
       - name: Commit och push om farjor_data.json ändrats
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add farjor_data.json
+          git add farjor_data.json docs/farjelinjer-kallor.md docs/source-inventory.json
           if git diff --staged --quiet; then
             echo "Inga ändringar – inget commit behövs."
           else

@@ -1,0 +1,25 @@
+{
+  "checks": [
+    {
+      "url": "https://farjor.axling.nu/",
+      "checked_at": "2026-10-21T20:42:27+00:00",
+      "http_status": 200,
+      "final_url": "https://farjor.axling.nu/"
+    },
+    {
+      "url": "https://farjor.axling.nu/farjor.html",
+      "checked_at": "2026-10-21T20:42:27+00:00",
+      "http_status": 200,
+      "final_url": "https://farjor.axling.nu/farjor.html"
+    },
+    {
+      "url": "https://farjor.axling.nu/farjor_data.json",
+      "checked_at": "2026-10-21T20:42:28+00:00",
+      "http_status": 200,
+      "final_url": "https://farjor.axling.nu/farjor_data.json",
+      "data_updated_at": "2026-10-21T20:27:10Z",
+      "data_errors": []
+    }
+  ],
+  "errors": []
+}

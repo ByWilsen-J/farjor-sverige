@@ -1,0 +1,2768 @@
+{
+  "generated_at": "2026-10-21T20:47:57+00:00",
+  "pages": {
+    "index.html": {
+      "description": "farjor_data.json → avgangsinstanser; reservvisning från schema. Live-/datumdata hämtas av Python-jobben nedan; frontend har även direkta API-anrop som komplettering.",
+      "data_file": "farjor_data.json",
+      "external_links": [
+        {
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
+          "check": {
+            "url": "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
+            "redirect_statuses": [],
+            "content_type": "application/javascript; charset=utf-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:36+00:00"
+          }
+        },
+        {
+          "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html",
+          "check": {
+            "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html",
+            "checked_at": "2026-10-21T20:46:37+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:37+00:00"
+          }
+        },
+        {
+          "url": "https://stenalinefreight.com/timetable/",
+          "check": {
+            "url": "https://stenalinefreight.com/timetable/",
+            "checked_at": "2026-10-21T20:46:41+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://stenalinefreight.com/timetable/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:41+00:00"
+          }
+        },
+        {
+          "url": "https://sundbusserne.dk/fartplan/",
+          "check": {
+            "url": "https://sundbusserne.dk/fartplan/",
+            "checked_at": "2026-10-21T20:46:42+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://sundbusserne.dk/fartplan/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:42+00:00"
+          }
+        },
+        {
+          "url": "https://www.colorline.se/tidtabeller",
+          "check": {
+            "url": "https://www.colorline.se/tidtabeller",
+            "checked_at": "2026-10-21T20:46:43+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://www.colorline.se/tidtabeller",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:43+00:00"
+          }
+        },
+        {
+          "url": "https://www.dfds.com/en/freight-ferries-and-logistics/routes-and-schedules/klaipeda-trelleborg",
+          "check": {
+            "url": "https://www.dfds.com/en/freight-ferries-and-logistics/routes-and-schedules/klaipeda-trelleborg",
+            "checked_at": "2026-10-21T20:46:44+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.dfds.com/en/freight-ferries-and-logistics/routes-and-schedules/klaipeda-trelleborg",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=utf-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:44+00:00"
+          }
+        },
+        {
+          "url": "https://www.dfds.com/sv-se/fraktfarjor-och-logistik/rutter-och-tidtabeller",
+          "check": {
+            "url": "https://www.dfds.com/sv-se/fraktfarjor-och-logistik/rutter-och-tidtabeller",
+            "checked_at": "2026-10-21T20:46:44+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.dfds.com/sv-se/fraktfarjor-och-logistik/rutter-och-tidtabeller",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=utf-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:44+00:00"
+          }
+        },
+        {
+          "url": "https://www.eckerolinjen.se/turlista",
+          "check": {
+            "url": "https://www.eckerolinjen.se/turlista",
+            "checked_at": "2026-10-21T20:46:45+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.eckerolinjen.se/turlista",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=utf-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:45+00:00"
+          }
+        },
+        {
+          "url": "https://www.finnlines.com/freight/schedules/",
+          "check": {
+            "url": "https://www.finnlines.com/freight/schedules/",
+            "checked_at": "2026-10-21T20:46:45+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.finnlines.com/freight/schedules/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:45+00:00"
+          }
+        },
+        {
+          "url": "https://www.marinetraffic.com/en/ais/home/centerx:11.97/centery:57.7/zoom:10",
+          "check": {
+            "url": "https://www.marinetraffic.com/en/ais/home/centerx:11.97/centery:57.7/zoom:10",
+            "checked_at": "2026-10-21T20:46:46+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://www.marinetraffic.com/en/ais/home/centerx:11.97/centery:57.7/zoom:10",
+            "redirect_statuses": [],
+            "content_type": "text/html",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:46+00:00"
+          }
+        },
+        {
+          "url": "https://www.marinetraffic.com/en/ais/home/centerx:13.15/centery:55.55/zoom:10",
+          "check": {
+            "url": "https://www.marinetraffic.com/en/ais/home/centerx:13.15/centery:55.55/zoom:10",
+            "checked_at": "2026-10-21T20:46:46+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://www.marinetraffic.com/en/ais/home/centerx:13.15/centery:55.55/zoom:10",
+            "redirect_statuses": [],
+            "content_type": "text/html",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:46+00:00"
+          }
+        },
+        {
+          "url": "https://www.marinetraffic.com/en/ais/home/centerx:18/centery:59/zoom:7",
+          "check": {
+            "url": "https://www.marinetraffic.com/en/ais/home/centerx:18/centery:59/zoom:7",
+            "checked_at": "2026-10-21T20:46:46+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://www.marinetraffic.com/en/ais/home/centerx:18/centery:59/zoom:7",
+            "redirect_statuses": [],
+            "content_type": "text/html",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:46+00:00"
+          }
+        },
+        {
+          "url": "https://www.portofgothenburg.com/maritime/arrivals-departures/",
+          "check": {
+            "url": "https://www.portofgothenburg.com/maritime/arrivals-departures/",
+            "checked_at": "2026-10-21T20:46:46+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.portofgothenburg.com/maritime/arrivals-departures/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=utf-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:46+00:00"
+          }
+        },
+        {
+          "url": "https://www.sales.vikingline.com/find-trip/timetable/traffic-bulletin/",
+          "check": {
+            "url": "https://www.sales.vikingline.com/find-trip/timetable/traffic-bulletin/",
+            "checked_at": "2026-10-21T20:46:46+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "blocked_or_limited",
+            "http_status": 403,
+            "final_url": "https://www.sales.vikingline.com/find-trip/timetable/traffic-bulletin/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false
+          }
+        },
+        {
+          "url": "https://www.sales.vikingline.com/protheus-api/v1/ferry/eng/en/search-ferry/day/",
+          "check": null
+        },
+        {
+          "url": "https://www.stockholmshamnar.se/fartygsanloep/",
+          "check": {
+            "url": "https://www.stockholmshamnar.se/fartygsanloep/",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.stockholmshamnar.se/fartygsanloep/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=utf-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:47+00:00"
+          }
+        },
+        {
+          "url": "https://www.tallink.com/sv/tidtabeller",
+          "check": {
+            "url": "https://www.tallink.com/sv/tidtabeller",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.tallink.com/sv/tidtabeller",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=utf-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:47+00:00"
+          }
+        },
+        {
+          "url": "https://www.trelleborgshamn.se/en/english/about-the-port/arrivals-and-departures/",
+          "check": {
+            "url": "https://www.trelleborgshamn.se/en/english/about-the-port/arrivals-and-departures/",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.trelleborgshamn.se/en/english/about-the-port/arrivals-and-departures/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:47+00:00"
+          }
+        },
+        {
+          "url": "https://www.ttline.com/en/freight/timetable/",
+          "check": {
+            "url": "https://www.ttline.com/en/freight/timetable/",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.ttline.com/en/freight/timetable/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=utf-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:47+00:00"
+          }
+        },
+        {
+          "url": "https://www.ttline.com/en/timetables/",
+          "check": {
+            "url": "https://www.ttline.com/en/timetables/",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "blocked_or_limited",
+            "http_status": 403,
+            "final_url": "https://www.ttline.com/en/timetables/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false
+          }
+        },
+        {
+          "url": "https://www.vesselfinder.com/vessels",
+          "check": {
+            "url": "https://www.vesselfinder.com/vessels",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://www.vesselfinder.com/vessels",
+            "redirect_statuses": [],
+            "content_type": "text/html;charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:47+00:00"
+          }
+        },
+        {
+          "url": "https://www.wasaline.com/tidtabell/",
+          "check": {
+            "url": "https://www.wasaline.com/tidtabell/",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.wasaline.com/tidtabell/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:47+00:00"
+          }
+        }
+      ]
+    },
+    "farjor.html": {
+      "description": "Omdirigering till index.html; ingen separat tidtabell.",
+      "data_file": null,
+      "external_links": []
+    }
+  },
+  "routes": [
+    {
+      "operator": "Bornholmslinjen",
+      "from": "Rønne",
+      "to": "Ystad",
+      "source_type": "dynamic_schedule",
+      "importer": "molslinjen_scraper.py → update_fartyg.py",
+      "registry_url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2",
+      "last_successful_data_at": "2026-10-21T20:46:02Z",
+      "cached_rows": 138,
+      "sources": [
+        {
+          "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2",
+          "check": {
+            "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_requires_request",
+            "http_status": 400,
+            "final_url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2",
+            "redirect_statuses": [],
+            "content_type": "application/problem+json; charset=utf-8",
+            "safe_redirect": false
+          }
+        },
+        {
+          "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2&routeId=BOR7",
+          "check": {
+            "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2&routeId=BOR7",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2&routeId=BOR7",
+            "redirect_statuses": [],
+            "content_type": "application/json; charset=utf-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:36+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Bornholmslinjen",
+      "from": "Ystad",
+      "to": "Rønne",
+      "source_type": "dynamic_schedule",
+      "importer": "molslinjen_scraper.py → update_fartyg.py",
+      "registry_url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2",
+      "last_successful_data_at": "2026-10-21T20:46:02Z",
+      "cached_rows": 137,
+      "sources": [
+        {
+          "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2",
+          "check": {
+            "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_requires_request",
+            "http_status": 400,
+            "final_url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2",
+            "redirect_statuses": [],
+            "content_type": "application/problem+json; charset=utf-8",
+            "safe_redirect": false
+          }
+        },
+        {
+          "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2&routeId=SVE7",
+          "check": {
+            "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2&routeId=SVE7",
+            "checked_at": "2026-10-21T20:46:37+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2&routeId=SVE7",
+            "redirect_statuses": [],
+            "content_type": "application/json; charset=utf-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:37+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Color Line",
+      "from": "Sandefjord",
+      "to": "Strömstad",
+      "source_type": "link_only",
+      "importer": "index.html (länkvisare; ingen tidtabellsimport)",
+      "registry_url": "https://www.colorline.se/tidtabeller",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://www.colorline.se/tidtabeller",
+          "check": {
+            "url": "https://www.colorline.se/tidtabeller",
+            "checked_at": "2026-10-21T20:46:43+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://www.colorline.se/tidtabeller",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:43+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Color Line",
+      "from": "Strömstad",
+      "to": "Sandefjord",
+      "source_type": "link_only",
+      "importer": "index.html (länkvisare; ingen tidtabellsimport)",
+      "registry_url": "https://www.colorline.se/tidtabeller",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://www.colorline.se/tidtabeller",
+          "check": {
+            "url": "https://www.colorline.se/tidtabeller",
+            "checked_at": "2026-10-21T20:46:43+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://www.colorline.se/tidtabeller",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:43+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "DFDS",
+      "from": "Brevik",
+      "to": "Göteborg",
+      "source_type": "dynamic_schedule",
+      "importer": "dfds_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.dfds.com/api/timetable",
+      "last_successful_data_at": "2026-10-21T20:45:25Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://www.dfds.com/api/timetable",
+          "check": {
+            "url": "https://www.dfds.com/api/timetable",
+            "checked_at": "2026-10-21T20:46:43+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_requires_request",
+            "http_status": 400,
+            "final_url": "https://www.dfds.com/api/timetable",
+            "redirect_statuses": [],
+            "content_type": "application/json",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "DFDS",
+      "from": "Ghent",
+      "to": "Göteborg",
+      "source_type": "dynamic_schedule",
+      "importer": "dfds_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.dfds.com/api/timetable",
+      "last_successful_data_at": "2026-10-21T20:45:25Z",
+      "cached_rows": 6,
+      "sources": [
+        {
+          "url": "https://assets.ctfassets.net/z860498abl84/01D0W1MrnT10NhdISdd2zx/f156510b3637e58142e76b1fd3d7d76d/Passagiersinformatie_2026_GOTBVK_NL.pdf",
+          "check": {
+            "url": "https://assets.ctfassets.net/z860498abl84/01D0W1MrnT10NhdISdd2zx/f156510b3637e58142e76b1fd3d7d76d/Passagiersinformatie_2026_GOTBVK_NL.pdf",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://assets.ctfassets.net/z860498abl84/01D0W1MrnT10NhdISdd2zx/f156510b3637e58142e76b1fd3d7d76d/Passagiersinformatie_2026_GOTBVK_NL.pdf",
+            "redirect_statuses": [],
+            "content_type": "application/pdf",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:36+00:00"
+          }
+        },
+        {
+          "url": "https://www.dfds.com/api/timetable",
+          "check": {
+            "url": "https://www.dfds.com/api/timetable",
+            "checked_at": "2026-10-21T20:46:43+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_requires_request",
+            "http_status": 400,
+            "final_url": "https://www.dfds.com/api/timetable",
+            "redirect_statuses": [],
+            "content_type": "application/json",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "DFDS",
+      "from": "Göteborg",
+      "to": "Brevik",
+      "source_type": "dynamic_schedule",
+      "importer": "dfds_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.dfds.com/api/timetable",
+      "last_successful_data_at": "2026-10-21T20:45:25Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://www.dfds.com/api/timetable",
+          "check": {
+            "url": "https://www.dfds.com/api/timetable",
+            "checked_at": "2026-10-21T20:46:43+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_requires_request",
+            "http_status": 400,
+            "final_url": "https://www.dfds.com/api/timetable",
+            "redirect_statuses": [],
+            "content_type": "application/json",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "DFDS",
+      "from": "Göteborg",
+      "to": "Ghent",
+      "source_type": "dynamic_schedule",
+      "importer": "dfds_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.dfds.com/api/timetable",
+      "last_successful_data_at": "2026-10-21T20:45:25Z",
+      "cached_rows": 6,
+      "sources": [
+        {
+          "url": "https://assets.ctfassets.net/z860498abl84/01D0W1MrnT10NhdISdd2zx/f156510b3637e58142e76b1fd3d7d76d/Passagiersinformatie_2026_GOTBVK_NL.pdf",
+          "check": {
+            "url": "https://assets.ctfassets.net/z860498abl84/01D0W1MrnT10NhdISdd2zx/f156510b3637e58142e76b1fd3d7d76d/Passagiersinformatie_2026_GOTBVK_NL.pdf",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://assets.ctfassets.net/z860498abl84/01D0W1MrnT10NhdISdd2zx/f156510b3637e58142e76b1fd3d7d76d/Passagiersinformatie_2026_GOTBVK_NL.pdf",
+            "redirect_statuses": [],
+            "content_type": "application/pdf",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:36+00:00"
+          }
+        },
+        {
+          "url": "https://www.dfds.com/api/timetable",
+          "check": {
+            "url": "https://www.dfds.com/api/timetable",
+            "checked_at": "2026-10-21T20:46:43+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_requires_request",
+            "http_status": 400,
+            "final_url": "https://www.dfds.com/api/timetable",
+            "redirect_statuses": [],
+            "content_type": "application/json",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "DFDS",
+      "from": "Göteborg",
+      "to": "Immingham",
+      "source_type": "dynamic_schedule",
+      "importer": "dfds_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.dfds.com/api/timetable",
+      "last_successful_data_at": "2026-10-21T20:45:25Z",
+      "cached_rows": 1,
+      "sources": [
+        {
+          "url": "https://assets.ctfassets.net/mivicpf5zews/4xB5MDHvlrEsStONC9WAFA/22f3c9600417989e2bb8bf7463d24b68/Got-Bvk-Imm-W525-526.pdf",
+          "check": {
+            "url": "https://assets.ctfassets.net/mivicpf5zews/4xB5MDHvlrEsStONC9WAFA/22f3c9600417989e2bb8bf7463d24b68/Got-Bvk-Imm-W525-526.pdf",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://assets.ctfassets.net/mivicpf5zews/4xB5MDHvlrEsStONC9WAFA/22f3c9600417989e2bb8bf7463d24b68/Got-Bvk-Imm-W525-526.pdf",
+            "redirect_statuses": [],
+            "content_type": "application/pdf",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:36+00:00"
+          }
+        },
+        {
+          "url": "https://www.dfds.com/api/timetable",
+          "check": {
+            "url": "https://www.dfds.com/api/timetable",
+            "checked_at": "2026-10-21T20:46:43+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_requires_request",
+            "http_status": 400,
+            "final_url": "https://www.dfds.com/api/timetable",
+            "redirect_statuses": [],
+            "content_type": "application/json",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "DFDS",
+      "from": "Göteborg",
+      "to": "Zeebrugge",
+      "source_type": "dynamic_schedule",
+      "importer": "dfds_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.dfds.com/api/timetable",
+      "last_successful_data_at": "2026-10-21T20:45:25Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://www.dfds.com/api/timetable",
+          "check": {
+            "url": "https://www.dfds.com/api/timetable",
+            "checked_at": "2026-10-21T20:46:43+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_requires_request",
+            "http_status": 400,
+            "final_url": "https://www.dfds.com/api/timetable",
+            "redirect_statuses": [],
+            "content_type": "application/json",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "DFDS",
+      "from": "Immingham",
+      "to": "Göteborg",
+      "source_type": "dynamic_schedule",
+      "importer": "dfds_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.dfds.com/api/timetable",
+      "last_successful_data_at": "2026-10-21T20:45:25Z",
+      "cached_rows": 11,
+      "sources": [
+        {
+          "url": "https://assets.ctfassets.net/mivicpf5zews/4xB5MDHvlrEsStONC9WAFA/22f3c9600417989e2bb8bf7463d24b68/Got-Bvk-Imm-W525-526.pdf",
+          "check": {
+            "url": "https://assets.ctfassets.net/mivicpf5zews/4xB5MDHvlrEsStONC9WAFA/22f3c9600417989e2bb8bf7463d24b68/Got-Bvk-Imm-W525-526.pdf",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://assets.ctfassets.net/mivicpf5zews/4xB5MDHvlrEsStONC9WAFA/22f3c9600417989e2bb8bf7463d24b68/Got-Bvk-Imm-W525-526.pdf",
+            "redirect_statuses": [],
+            "content_type": "application/pdf",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:36+00:00"
+          }
+        },
+        {
+          "url": "https://www.dfds.com/api/timetable",
+          "check": {
+            "url": "https://www.dfds.com/api/timetable",
+            "checked_at": "2026-10-21T20:46:43+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_requires_request",
+            "http_status": 400,
+            "final_url": "https://www.dfds.com/api/timetable",
+            "redirect_statuses": [],
+            "content_type": "application/json",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "DFDS",
+      "from": "Kapellskär",
+      "to": "Paldiski",
+      "source_type": "dynamic_schedule",
+      "importer": "dfds_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.dfds.com/api/timetable",
+      "last_successful_data_at": "2026-10-21T20:45:25Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://laevagraafik.ee/en/Kapellskar-Paldiski/",
+          "check": {
+            "url": "https://laevagraafik.ee/en/Kapellskar-Paldiski/",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "network_error",
+            "error": "ConnectTimeout",
+            "error_detail": "HTTPSConnectionPool(host='laevagraafik.ee', port=443): Max retries exceeded with url: /en/Kapellskar-Paldiski/ (Caused by ConnectTimeoutError(<HTTPSConnection(host='laevagraafik.ee', port=443) at 0x10a6ada90>, 'Connection to laevagraafik.ee timed out. (connect timeout=10)'))",
+            "safe_redirect": false
+          }
+        },
+        {
+          "url": "https://www.dfds.com/api/timetable",
+          "check": {
+            "url": "https://www.dfds.com/api/timetable",
+            "checked_at": "2026-10-21T20:46:43+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_requires_request",
+            "http_status": 400,
+            "final_url": "https://www.dfds.com/api/timetable",
+            "redirect_statuses": [],
+            "content_type": "application/json",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "DFDS",
+      "from": "Karlshamn",
+      "to": "Klaipėda",
+      "source_type": "dynamic_schedule",
+      "importer": "dfds_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.dfds.com/api/timetable",
+      "last_successful_data_at": "2026-10-21T20:45:25Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://assets.ctfassets.net/z860498abl84/387d4nLJuuIO4rClKZMfVc/06bc53b87db30fa5b3994516048c5914/Schedule-KLJ-KAN-2026.pdf",
+          "check": {
+            "url": "https://assets.ctfassets.net/z860498abl84/387d4nLJuuIO4rClKZMfVc/06bc53b87db30fa5b3994516048c5914/Schedule-KLJ-KAN-2026.pdf",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://assets.ctfassets.net/z860498abl84/387d4nLJuuIO4rClKZMfVc/06bc53b87db30fa5b3994516048c5914/Schedule-KLJ-KAN-2026.pdf",
+            "redirect_statuses": [],
+            "content_type": "application/pdf",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:36+00:00"
+          }
+        },
+        {
+          "url": "https://www.dfds.com/api/timetable",
+          "check": {
+            "url": "https://www.dfds.com/api/timetable",
+            "checked_at": "2026-10-21T20:46:43+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_requires_request",
+            "http_status": 400,
+            "final_url": "https://www.dfds.com/api/timetable",
+            "redirect_statuses": [],
+            "content_type": "application/json",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "DFDS",
+      "from": "Klaipėda",
+      "to": "Karlshamn",
+      "source_type": "dynamic_schedule",
+      "importer": "dfds_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.dfds.com/api/timetable",
+      "last_successful_data_at": "2026-10-21T20:45:25Z",
+      "cached_rows": 20,
+      "sources": [
+        {
+          "url": "https://assets.ctfassets.net/z860498abl84/387d4nLJuuIO4rClKZMfVc/06bc53b87db30fa5b3994516048c5914/Schedule-KLJ-KAN-2026.pdf",
+          "check": {
+            "url": "https://assets.ctfassets.net/z860498abl84/387d4nLJuuIO4rClKZMfVc/06bc53b87db30fa5b3994516048c5914/Schedule-KLJ-KAN-2026.pdf",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://assets.ctfassets.net/z860498abl84/387d4nLJuuIO4rClKZMfVc/06bc53b87db30fa5b3994516048c5914/Schedule-KLJ-KAN-2026.pdf",
+            "redirect_statuses": [],
+            "content_type": "application/pdf",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:36+00:00"
+          }
+        },
+        {
+          "url": "https://www.dfds.com/api/timetable",
+          "check": {
+            "url": "https://www.dfds.com/api/timetable",
+            "checked_at": "2026-10-21T20:46:43+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_requires_request",
+            "http_status": 400,
+            "final_url": "https://www.dfds.com/api/timetable",
+            "redirect_statuses": [],
+            "content_type": "application/json",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "DFDS",
+      "from": "Klaipėda",
+      "to": "Trelleborg",
+      "source_type": "dynamic_schedule",
+      "importer": "dfds_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.dfds.com/api/timetable",
+      "last_successful_data_at": "2026-10-21T20:45:25Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://www.dfds.com/api/timetable",
+          "check": {
+            "url": "https://www.dfds.com/api/timetable",
+            "checked_at": "2026-10-21T20:46:43+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_requires_request",
+            "http_status": 400,
+            "final_url": "https://www.dfds.com/api/timetable",
+            "redirect_statuses": [],
+            "content_type": "application/json",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "DFDS",
+      "from": "Paldiski",
+      "to": "Kapellskär",
+      "source_type": "dynamic_schedule",
+      "importer": "dfds_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.dfds.com/api/timetable",
+      "last_successful_data_at": "2026-10-21T20:45:25Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://laevagraafik.ee/en/Paldiski-Kapellskar/",
+          "check": {
+            "url": "https://laevagraafik.ee/en/Paldiski-Kapellskar/",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "network_error",
+            "error": "ConnectTimeout",
+            "error_detail": "HTTPSConnectionPool(host='laevagraafik.ee', port=443): Max retries exceeded with url: /en/Paldiski-Kapellskar/ (Caused by ConnectTimeoutError(<HTTPSConnection(host='laevagraafik.ee', port=443) at 0x10a6ae450>, 'Connection to laevagraafik.ee timed out. (connect timeout=10)'))",
+            "safe_redirect": false
+          }
+        },
+        {
+          "url": "https://www.dfds.com/api/timetable",
+          "check": {
+            "url": "https://www.dfds.com/api/timetable",
+            "checked_at": "2026-10-21T20:46:43+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_requires_request",
+            "http_status": 400,
+            "final_url": "https://www.dfds.com/api/timetable",
+            "redirect_statuses": [],
+            "content_type": "application/json",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "DFDS",
+      "from": "Trelleborg",
+      "to": "Klaipėda",
+      "source_type": "dynamic_schedule",
+      "importer": "dfds_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.dfds.com/api/timetable",
+      "last_successful_data_at": "2026-10-21T20:45:25Z",
+      "cached_rows": 1,
+      "sources": [
+        {
+          "url": "https://www.dfds.com/api/timetable",
+          "check": {
+            "url": "https://www.dfds.com/api/timetable",
+            "checked_at": "2026-10-21T20:46:43+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_requires_request",
+            "http_status": 400,
+            "final_url": "https://www.dfds.com/api/timetable",
+            "redirect_statuses": [],
+            "content_type": "application/json",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "DFDS",
+      "from": "Zeebrugge",
+      "to": "Göteborg",
+      "source_type": "dynamic_schedule",
+      "importer": "dfds_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.dfds.com/api/timetable",
+      "last_successful_data_at": "2026-10-21T20:45:25Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://www.dfds.com/api/timetable",
+          "check": {
+            "url": "https://www.dfds.com/api/timetable",
+            "checked_at": "2026-10-21T20:46:43+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_requires_request",
+            "http_status": 400,
+            "final_url": "https://www.dfds.com/api/timetable",
+            "redirect_statuses": [],
+            "content_type": "application/json",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Eckerö Linjen",
+      "from": "Eckerö",
+      "to": "Grisslehamn",
+      "source_type": "weekly_schedule",
+      "importer": "generera_json.py + verified_schema_overrides.py (verifierat reservschema; inte ny livehämtning)",
+      "registry_url": "https://www.eckerolinjen.se/en/timetable",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://www.eckerolinjen.se/en/timetable",
+          "check": {
+            "url": "https://www.eckerolinjen.se/en/timetable",
+            "checked_at": "2026-10-21T20:46:44+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.eckerolinjen.se/en/timetable",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=utf-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:44+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Eckerö Linjen",
+      "from": "Grisslehamn",
+      "to": "Eckerö",
+      "source_type": "weekly_schedule",
+      "importer": "generera_json.py + verified_schema_overrides.py (verifierat reservschema; inte ny livehämtning)",
+      "registry_url": "https://www.eckerolinjen.se/en/timetable",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://www.eckerolinjen.se/en/timetable",
+          "check": {
+            "url": "https://www.eckerolinjen.se/en/timetable",
+            "checked_at": "2026-10-21T20:46:44+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.eckerolinjen.se/en/timetable",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=utf-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:44+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Finnlines",
+      "from": "Kapellskär",
+      "to": "Naantali",
+      "source_type": "dynamic_schedule",
+      "importer": "finnlines_scraper.py → update_fartyg.py",
+      "registry_url": "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql",
+          "check": {
+            "url": "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "blocked_or_limited",
+            "http_status": 403,
+            "final_url": "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql",
+            "redirect_statuses": [],
+            "content_type": "application/json; charset=UTF-8",
+            "safe_redirect": false
+          }
+        },
+        {
+          "url": "https://www.finnlines.com/sv/rutter/kapellskar-langnas-nadendal/",
+          "check": {
+            "url": "https://www.finnlines.com/sv/rutter/kapellskar-langnas-nadendal/",
+            "checked_at": "2026-10-21T20:46:46+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.finnlines.com/sv/rutter/kapellskar-langnas-nadendal/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:46+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Finnlines",
+      "from": "Malmö",
+      "to": "Travemünde",
+      "source_type": "dynamic_schedule",
+      "importer": "finnlines_scraper.py → update_fartyg.py",
+      "registry_url": "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql",
+          "check": {
+            "url": "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "blocked_or_limited",
+            "http_status": 403,
+            "final_url": "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql",
+            "redirect_statuses": [],
+            "content_type": "application/json; charset=UTF-8",
+            "safe_redirect": false
+          }
+        },
+        {
+          "url": "https://www.finnlines.com/sv/rutter/malmo-travemunde/",
+          "check": {
+            "url": "https://www.finnlines.com/sv/rutter/malmo-travemunde/",
+            "checked_at": "2026-10-21T20:46:46+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.finnlines.com/sv/rutter/malmo-travemunde/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:46+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Finnlines",
+      "from": "Malmö",
+      "to": "Świnoujście",
+      "source_type": "weekly_schedule",
+      "importer": "generera_json.py + verified_schema_overrides.py (verifierat reservschema; inte ny livehämtning)",
+      "registry_url": "https://www.finnlines.com/sv/rutter/malmo-swinoujscie/",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://www.finnlines.com/sv/rutter/malmo-swinoujscie/",
+          "check": {
+            "url": "https://www.finnlines.com/sv/rutter/malmo-swinoujscie/",
+            "checked_at": "2026-10-21T20:46:46+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.finnlines.com/sv/rutter/malmo-swinoujscie/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:46+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Finnlines",
+      "from": "Naantali",
+      "to": "Kapellskär",
+      "source_type": "dynamic_schedule",
+      "importer": "finnlines_scraper.py → update_fartyg.py",
+      "registry_url": "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql",
+          "check": {
+            "url": "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "blocked_or_limited",
+            "http_status": 403,
+            "final_url": "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql",
+            "redirect_statuses": [],
+            "content_type": "application/json; charset=UTF-8",
+            "safe_redirect": false
+          }
+        },
+        {
+          "url": "https://www.finnlines.com/sv/rutter/kapellskar-langnas-nadendal/",
+          "check": {
+            "url": "https://www.finnlines.com/sv/rutter/kapellskar-langnas-nadendal/",
+            "checked_at": "2026-10-21T20:46:46+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.finnlines.com/sv/rutter/kapellskar-langnas-nadendal/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:46+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Finnlines",
+      "from": "Travemünde",
+      "to": "Malmö",
+      "source_type": "dynamic_schedule",
+      "importer": "finnlines_scraper.py → update_fartyg.py",
+      "registry_url": "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql",
+          "check": {
+            "url": "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "blocked_or_limited",
+            "http_status": 403,
+            "final_url": "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql",
+            "redirect_statuses": [],
+            "content_type": "application/json; charset=UTF-8",
+            "safe_redirect": false
+          }
+        },
+        {
+          "url": "https://www.finnlines.com/sv/rutter/malmo-travemunde/",
+          "check": {
+            "url": "https://www.finnlines.com/sv/rutter/malmo-travemunde/",
+            "checked_at": "2026-10-21T20:46:46+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.finnlines.com/sv/rutter/malmo-travemunde/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:46+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Finnlines",
+      "from": "Świnoujście",
+      "to": "Malmö",
+      "source_type": "weekly_schedule",
+      "importer": "generera_json.py + verified_schema_overrides.py (verifierat reservschema; inte ny livehämtning)",
+      "registry_url": "https://www.finnlines.com/sv/rutter/malmo-swinoujscie/",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://www.finnlines.com/sv/rutter/malmo-swinoujscie/",
+          "check": {
+            "url": "https://www.finnlines.com/sv/rutter/malmo-swinoujscie/",
+            "checked_at": "2026-10-21T20:46:46+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.finnlines.com/sv/rutter/malmo-swinoujscie/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:46+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Polferries (POLSCA)",
+      "from": "Gdańsk",
+      "to": "Karlshamn",
+      "source_type": "date_table",
+      "importer": "polferries_scraper.py → update_fartyg.py",
+      "registry_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gh",
+      "last_successful_data_at": "2026-10-21T20:45:58Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gh",
+          "check": {
+            "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gh",
+            "checked_at": "2026-10-21T20:46:38+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gh",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:38+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Polferries (POLSCA)",
+      "from": "Gdańsk",
+      "to": "Nynäshamn",
+      "source_type": "date_table",
+      "importer": "polferries_scraper.py → update_fartyg.py",
+      "registry_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gn",
+      "last_successful_data_at": "2026-10-21T20:45:58Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gn",
+          "check": {
+            "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gn",
+            "checked_at": "2026-10-21T20:46:38+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gn",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:38+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Polferries (POLSCA)",
+      "from": "Karlshamn",
+      "to": "Gdańsk",
+      "source_type": "date_table",
+      "importer": "polferries_scraper.py → update_fartyg.py",
+      "registry_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gh",
+      "last_successful_data_at": "2026-10-21T20:45:58Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gh",
+          "check": {
+            "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gh",
+            "checked_at": "2026-10-21T20:46:38+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gh",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:38+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Polferries (POLSCA)",
+      "from": "Nynäshamn",
+      "to": "Gdańsk",
+      "source_type": "date_table",
+      "importer": "polferries_scraper.py → update_fartyg.py",
+      "registry_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gn",
+      "last_successful_data_at": "2026-10-21T20:45:58Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gn",
+          "check": {
+            "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gn",
+            "checked_at": "2026-10-21T20:46:38+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gn",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:38+00:00"
+          }
+        },
+        {
+          "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ng",
+          "check": {
+            "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ng",
+            "checked_at": "2026-10-21T20:46:38+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ng",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:38+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Polferries (POLSCA)",
+      "from": "Trelleborg",
+      "to": "Świnoujście",
+      "source_type": "date_table",
+      "importer": "polferries_scraper.py → update_fartyg.py",
+      "registry_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=st",
+      "last_successful_data_at": "2026-10-21T20:45:58Z",
+      "cached_rows": 27,
+      "sources": [
+        {
+          "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=st",
+          "check": {
+            "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=st",
+            "checked_at": "2026-10-21T20:46:39+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=st",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:39+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Polferries (POLSCA)",
+      "from": "Ystad",
+      "to": "Świnoujście",
+      "source_type": "date_table",
+      "importer": "polferries_scraper.py → update_fartyg.py",
+      "registry_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ys",
+      "last_successful_data_at": "2026-10-21T20:45:58Z",
+      "cached_rows": 32,
+      "sources": [
+        {
+          "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ys",
+          "check": {
+            "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ys",
+            "checked_at": "2026-10-21T20:46:40+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ys",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:40+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Polferries (POLSCA)",
+      "from": "Świnoujście",
+      "to": "Trelleborg",
+      "source_type": "date_table",
+      "importer": "polferries_scraper.py → update_fartyg.py",
+      "registry_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=st",
+      "last_successful_data_at": "2026-10-21T20:45:58Z",
+      "cached_rows": 28,
+      "sources": [
+        {
+          "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=st",
+          "check": {
+            "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=st",
+            "checked_at": "2026-10-21T20:46:39+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=st",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:39+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Polferries (POLSCA)",
+      "from": "Świnoujście",
+      "to": "Ystad",
+      "source_type": "date_table",
+      "importer": "polferries_scraper.py → update_fartyg.py",
+      "registry_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ys",
+      "last_successful_data_at": "2026-10-21T20:45:58Z",
+      "cached_rows": 31,
+      "sources": [
+        {
+          "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ys",
+          "check": {
+            "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ys",
+            "checked_at": "2026-10-21T20:46:40+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ys",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:40+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Stena Line",
+      "from": "Frederikshavn",
+      "to": "Göteborg",
+      "source_type": "dynamic_schedule",
+      "importer": "stena_line_scraper.py → update_fartyg.py",
+      "registry_url": "https://stenalinefreight.com/timetable/",
+      "last_successful_data_at": "2026-10-21T20:45:45Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://stenalinefreight.com/timetable/",
+          "check": {
+            "url": "https://stenalinefreight.com/timetable/",
+            "checked_at": "2026-10-21T20:46:41+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://stenalinefreight.com/timetable/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:41+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Stena Line",
+      "from": "Gdynia",
+      "to": "Karlskrona",
+      "source_type": "dynamic_schedule",
+      "importer": "stena_line_scraper.py → update_fartyg.py",
+      "registry_url": "https://stenalinefreight.com/timetable/",
+      "last_successful_data_at": "2026-10-21T20:45:45Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://stenalinefreight.com/timetable/",
+          "check": {
+            "url": "https://stenalinefreight.com/timetable/",
+            "checked_at": "2026-10-21T20:46:41+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://stenalinefreight.com/timetable/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:41+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Stena Line",
+      "from": "Göteborg",
+      "to": "Frederikshavn",
+      "source_type": "dynamic_schedule",
+      "importer": "stena_line_scraper.py → update_fartyg.py",
+      "registry_url": "https://stenalinefreight.com/timetable/",
+      "last_successful_data_at": "2026-10-21T20:45:45Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://stenalinefreight.com/timetable/",
+          "check": {
+            "url": "https://stenalinefreight.com/timetable/",
+            "checked_at": "2026-10-21T20:46:41+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://stenalinefreight.com/timetable/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:41+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Stena Line",
+      "from": "Göteborg",
+      "to": "Kiel",
+      "source_type": "dynamic_schedule",
+      "importer": "stena_line_scraper.py → update_fartyg.py",
+      "registry_url": "https://stenalinefreight.com/timetable/",
+      "last_successful_data_at": "2026-10-21T20:45:45Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://stenalinefreight.com/timetable/",
+          "check": {
+            "url": "https://stenalinefreight.com/timetable/",
+            "checked_at": "2026-10-21T20:46:41+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://stenalinefreight.com/timetable/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:41+00:00"
+          }
+        },
+        {
+          "url": "https://www.stenalinetravel.com/routes/kiel-gothenburg",
+          "check": {
+            "url": "https://www.stenalinetravel.com/routes/kiel-gothenburg",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://www.stenalinetravel.com/routes/kiel-gothenburg",
+            "redirect_statuses": [],
+            "content_type": "text/html;charset=utf-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:47+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Stena Line",
+      "from": "Karlskrona",
+      "to": "Gdynia",
+      "source_type": "dynamic_schedule",
+      "importer": "stena_line_scraper.py → update_fartyg.py",
+      "registry_url": "https://stenalinefreight.com/timetable/",
+      "last_successful_data_at": "2026-10-21T20:45:45Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://stenalinefreight.com/timetable/",
+          "check": {
+            "url": "https://stenalinefreight.com/timetable/",
+            "checked_at": "2026-10-21T20:46:41+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://stenalinefreight.com/timetable/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:41+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Stena Line",
+      "from": "Kiel",
+      "to": "Göteborg",
+      "source_type": "dynamic_schedule",
+      "importer": "stena_line_scraper.py → update_fartyg.py",
+      "registry_url": "https://stenalinefreight.com/timetable/",
+      "last_successful_data_at": "2026-10-21T20:45:45Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://stenalinefreight.com/timetable/",
+          "check": {
+            "url": "https://stenalinefreight.com/timetable/",
+            "checked_at": "2026-10-21T20:46:41+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://stenalinefreight.com/timetable/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:41+00:00"
+          }
+        },
+        {
+          "url": "https://www.portofkiel.com/",
+          "check": {
+            "url": "https://www.portofkiel.com/",
+            "checked_at": "2026-10-21T20:46:46+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.portofkiel.com/home.html",
+            "redirect_statuses": [
+              302
+            ],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:46+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Stena Line",
+      "from": "Nynäshamn",
+      "to": "Ventspils",
+      "source_type": "dynamic_schedule",
+      "importer": "stena_line_scraper.py → update_fartyg.py",
+      "registry_url": "https://stenalinefreight.com/timetable/",
+      "last_successful_data_at": "2026-10-21T20:45:45Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://stenalinefreight.com/timetable/",
+          "check": {
+            "url": "https://stenalinefreight.com/timetable/",
+            "checked_at": "2026-10-21T20:46:41+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://stenalinefreight.com/timetable/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:41+00:00"
+          }
+        },
+        {
+          "url": "https://stenalinefreight.com/timetable/NYVE/",
+          "check": {
+            "url": "https://stenalinefreight.com/timetable/NYVE/",
+            "checked_at": "2026-10-21T20:46:42+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://stenalinefreight.com/timetable/NYVE/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:42+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Stena Line",
+      "from": "Rostock",
+      "to": "Trelleborg",
+      "source_type": "dynamic_schedule",
+      "importer": "stena_line_scraper.py → update_fartyg.py",
+      "registry_url": "https://stenalinefreight.com/timetable/",
+      "last_successful_data_at": "2026-10-21T20:45:45Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://rostocktrelleborg.com/timetable/",
+          "check": {
+            "url": "https://rostocktrelleborg.com/timetable/",
+            "checked_at": "2026-10-21T20:46:40+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://rostocktrelleborg.com/timetable/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:40+00:00"
+          }
+        },
+        {
+          "url": "https://stenalinefreight.com/timetable/",
+          "check": {
+            "url": "https://stenalinefreight.com/timetable/",
+            "checked_at": "2026-10-21T20:46:41+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://stenalinefreight.com/timetable/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:41+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Stena Line",
+      "from": "Trelleborg",
+      "to": "Rostock",
+      "source_type": "dynamic_schedule",
+      "importer": "stena_line_scraper.py → update_fartyg.py",
+      "registry_url": "https://stenalinefreight.com/timetable/",
+      "last_successful_data_at": "2026-10-21T20:45:45Z",
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://stenalinefreight.com/timetable/",
+          "check": {
+            "url": "https://stenalinefreight.com/timetable/",
+            "checked_at": "2026-10-21T20:46:41+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://stenalinefreight.com/timetable/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:41+00:00"
+          }
+        },
+        {
+          "url": "https://www.trelleborgshamn.se/en/english/about-the-port/arrivals-and-departures/",
+          "check": {
+            "url": "https://www.trelleborgshamn.se/en/english/about-the-port/arrivals-and-departures/",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.trelleborgshamn.se/en/english/about-the-port/arrivals-and-departures/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:47+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Stena Line",
+      "from": "Ventspils",
+      "to": "Nynäshamn",
+      "source_type": "dynamic_schedule",
+      "importer": "stena_line_scraper.py → update_fartyg.py",
+      "registry_url": "https://stenalinefreight.com/timetable/",
+      "last_successful_data_at": "2026-10-21T20:45:45Z",
+      "cached_rows": 106,
+      "sources": [
+        {
+          "url": "https://stenalinefreight.com/timetable/",
+          "check": {
+            "url": "https://stenalinefreight.com/timetable/",
+            "checked_at": "2026-10-21T20:46:41+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://stenalinefreight.com/timetable/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:41+00:00"
+          }
+        },
+        {
+          "url": "https://stenalinefreight.com/timetable/NYVE/",
+          "check": {
+            "url": "https://stenalinefreight.com/timetable/NYVE/",
+            "checked_at": "2026-10-21T20:46:42+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://stenalinefreight.com/timetable/NYVE/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:42+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Sundbusserne",
+      "from": "Helsingborg",
+      "to": "Helsingør",
+      "source_type": "weekly_schedule",
+      "importer": "generera_json.py + verified_schema_overrides.py (verifierat reservschema; inte ny livehämtning)",
+      "registry_url": "https://sundbusserne.dk/fartplan/",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://sundbusserne.dk/fartplan/",
+          "check": {
+            "url": "https://sundbusserne.dk/fartplan/",
+            "checked_at": "2026-10-21T20:46:42+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://sundbusserne.dk/fartplan/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:42+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Sundbusserne",
+      "from": "Helsingør",
+      "to": "Helsingborg",
+      "source_type": "weekly_schedule",
+      "importer": "generera_json.py + verified_schema_overrides.py (verifierat reservschema; inte ny livehämtning)",
+      "registry_url": "https://sundbusserne.dk/fartplan/",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://sundbusserne.dk/fartplan/",
+          "check": {
+            "url": "https://sundbusserne.dk/fartplan/",
+            "checked_at": "2026-10-21T20:46:42+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://sundbusserne.dk/fartplan/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:42+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "TT-Line",
+      "from": "Karlshamn",
+      "to": "Travemünde",
+      "source_type": "dynamic_schedule",
+      "importer": "ttline_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.ttline.com/en/timetables/",
+      "last_successful_data_at": null,
+      "cached_rows": 4,
+      "sources": [
+        {
+          "url": "https://www.ttline.com/en/timetables/",
+          "check": {
+            "url": "https://www.ttline.com/en/timetables/",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "blocked_or_limited",
+            "http_status": 403,
+            "final_url": "https://www.ttline.com/en/timetables/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false
+          }
+        },
+        {
+          "url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026-karcon.pdf",
+          "check": {
+            "url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026-karcon.pdf",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026-karcon.pdf",
+            "redirect_statuses": [],
+            "content_type": "application/pdf",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:47+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "TT-Line",
+      "from": "Rostock",
+      "to": "Karlshamn",
+      "source_type": "weekly_schedule",
+      "importer": "generera_json.py + verified_schema_overrides.py (verifierat reservschema; inte ny livehämtning)",
+      "registry_url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026-karcon.pdf",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026-karcon.pdf",
+          "check": {
+            "url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026-karcon.pdf",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026-karcon.pdf",
+            "redirect_statuses": [],
+            "content_type": "application/pdf",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:47+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "TT-Line",
+      "from": "Rostock",
+      "to": "Trelleborg",
+      "source_type": "dynamic_schedule",
+      "importer": "ttline_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.ttline.com/en/timetables/",
+      "last_successful_data_at": null,
+      "cached_rows": 72,
+      "sources": [
+        {
+          "url": "https://rostocktrelleborg.com/timetable/",
+          "check": {
+            "url": "https://rostocktrelleborg.com/timetable/",
+            "checked_at": "2026-10-21T20:46:40+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://rostocktrelleborg.com/timetable/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:40+00:00"
+          }
+        },
+        {
+          "url": "https://www.ttline.com/en/timetables/",
+          "check": {
+            "url": "https://www.ttline.com/en/timetables/",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "blocked_or_limited",
+            "http_status": 403,
+            "final_url": "https://www.ttline.com/en/timetables/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "TT-Line",
+      "from": "Travemünde",
+      "to": "Karlshamn",
+      "source_type": "dynamic_schedule",
+      "importer": "ttline_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.ttline.com/en/timetables/",
+      "last_successful_data_at": null,
+      "cached_rows": 3,
+      "sources": [
+        {
+          "url": "https://www.ttline.com/en/timetables/",
+          "check": {
+            "url": "https://www.ttline.com/en/timetables/",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "blocked_or_limited",
+            "http_status": 403,
+            "final_url": "https://www.ttline.com/en/timetables/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false
+          }
+        },
+        {
+          "url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026-karcon.pdf",
+          "check": {
+            "url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026-karcon.pdf",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026-karcon.pdf",
+            "redirect_statuses": [],
+            "content_type": "application/pdf",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:47+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "TT-Line",
+      "from": "Travemünde",
+      "to": "Trelleborg",
+      "source_type": "dynamic_schedule",
+      "importer": "ttline_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.ttline.com/en/timetables/",
+      "last_successful_data_at": null,
+      "cached_rows": 80,
+      "sources": [
+        {
+          "url": "https://www.ttline.com/en/timetables/",
+          "check": {
+            "url": "https://www.ttline.com/en/timetables/",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "blocked_or_limited",
+            "http_status": 403,
+            "final_url": "https://www.ttline.com/en/timetables/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false
+          }
+        },
+        {
+          "url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_tra.pdf",
+          "check": {
+            "url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_tra.pdf",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_tra.pdf",
+            "redirect_statuses": [],
+            "content_type": "application/pdf",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:47+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "TT-Line",
+      "from": "Trelleborg",
+      "to": "Rostock",
+      "source_type": "dynamic_schedule",
+      "importer": "ttline_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.ttline.com/en/timetables/",
+      "last_successful_data_at": null,
+      "cached_rows": 68,
+      "sources": [
+        {
+          "url": "https://www.trelleborgshamn.se/en/english/about-the-port/arrivals-and-departures/",
+          "check": {
+            "url": "https://www.trelleborgshamn.se/en/english/about-the-port/arrivals-and-departures/",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.trelleborgshamn.se/en/english/about-the-port/arrivals-and-departures/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:47+00:00"
+          }
+        },
+        {
+          "url": "https://www.ttline.com/en/timetables/",
+          "check": {
+            "url": "https://www.ttline.com/en/timetables/",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "blocked_or_limited",
+            "http_status": 403,
+            "final_url": "https://www.ttline.com/en/timetables/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "TT-Line",
+      "from": "Trelleborg",
+      "to": "Travemünde",
+      "source_type": "dynamic_schedule",
+      "importer": "ttline_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.ttline.com/en/timetables/",
+      "last_successful_data_at": null,
+      "cached_rows": 73,
+      "sources": [
+        {
+          "url": "https://www.ttline.com/en/timetables/",
+          "check": {
+            "url": "https://www.ttline.com/en/timetables/",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "blocked_or_limited",
+            "http_status": 403,
+            "final_url": "https://www.ttline.com/en/timetables/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false
+          }
+        },
+        {
+          "url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_tra.pdf",
+          "check": {
+            "url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_tra.pdf",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_tra.pdf",
+            "redirect_statuses": [],
+            "content_type": "application/pdf",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:47+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "TT-Line",
+      "from": "Trelleborg",
+      "to": "Świnoujście",
+      "source_type": "dynamic_schedule",
+      "importer": "ttline_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.ttline.com/en/timetables/",
+      "last_successful_data_at": null,
+      "cached_rows": 43,
+      "sources": [
+        {
+          "url": "https://www.ttline.com/en/timetables/",
+          "check": {
+            "url": "https://www.ttline.com/en/timetables/",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "blocked_or_limited",
+            "http_status": 403,
+            "final_url": "https://www.ttline.com/en/timetables/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false
+          }
+        },
+        {
+          "url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_swi.pdf",
+          "check": {
+            "url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_swi.pdf",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_swi.pdf",
+            "redirect_statuses": [],
+            "content_type": "application/pdf",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:47+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "TT-Line",
+      "from": "Świnoujście",
+      "to": "Trelleborg",
+      "source_type": "dynamic_schedule",
+      "importer": "ttline_scraper.py → update_fartyg.py",
+      "registry_url": "https://www.ttline.com/en/timetables/",
+      "last_successful_data_at": null,
+      "cached_rows": 43,
+      "sources": [
+        {
+          "url": "https://www.ttline.com/en/timetables/",
+          "check": {
+            "url": "https://www.ttline.com/en/timetables/",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "blocked_or_limited",
+            "http_status": 403,
+            "final_url": "https://www.ttline.com/en/timetables/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false
+          }
+        },
+        {
+          "url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_swi.pdf",
+          "check": {
+            "url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_swi.pdf",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 206,
+            "final_url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_swi.pdf",
+            "redirect_statuses": [],
+            "content_type": "application/pdf",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:47+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Tallink Silja",
+      "from": "Helsingfors",
+      "to": "Stockholm",
+      "source_type": "dynamic_schedule",
+      "importer": "tallink_scraper.py → update_fartyg.py",
+      "registry_url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+      "last_successful_data_at": "2026-10-21T20:45:16Z",
+      "cached_rows": 31,
+      "sources": [
+        {
+          "url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+          "check": {
+            "url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_request_or_server_error",
+            "http_status": 500,
+            "final_url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+            "redirect_statuses": [],
+            "content_type": "application/json;charset=UTF-8",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Tallink Silja",
+      "from": "Stockholm",
+      "to": "Helsingfors",
+      "source_type": "dynamic_schedule",
+      "importer": "tallink_scraper.py → update_fartyg.py",
+      "registry_url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+      "last_successful_data_at": "2026-10-21T20:45:16Z",
+      "cached_rows": 31,
+      "sources": [
+        {
+          "url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+          "check": {
+            "url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_request_or_server_error",
+            "http_status": 500,
+            "final_url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+            "redirect_statuses": [],
+            "content_type": "application/json;charset=UTF-8",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Tallink Silja",
+      "from": "Stockholm",
+      "to": "Tallinn",
+      "source_type": "dynamic_schedule",
+      "importer": "tallink_scraper.py → update_fartyg.py",
+      "registry_url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+      "last_successful_data_at": "2026-10-21T20:45:16Z",
+      "cached_rows": 31,
+      "sources": [
+        {
+          "url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+          "check": {
+            "url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_request_or_server_error",
+            "http_status": 500,
+            "final_url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+            "redirect_statuses": [],
+            "content_type": "application/json;charset=UTF-8",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Tallink Silja",
+      "from": "Stockholm",
+      "to": "Åbo",
+      "source_type": "dynamic_schedule",
+      "importer": "tallink_scraper.py → update_fartyg.py",
+      "registry_url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+      "last_successful_data_at": "2026-10-21T20:45:16Z",
+      "cached_rows": 36,
+      "sources": [
+        {
+          "url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+          "check": {
+            "url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_request_or_server_error",
+            "http_status": 500,
+            "final_url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+            "redirect_statuses": [],
+            "content_type": "application/json;charset=UTF-8",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Tallink Silja",
+      "from": "Tallinn",
+      "to": "Stockholm",
+      "source_type": "dynamic_schedule",
+      "importer": "tallink_scraper.py → update_fartyg.py",
+      "registry_url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+      "last_successful_data_at": "2026-10-21T20:45:16Z",
+      "cached_rows": 31,
+      "sources": [
+        {
+          "url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+          "check": {
+            "url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_request_or_server_error",
+            "http_status": 500,
+            "final_url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+            "redirect_statuses": [],
+            "content_type": "application/json;charset=UTF-8",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Tallink Silja",
+      "from": "Åbo",
+      "to": "Stockholm",
+      "source_type": "dynamic_schedule",
+      "importer": "tallink_scraper.py → update_fartyg.py",
+      "registry_url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+      "last_successful_data_at": "2026-10-21T20:45:16Z",
+      "cached_rows": 32,
+      "sources": [
+        {
+          "url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+          "check": {
+            "url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+            "checked_at": "2026-10-21T20:46:36+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_request_or_server_error",
+            "http_status": 500,
+            "final_url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
+            "redirect_statuses": [],
+            "content_type": "application/json;charset=UTF-8",
+            "safe_redirect": false
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Viking Line",
+      "from": "Helsingfors",
+      "to": "Stockholm",
+      "source_type": "weekly_schedule",
+      "importer": "generera_json.py + verified_schema_overrides.py (verifierat reservschema; inte ny livehämtning)",
+      "registry_url": "https://www.sales.vikingline.com/find-trip/timetable/stockholm-helsinki/",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://www.sales.vikingline.com/find-trip/timetable/stockholm-helsinki/",
+          "check": {
+            "url": "https://www.sales.vikingline.com/find-trip/timetable/stockholm-helsinki/",
+            "checked_at": "2026-10-21T20:46:46+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.sales.vikingline.com:443/timetable/stockholm-helsinki/",
+            "redirect_statuses": [
+              301
+            ],
+            "content_type": "text/html; charset=utf-8",
+            "safe_redirect": true,
+            "last_ok_at": "2026-10-21T20:46:46+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Viking Line",
+      "from": "Stockholm",
+      "to": "Helsingfors",
+      "source_type": "weekly_schedule",
+      "importer": "generera_json.py + verified_schema_overrides.py (verifierat reservschema; inte ny livehämtning)",
+      "registry_url": "https://www.sales.vikingline.com/find-trip/timetable/stockholm-helsinki/",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://www.sales.vikingline.com/find-trip/timetable/stockholm-helsinki/",
+          "check": {
+            "url": "https://www.sales.vikingline.com/find-trip/timetable/stockholm-helsinki/",
+            "checked_at": "2026-10-21T20:46:46+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.sales.vikingline.com:443/timetable/stockholm-helsinki/",
+            "redirect_statuses": [
+              301
+            ],
+            "content_type": "text/html; charset=utf-8",
+            "safe_redirect": true,
+            "last_ok_at": "2026-10-21T20:46:46+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Viking Line",
+      "from": "Stockholm",
+      "to": "Åbo",
+      "source_type": "weekly_schedule",
+      "importer": "generera_json.py + verified_schema_overrides.py (verifierat reservschema; inte ny livehämtning)",
+      "registry_url": "https://www.sales.vikingline.com/find-trip/timetable/stockholm-turku/",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://www.sales.vikingline.com/find-trip/timetable/stockholm-turku/",
+          "check": {
+            "url": "https://www.sales.vikingline.com/find-trip/timetable/stockholm-turku/",
+            "checked_at": "2026-10-21T20:46:46+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.sales.vikingline.com:443/timetable/stockholm-turku/",
+            "redirect_statuses": [
+              301
+            ],
+            "content_type": "text/html; charset=utf-8",
+            "safe_redirect": true,
+            "last_ok_at": "2026-10-21T20:46:46+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Viking Line",
+      "from": "Åbo",
+      "to": "Stockholm",
+      "source_type": "weekly_schedule",
+      "importer": "generera_json.py + verified_schema_overrides.py (verifierat reservschema; inte ny livehämtning)",
+      "registry_url": "https://www.sales.vikingline.com/find-trip/timetable/stockholm-turku/",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://www.nordicmarketing.de/en/blog/schedule-update-viking-glory-to-operate-evening-departures-from-turku",
+          "check": {
+            "url": "https://www.nordicmarketing.de/en/blog/schedule-update-viking-glory-to-operate-evening-departures-from-turku",
+            "checked_at": "2026-10-21T20:46:46+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.nordicmarketing.de/en/blog/schedule-update-viking-glory-to-operate-evening-departures-from-turku",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:46+00:00"
+          }
+        },
+        {
+          "url": "https://www.sales.vikingline.com/find-trip/timetable/stockholm-turku/",
+          "check": {
+            "url": "https://www.sales.vikingline.com/find-trip/timetable/stockholm-turku/",
+            "checked_at": "2026-10-21T20:46:46+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.sales.vikingline.com:443/timetable/stockholm-turku/",
+            "redirect_statuses": [
+              301
+            ],
+            "content_type": "text/html; charset=utf-8",
+            "safe_redirect": true,
+            "last_ok_at": "2026-10-21T20:46:46+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Wasaline",
+      "from": "Umeå",
+      "to": "Vasa",
+      "source_type": "weekly_schedule",
+      "importer": "generera_json.py + verified_schema_overrides.py (verifierat reservschema; inte ny livehämtning)",
+      "registry_url": "https://www.wasaline.com/en/timetable/",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://www.wasaline.com/en/timetable/",
+          "check": {
+            "url": "https://www.wasaline.com/en/timetable/",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.wasaline.com/en/timetable/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:47+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Wasaline",
+      "from": "Vasa",
+      "to": "Umeå",
+      "source_type": "weekly_schedule",
+      "importer": "generera_json.py + verified_schema_overrides.py (verifierat reservschema; inte ny livehämtning)",
+      "registry_url": "https://www.wasaline.com/en/timetable/",
+      "last_successful_data_at": null,
+      "cached_rows": 0,
+      "sources": [
+        {
+          "url": "https://www.wasaline.com/en/timetable/",
+          "check": {
+            "url": "https://www.wasaline.com/en/timetable/",
+            "checked_at": "2026-10-21T20:46:47+00:00",
+            "method": "GET",
+            "api_endpoint": false,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://www.wasaline.com/en/timetable/",
+            "redirect_statuses": [],
+            "content_type": "text/html; charset=UTF-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:47+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Øresundslinjen",
+      "from": "Helsingborg",
+      "to": "Helsingør",
+      "source_type": "dynamic_schedule",
+      "importer": "molslinjen_scraper.py → update_fartyg.py",
+      "registry_url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7",
+      "last_successful_data_at": "2026-10-21T20:46:02Z",
+      "cached_rows": 1526,
+      "sources": [
+        {
+          "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7",
+          "check": {
+            "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7",
+            "checked_at": "2026-10-21T20:46:37+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_requires_request",
+            "http_status": 400,
+            "final_url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7",
+            "redirect_statuses": [],
+            "content_type": "application/problem+json; charset=utf-8",
+            "safe_redirect": false
+          }
+        },
+        {
+          "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7&routeId=SVE22",
+          "check": {
+            "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7&routeId=SVE22",
+            "checked_at": "2026-10-21T20:46:37+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7&routeId=SVE22",
+            "redirect_statuses": [],
+            "content_type": "application/json; charset=utf-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:37+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "operator": "Øresundslinjen",
+      "from": "Helsingør",
+      "to": "Helsingborg",
+      "source_type": "dynamic_schedule",
+      "importer": "molslinjen_scraper.py → update_fartyg.py",
+      "registry_url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7",
+      "last_successful_data_at": "2026-10-21T20:46:02Z",
+      "cached_rows": 1525,
+      "sources": [
+        {
+          "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7",
+          "check": {
+            "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7",
+            "checked_at": "2026-10-21T20:46:37+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "api_requires_request",
+            "http_status": 400,
+            "final_url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7",
+            "redirect_statuses": [],
+            "content_type": "application/problem+json; charset=utf-8",
+            "safe_redirect": false
+          }
+        },
+        {
+          "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7&routeId=SJÆ22",
+          "check": {
+            "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7&routeId=SJÆ22",
+            "checked_at": "2026-10-21T20:46:37+00:00",
+            "method": "GET",
+            "api_endpoint": true,
+            "status": "ok",
+            "http_status": 200,
+            "final_url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7&routeId=SJ%C3%8622",
+            "redirect_statuses": [],
+            "content_type": "application/json; charset=utf-8",
+            "safe_redirect": false,
+            "last_ok_at": "2026-10-21T20:46:37+00:00"
+          }
+        }
+      ]
+    }
+  ]
+}

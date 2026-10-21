@@ -68,7 +68,7 @@ VIKING_API = ("dynamic_schedule", "Viking Protheus ferry API", "https://www.sale
 FINNLINES_API = ("dynamic_schedule", "Finnlines GraphQL timetable API", "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql")
 STENA_API = ("dynamic_schedule", "Stena Freight LiveView", "https://stenalinefreight.com/timetable/")
 TTLINE_API = ("dynamic_schedule", "TT-Line timetable endpoint", "https://www.ttline.com/en/timetables/")
-POLSCA_WEEKLY = ("weekly_schedule", None, "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html")
+POLSCA_GDANSK_NYNASHAMN = ("date_table", "Polferries Gdańsk-Nynäshamn timetable", "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gn")
 POLSCA_YS_TIMETABLE = (
     "date_table",
     "Polferries Świnoujście-Ystad timetable",
@@ -80,7 +80,7 @@ POLSCA_ST_TIMETABLE = (
     "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=st",
 )
 POLSCA_GDANSK_KARLSHAMN = (
-    "weekly_schedule",
+    "date_table",
     "Polferries Gdańsk-Karlshamn timetable",
     "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gh",
 )
@@ -152,7 +152,7 @@ ACTIVE_ROUTES: tuple[RouteSource, ...] = (
     # Polferries / POLSCA
     *two_way("Polferries (POLSCA)", "Świnoujście", "Ystad", POLSCA_YS_TIMETABLE),
     *two_way("Polferries (POLSCA)", "Świnoujście", "Trelleborg", POLSCA_ST_TIMETABLE),
-    *two_way("Polferries (POLSCA)", "Gdańsk", "Nynäshamn", POLSCA_WEEKLY),
+    *two_way("Polferries (POLSCA)", "Gdańsk", "Nynäshamn", POLSCA_GDANSK_NYNASHAMN),
     *two_way("Polferries (POLSCA)", "Gdańsk", "Karlshamn", POLSCA_GDANSK_KARLSHAMN),
 )
 
@@ -220,18 +220,18 @@ def source_identity(inst: dict) -> tuple[str, str, str, str]:
 def filter_instances_to_primary_sources(instances_by_date: dict[str, list[dict]]) -> Counter:
     """Mutera avgangsinstanser så endast ruttens utsedda primärkälla återstår.
 
-    Om primärkällan saknas helt för en rutt i en körning behålls verifierad
-    fallbackdata, annars kan en tillfällig API-blockering radera aktiva linjer.
+    Källvalet gäller per avgångsdatum och rutt. En primärkälla för en dag
+    får inte radera verifierad fallback för andra dagar i publiceringsfönstret.
     """
     removed: Counter = Counter()
-    primary_present_routes: set[tuple[str, str, str]] = set()
+    primary_present_routes: set[tuple[str, tuple[str, str, str]]] = set()
 
-    for entries in instances_by_date.values():
+    for dep_date, entries in instances_by_date.items():
         for inst in entries or []:
             key = route_key_from_instance(inst)
             route = ACTIVE_BY_ROUTE.get(key)
             if route and source_matches(inst, route):
-                primary_present_routes.add(key)
+                primary_present_routes.add((dep_date, key))
 
     for dep_date, entries in list(instances_by_date.items()):
         kept: list[dict] = []
@@ -244,7 +244,7 @@ def filter_instances_to_primary_sources(instances_by_date: dict[str, list[dict]]
                 removed["suppressed_duplicate_route"] += 1
                 continue
             route = ACTIVE_BY_ROUTE.get(key)
-            if route and key in primary_present_routes and not source_matches(inst, route):
+            if route and (dep_date, key) in primary_present_routes and not source_matches(inst, route):
                 removed["non_primary_source"] += 1
                 continue
             kept.append(inst)
