@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-21T23:24:51+00:00",
+  "generated_at": "2026-10-22T00:55:59+00:00",
   "pages": {
     "index.html": {
       "description": "farjor_data.json → avgangsinstanser; reservvisning från schema. Live-/datumdata hämtas av Python-jobben nedan; frontend har även direkta API-anrop som komplettering.",
@@ -359,7 +359,7 @@
       "source_type": "dynamic_schedule",
       "importer": "molslinjen_scraper.py → update_fartyg.py",
       "registry_url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2",
-      "last_successful_data_at": "2026-10-21T23:24:37Z",
+      "last_successful_data_at": "2026-10-22T00:55:46Z",
       "cached_rows": 134,
       "sources": [
         {
@@ -402,7 +402,7 @@
       "source_type": "dynamic_schedule",
       "importer": "molslinjen_scraper.py → update_fartyg.py",
       "registry_url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2",
-      "last_successful_data_at": "2026-10-21T23:24:37Z",
+      "last_successful_data_at": "2026-10-22T00:55:46Z",
       "cached_rows": 133,
       "sources": [
         {
@@ -501,7 +501,7 @@
       "source_type": "dynamic_schedule",
       "importer": "dfds_scraper.py → update_fartyg.py",
       "registry_url": "https://www.dfds.com/api/timetable",
-      "last_successful_data_at": "2026-10-21T23:23:56Z",
+      "last_successful_data_at": "2026-10-22T00:55:01Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -528,7 +528,7 @@
       "source_type": "dynamic_schedule",
       "importer": "dfds_scraper.py → update_fartyg.py",
       "registry_url": "https://www.dfds.com/api/timetable",
-      "last_successful_data_at": "2026-10-21T23:23:56Z",
+      "last_successful_data_at": "2026-10-22T00:55:01Z",
       "cached_rows": 6,
       "sources": [
         {
@@ -571,7 +571,7 @@
       "source_type": "dynamic_schedule",
       "importer": "dfds_scraper.py → update_fartyg.py",
       "registry_url": "https://www.dfds.com/api/timetable",
-      "last_successful_data_at": "2026-10-21T23:23:56Z",
+      "last_successful_data_at": "2026-10-22T00:55:01Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -598,7 +598,7 @@
       "source_type": "dynamic_schedule",
       "importer": "dfds_scraper.py → update_fartyg.py",
       "registry_url": "https://www.dfds.com/api/timetable",
-      "last_successful_data_at": "2026-10-21T23:23:56Z",
+      "last_successful_data_at": "2026-10-22T00:55:01Z",
       "cached_rows": 6,
       "sources": [
         {
@@ -641,7 +641,7 @@
       "source_type": "dynamic_schedule",
       "importer": "dfds_scraper.py → update_fartyg.py",
       "registry_url": "https://www.dfds.com/api/timetable",
-      "last_successful_data_at": "2026-10-21T23:23:56Z",
+      "last_successful_data_at": "2026-10-22T00:55:01Z",
       "cached_rows": 1,
       "sources": [
         {
@@ -684,7 +684,7 @@
       "source_type": "dynamic_schedule",
       "importer": "dfds_scraper.py → update_fartyg.py",
       "registry_url": "https://www.dfds.com/api/timetable",
-      "last_successful_data_at": "2026-10-21T23:23:56Z",
+      "last_successful_data_at": "2026-10-22T00:55:01Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -711,7 +711,7 @@
       "source_type": "dynamic_schedule",
       "importer": "dfds_scraper.py → update_fartyg.py",
       "registry_url": "https://www.dfds.com/api/timetable",
-      "last_successful_data_at": "2026-10-21T23:23:56Z",
+      "last_successful_data_at": "2026-10-22T00:55:01Z",
       "cached_rows": 11,
       "sources": [
         {
@@ -754,7 +754,7 @@
       "source_type": "dynamic_schedule",
       "importer": "dfds_scraper.py → update_fartyg.py",
       "registry_url": "https://www.dfds.com/api/timetable",
-      "last_successful_data_at": "2026-10-21T23:23:56Z",
+      "last_successful_data_at": "2026-10-22T00:55:01Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -794,7 +794,7 @@
       "source_type": "dynamic_schedule",
       "importer": "dfds_scraper.py → update_fartyg.py",
       "registry_url": "https://www.dfds.com/api/timetable",
-      "last_successful_data_at": "2026-10-21T23:23:56Z",
+      "last_successful_data_at": "2026-10-22T00:55:01Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -837,7 +837,7 @@
       "source_type": "dynamic_schedule",
       "importer": "dfds_scraper.py → update_fartyg.py",
       "registry_url": "https://www.dfds.com/api/timetable",
-      "last_successful_data_at": "2026-10-21T23:23:56Z",
+      "last_successful_data_at": "2026-10-22T00:55:01Z",
       "cached_rows": 20,
       "sources": [
         {
@@ -880,7 +880,7 @@
       "source_type": "dynamic_schedule",
       "importer": "dfds_scraper.py → update_fartyg.py",
       "registry_url": "https://www.dfds.com/api/timetable",
-      "last_successful_data_at": "2026-10-21T23:23:56Z",
+      "last_successful_data_at": "2026-10-22T00:55:01Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -907,7 +907,7 @@
       "source_type": "dynamic_schedule",
       "importer": "dfds_scraper.py → update_fartyg.py",
       "registry_url": "https://www.dfds.com/api/timetable",
-      "last_successful_data_at": "2026-10-21T23:23:56Z",
+      "last_successful_data_at": "2026-10-22T00:55:01Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -947,7 +947,7 @@
       "source_type": "dynamic_schedule",
       "importer": "dfds_scraper.py → update_fartyg.py",
       "registry_url": "https://www.dfds.com/api/timetable",
-      "last_successful_data_at": "2026-10-21T23:23:56Z",
+      "last_successful_data_at": "2026-10-22T00:55:01Z",
       "cached_rows": 1,
       "sources": [
         {
@@ -974,7 +974,7 @@
       "source_type": "dynamic_schedule",
       "importer": "dfds_scraper.py → update_fartyg.py",
       "registry_url": "https://www.dfds.com/api/timetable",
-      "last_successful_data_at": "2026-10-21T23:23:56Z",
+      "last_successful_data_at": "2026-10-22T00:55:01Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -1285,7 +1285,7 @@
       "source_type": "date_table",
       "importer": "polferries_scraper.py → update_fartyg.py",
       "registry_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gh",
-      "last_successful_data_at": "2026-10-21T23:24:31Z",
+      "last_successful_data_at": "2026-10-22T00:55:39Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -1313,7 +1313,7 @@
       "source_type": "date_table",
       "importer": "polferries_scraper.py → update_fartyg.py",
       "registry_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gn",
-      "last_successful_data_at": "2026-10-21T23:24:31Z",
+      "last_successful_data_at": "2026-10-22T00:55:39Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -1341,7 +1341,7 @@
       "source_type": "date_table",
       "importer": "polferries_scraper.py → update_fartyg.py",
       "registry_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gh",
-      "last_successful_data_at": "2026-10-21T23:24:31Z",
+      "last_successful_data_at": "2026-10-22T00:55:39Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -1369,7 +1369,7 @@
       "source_type": "date_table",
       "importer": "polferries_scraper.py → update_fartyg.py",
       "registry_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gn",
-      "last_successful_data_at": "2026-10-21T23:24:31Z",
+      "last_successful_data_at": "2026-10-22T00:55:39Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -1413,7 +1413,7 @@
       "source_type": "date_table",
       "importer": "polferries_scraper.py → update_fartyg.py",
       "registry_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=st",
-      "last_successful_data_at": "2026-10-21T23:24:31Z",
+      "last_successful_data_at": "2026-10-22T00:55:39Z",
       "cached_rows": 24,
       "sources": [
         {
@@ -1441,7 +1441,7 @@
       "source_type": "date_table",
       "importer": "polferries_scraper.py → update_fartyg.py",
       "registry_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ys",
-      "last_successful_data_at": "2026-10-21T23:24:31Z",
+      "last_successful_data_at": "2026-10-22T00:55:39Z",
       "cached_rows": 30,
       "sources": [
         {
@@ -1469,7 +1469,7 @@
       "source_type": "date_table",
       "importer": "polferries_scraper.py → update_fartyg.py",
       "registry_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=st",
-      "last_successful_data_at": "2026-10-21T23:24:31Z",
+      "last_successful_data_at": "2026-10-22T00:55:39Z",
       "cached_rows": 25,
       "sources": [
         {
@@ -1497,7 +1497,7 @@
       "source_type": "date_table",
       "importer": "polferries_scraper.py → update_fartyg.py",
       "registry_url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ys",
-      "last_successful_data_at": "2026-10-21T23:24:31Z",
+      "last_successful_data_at": "2026-10-22T00:55:39Z",
       "cached_rows": 28,
       "sources": [
         {
@@ -1525,7 +1525,7 @@
       "source_type": "dynamic_schedule",
       "importer": "stena_line_scraper.py → update_fartyg.py",
       "registry_url": "https://stenalinefreight.com/timetable/",
-      "last_successful_data_at": "2026-10-21T23:24:17Z",
+      "last_successful_data_at": "2026-10-22T00:55:24Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -1553,7 +1553,7 @@
       "source_type": "dynamic_schedule",
       "importer": "stena_line_scraper.py → update_fartyg.py",
       "registry_url": "https://stenalinefreight.com/timetable/",
-      "last_successful_data_at": "2026-10-21T23:24:17Z",
+      "last_successful_data_at": "2026-10-22T00:55:24Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -1581,7 +1581,7 @@
       "source_type": "dynamic_schedule",
       "importer": "stena_line_scraper.py → update_fartyg.py",
       "registry_url": "https://stenalinefreight.com/timetable/",
-      "last_successful_data_at": "2026-10-21T23:24:17Z",
+      "last_successful_data_at": "2026-10-22T00:55:24Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -1609,7 +1609,7 @@
       "source_type": "dynamic_schedule",
       "importer": "stena_line_scraper.py → update_fartyg.py",
       "registry_url": "https://stenalinefreight.com/timetable/",
-      "last_successful_data_at": "2026-10-21T23:24:17Z",
+      "last_successful_data_at": "2026-10-22T00:55:24Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -1653,7 +1653,7 @@
       "source_type": "dynamic_schedule",
       "importer": "stena_line_scraper.py → update_fartyg.py",
       "registry_url": "https://stenalinefreight.com/timetable/",
-      "last_successful_data_at": "2026-10-21T23:24:17Z",
+      "last_successful_data_at": "2026-10-22T00:55:24Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -1681,7 +1681,7 @@
       "source_type": "dynamic_schedule",
       "importer": "stena_line_scraper.py → update_fartyg.py",
       "registry_url": "https://stenalinefreight.com/timetable/",
-      "last_successful_data_at": "2026-10-21T23:24:17Z",
+      "last_successful_data_at": "2026-10-22T00:55:24Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -1727,7 +1727,7 @@
       "source_type": "dynamic_schedule",
       "importer": "stena_line_scraper.py → update_fartyg.py",
       "registry_url": "https://stenalinefreight.com/timetable/",
-      "last_successful_data_at": "2026-10-21T23:24:17Z",
+      "last_successful_data_at": "2026-10-22T00:55:24Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -1771,7 +1771,7 @@
       "source_type": "dynamic_schedule",
       "importer": "stena_line_scraper.py → update_fartyg.py",
       "registry_url": "https://stenalinefreight.com/timetable/",
-      "last_successful_data_at": "2026-10-21T23:24:17Z",
+      "last_successful_data_at": "2026-10-22T00:55:24Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -1815,7 +1815,7 @@
       "source_type": "dynamic_schedule",
       "importer": "stena_line_scraper.py → update_fartyg.py",
       "registry_url": "https://stenalinefreight.com/timetable/",
-      "last_successful_data_at": "2026-10-21T23:24:17Z",
+      "last_successful_data_at": "2026-10-22T00:55:24Z",
       "cached_rows": 0,
       "sources": [
         {
@@ -1859,7 +1859,7 @@
       "source_type": "dynamic_schedule",
       "importer": "stena_line_scraper.py → update_fartyg.py",
       "registry_url": "https://stenalinefreight.com/timetable/",
-      "last_successful_data_at": "2026-10-21T23:24:17Z",
+      "last_successful_data_at": "2026-10-22T00:55:24Z",
       "cached_rows": 106,
       "sources": [
         {
@@ -2331,7 +2331,7 @@
       "source_type": "dynamic_schedule",
       "importer": "tallink_scraper.py → update_fartyg.py",
       "registry_url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
-      "last_successful_data_at": "2026-10-21T23:23:44Z",
+      "last_successful_data_at": "2026-10-22T00:54:46Z",
       "cached_rows": 30,
       "sources": [
         {
@@ -2358,7 +2358,7 @@
       "source_type": "dynamic_schedule",
       "importer": "tallink_scraper.py → update_fartyg.py",
       "registry_url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
-      "last_successful_data_at": "2026-10-21T23:23:44Z",
+      "last_successful_data_at": "2026-10-22T00:54:46Z",
       "cached_rows": 30,
       "sources": [
         {
@@ -2385,7 +2385,7 @@
       "source_type": "dynamic_schedule",
       "importer": "tallink_scraper.py → update_fartyg.py",
       "registry_url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
-      "last_successful_data_at": "2026-10-21T23:23:44Z",
+      "last_successful_data_at": "2026-10-22T00:54:46Z",
       "cached_rows": 30,
       "sources": [
         {
@@ -2412,7 +2412,7 @@
       "source_type": "dynamic_schedule",
       "importer": "tallink_scraper.py → update_fartyg.py",
       "registry_url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
-      "last_successful_data_at": "2026-10-21T23:23:44Z",
+      "last_successful_data_at": "2026-10-22T00:54:46Z",
       "cached_rows": 35,
       "sources": [
         {
@@ -2439,7 +2439,7 @@
       "source_type": "dynamic_schedule",
       "importer": "tallink_scraper.py → update_fartyg.py",
       "registry_url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
-      "last_successful_data_at": "2026-10-21T23:23:44Z",
+      "last_successful_data_at": "2026-10-22T00:54:46Z",
       "cached_rows": 31,
       "sources": [
         {
@@ -2466,7 +2466,7 @@
       "source_type": "dynamic_schedule",
       "importer": "tallink_scraper.py → update_fartyg.py",
       "registry_url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
-      "last_successful_data_at": "2026-10-21T23:23:44Z",
+      "last_successful_data_at": "2026-10-22T00:54:46Z",
       "cached_rows": 31,
       "sources": [
         {
@@ -2677,8 +2677,8 @@
       "source_type": "dynamic_schedule",
       "importer": "molslinjen_scraper.py → update_fartyg.py",
       "registry_url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7",
-      "last_successful_data_at": "2026-10-21T23:24:37Z",
-      "cached_rows": 1491,
+      "last_successful_data_at": "2026-10-22T00:55:46Z",
+      "cached_rows": 1492,
       "sources": [
         {
           "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7",
@@ -2720,8 +2720,8 @@
       "source_type": "dynamic_schedule",
       "importer": "molslinjen_scraper.py → update_fartyg.py",
       "registry_url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7",
-      "last_successful_data_at": "2026-10-21T23:24:37Z",
-      "cached_rows": 1490,
+      "last_successful_data_at": "2026-10-22T00:55:46Z",
+      "cached_rows": 1491,
       "sources": [
         {
           "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7",
