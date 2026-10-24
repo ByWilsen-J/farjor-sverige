@@ -1,5 +1,5 @@
 {
-  "assessed_at": "2026-10-23T05:53:01+00:00",
+  "assessed_at": "2026-10-24T05:50:50+00:00",
   "issues": [
     {
       "source": "Viking Line",
@@ -10,13 +10,13 @@
     {
       "source": "Finnlines",
       "status": "empty",
-      "checked_at": "2026-10-23T05:52:30Z",
+      "checked_at": "2026-10-24T05:50:19Z",
       "reason": "Ingen fullständigt godkänd livehämtning; fortsatt felsökning behövs."
     },
     {
       "source": "TT-Line",
       "status": "empty",
-      "checked_at": "2026-10-23T05:52:45Z",
+      "checked_at": "2026-10-24T05:50:32Z",
       "reason": "Ingen fullständigt godkänd livehämtning; fortsatt felsökning behövs."
     }
   ]
