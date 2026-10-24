@@ -88,6 +88,27 @@ def live_source_issues(data, now=None):
     return issues
 
 
+KNOWN_LIVE_ISSUES_FILE = ROOT / "docs/known-live-source-issues.json"
+
+
+def load_known_live_issues(path=KNOWN_LIVE_ISSUES_FILE):
+    """Kända, redan utredda livekällsproblem. Saknas filen räknas inga som kända."""
+    try:
+        data = json.loads(Path(path).read_text())
+    except FileNotFoundError:
+        return {}
+    return {name: entry for name, entry in data.get("sources", {}).items() if name in LIVE_SOURCE_NAMES}
+
+
+def classify_live_issues(issues, known):
+    """Dela upp i nya problem (fäller jobbet), kända (varning) och kända som fungerar igen."""
+    open_names = {item["source"] for item in issues}
+    new = [item for item in issues if item["source"] not in known]
+    known_open = [dict(item, known_note=known[item["source"]].get("note", "")) for item in issues if item["source"] in known]
+    recovered = sorted(name for name in known if name not in open_names)
+    return new, known_open, recovered
+
+
 class Scripts(HTMLParser):
     def __init__(self):
         super().__init__()
@@ -161,13 +182,25 @@ def main():
     parser.add_argument("--skip-javascript", action="store_true")
     parser.add_argument("--published-only", action="store_true", help="Kontrollera den verkliga publicerade sidan separat från kandidatens publiceringsgrind.")
     parser.add_argument("--live-sources-only", action="store_true", help="Markera otillgängliga eller oprövade livekällor som fortsatt arbete, separat från publiceringsgrinden.")
+    parser.add_argument("--known-issues", type=Path, default=KNOWN_LIVE_ISSUES_FILE, help="JSON med kända livekällsproblem som bara ska ge varning.")
     args = parser.parse_args()
     if args.live_sources_only:
         issues = live_source_issues(json.loads((ROOT / "farjor_data.json").read_text()))
-        (ROOT / "docs/live-source-status.json").write_text(json.dumps({"assessed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "issues": issues}, ensure_ascii=False, indent=2) + "\n")
-        for item in issues:
-            print(f"ÖPPEN LIVEKÄLLA: {item['source']}: {item['reason']}")
-        return bool(issues)
+        new, known_open, recovered = classify_live_issues(issues, load_known_live_issues(args.known_issues))
+        status = {
+            "assessed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "issues": [dict(item, known=False) for item in new] + [dict(item, known=True) for item in known_open],
+            "known_sources_working_again": recovered,
+        }
+        (ROOT / "docs/live-source-status.json").write_text(json.dumps(status, ensure_ascii=False, indent=2) + "\n")
+        for item in known_open:
+            print(f"::warning title=Känd öppen livekälla: {item['source']}::{item['reason']}")
+        for name in recovered:
+            print(f"::notice title=Livekälla fungerar igen: {name}::Ta bort {name} från docs/known-live-source-issues.json så att nya fel larmar.")
+        for item in new:
+            print(f"::error title=NY trasig livekälla: {item['source']}::{item['reason']}")
+        print(f"Livekällor: {len(new)} nya fel, {len(known_open)} kända öppna, {len(recovered)} kända som fungerar igen.")
+        return bool(new)
     if args.published_only:
         errors, observations = check_published()
         (ROOT / "docs/site-health-checks.json").write_text(json.dumps({"checks": observations, "errors": errors}, ensure_ascii=False, indent=2) + "\n")

@@ -98,6 +98,7 @@ jobs:
             docs/source-link-checks.json
             docs/site-health-checks.json
             docs/live-source-status.json
+            docs/known-live-source-issues.json
           retention-days: 30
 
       - name: Publicera enbart godkända säkra ändringar
@@ -127,8 +128,19 @@ jobs:
             echo 'Bekräftad trasig länk kräver källgranskning; inga tider eller nya källdomäner gissas.' >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
+          if [ -n "$LIVE_OUTCOME" ] && [ "$LIVE_OUTCOME" != 'skipped' ]; then
+          python3 - >> "$GITHUB_STEP_SUMMARY" <<'PY'
+          import json
+          d = json.load(open('docs/live-source-status.json'))
+          for i in d['issues']:
+              tag = 'Känd (varning)' if i.get('known') else 'NY – fäller jobbet'
+              print(f"- {tag}: {i['source']} – {i['reason']}")
+          for name in d.get('known_sources_working_again', []):
+              print(f"- Fungerar igen: {name} – ta bort från docs/known-live-source-issues.json")
+          PY
+          fi
           if [ "$LIVE_OUTCOME" = 'failure' ]; then
-            echo 'Livehämtning återstår att lösa; reservschema räknas inte som återställd livekälla. Se live-source-status.json.' >> "$GITHUB_STEP_SUMMARY"
+            echo 'Ny trasig livekälla som inte finns bland kända problem. Se live-source-status.json.' >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
           if [ "$PUBLISHED_OUTCOME" = 'failure' ]; then
