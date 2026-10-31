@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-10-30T05:48:27+00:00",
+  "generated_at": "2026-10-31T05:48:12+00:00",
   "links": {
     "https://assets.ctfassets.net/mivicpf5zews/4xB5MDHvlrEsStONC9WAFA/22f3c9600417989e2bb8bf7463d24b68/Got-Bvk-Imm-W525-526.pdf": {
       "url": "https://assets.ctfassets.net/mivicpf5zews/4xB5MDHvlrEsStONC9WAFA/22f3c9600417989e2bb8bf7463d24b68/Got-Bvk-Imm-W525-526.pdf",
-      "checked_at": "2026-10-30T05:48:14+00:00",
+      "checked_at": "2026-10-31T05:48:00+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -12,11 +12,11 @@
       "redirect_statuses": [],
       "content_type": "application/pdf",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:14+00:00"
+      "last_ok_at": "2026-10-31T05:48:00+00:00"
     },
     "https://assets.ctfassets.net/z860498abl84/01D0W1MrnT10NhdISdd2zx/f156510b3637e58142e76b1fd3d7d76d/Passagiersinformatie_2026_GOTBVK_NL.pdf": {
       "url": "https://assets.ctfassets.net/z860498abl84/01D0W1MrnT10NhdISdd2zx/f156510b3637e58142e76b1fd3d7d76d/Passagiersinformatie_2026_GOTBVK_NL.pdf",
-      "checked_at": "2026-10-30T05:48:14+00:00",
+      "checked_at": "2026-10-31T05:48:00+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -25,11 +25,11 @@
       "redirect_statuses": [],
       "content_type": "application/pdf",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:14+00:00"
+      "last_ok_at": "2026-10-31T05:48:00+00:00"
     },
     "https://assets.ctfassets.net/z860498abl84/387d4nLJuuIO4rClKZMfVc/06bc53b87db30fa5b3994516048c5914/Schedule-KLJ-KAN-2026.pdf": {
       "url": "https://assets.ctfassets.net/z860498abl84/387d4nLJuuIO4rClKZMfVc/06bc53b87db30fa5b3994516048c5914/Schedule-KLJ-KAN-2026.pdf",
-      "checked_at": "2026-10-30T05:48:14+00:00",
+      "checked_at": "2026-10-31T05:48:00+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -38,11 +38,11 @@
       "redirect_statuses": [],
       "content_type": "application/pdf",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:14+00:00"
+      "last_ok_at": "2026-10-31T05:48:00+00:00"
     },
     "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js": {
       "url": "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
-      "checked_at": "2026-10-30T05:48:14+00:00",
+      "checked_at": "2026-10-31T05:48:00+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -51,11 +51,11 @@
       "redirect_statuses": [],
       "content_type": "application/javascript; charset=utf-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:14+00:00"
+      "last_ok_at": "2026-10-31T05:48:00+00:00"
     },
     "https://cms-web-api-nx.tallink.com/api/seaweb/timetables": {
       "url": "https://cms-web-api-nx.tallink.com/api/seaweb/timetables",
-      "checked_at": "2026-10-30T05:48:14+00:00",
+      "checked_at": "2026-10-31T05:48:00+00:00",
       "method": "GET",
       "api_endpoint": true,
       "status": "api_request_or_server_error",
@@ -67,7 +67,7 @@
     },
     "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql": {
       "url": "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql",
-      "checked_at": "2026-10-30T05:48:14+00:00",
+      "checked_at": "2026-10-31T05:48:00+00:00",
       "method": "GET",
       "api_endpoint": true,
       "status": "blocked_or_limited",
@@ -79,7 +79,7 @@
     },
     "https://en.tallink.com/stockholm-tallinn": {
       "url": "https://en.tallink.com/stockholm-tallinn",
-      "checked_at": "2026-10-30T05:48:14+00:00",
+      "checked_at": "2026-10-31T05:48:00+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -90,11 +90,11 @@
       ],
       "content_type": "text/html; charset=utf-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:14+00:00"
+      "last_ok_at": "2026-10-31T05:48:00+00:00"
     },
     "https://en.tallink.com/web/int/stockholm-helsinki": {
       "url": "https://en.tallink.com/web/int/stockholm-helsinki",
-      "checked_at": "2026-10-30T05:48:14+00:00",
+      "checked_at": "2026-10-31T05:48:00+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -105,11 +105,11 @@
       ],
       "content_type": "text/html; charset=utf-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:14+00:00"
+      "last_ok_at": "2026-10-31T05:48:00+00:00"
     },
     "https://laevagraafik.ee/en/Kapellskar-Paldiski/": {
       "url": "https://laevagraafik.ee/en/Kapellskar-Paldiski/",
-      "checked_at": "2026-10-30T05:48:14+00:00",
+      "checked_at": "2026-10-31T05:48:00+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -118,11 +118,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:14+00:00"
+      "last_ok_at": "2026-10-31T05:48:00+00:00"
     },
     "https://laevagraafik.ee/en/Paldiski-Kapellskar/": {
       "url": "https://laevagraafik.ee/en/Paldiski-Kapellskar/",
-      "checked_at": "2026-10-30T05:48:14+00:00",
+      "checked_at": "2026-10-31T05:48:00+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -131,11 +131,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:14+00:00"
+      "last_ok_at": "2026-10-31T05:48:00+00:00"
     },
     "https://laevagraafik.ee/en/Tallinn-Stockholm/": {
       "url": "https://laevagraafik.ee/en/Tallinn-Stockholm/",
-      "checked_at": "2026-10-30T05:48:15+00:00",
+      "checked_at": "2026-10-31T05:48:00+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -144,11 +144,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:15+00:00"
+      "last_ok_at": "2026-10-31T05:48:00+00:00"
     },
     "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2": {
       "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2",
-      "checked_at": "2026-10-30T05:48:15+00:00",
+      "checked_at": "2026-10-31T05:48:01+00:00",
       "method": "GET",
       "api_endpoint": true,
       "status": "api_requires_request",
@@ -160,7 +160,7 @@
     },
     "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2&routeId=BOR7": {
       "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2&routeId=BOR7",
-      "checked_at": "2026-10-30T05:48:15+00:00",
+      "checked_at": "2026-10-31T05:48:01+00:00",
       "method": "GET",
       "api_endpoint": true,
       "status": "ok",
@@ -169,11 +169,11 @@
       "redirect_statuses": [],
       "content_type": "application/json; charset=utf-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:15+00:00"
+      "last_ok_at": "2026-10-31T05:48:01+00:00"
     },
     "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2&routeId=SVE7": {
       "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=2&routeId=SVE7",
-      "checked_at": "2026-10-30T05:48:15+00:00",
+      "checked_at": "2026-10-31T05:48:01+00:00",
       "method": "GET",
       "api_endpoint": true,
       "status": "ok",
@@ -182,11 +182,11 @@
       "redirect_statuses": [],
       "content_type": "application/json; charset=utf-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:15+00:00"
+      "last_ok_at": "2026-10-31T05:48:01+00:00"
     },
     "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7": {
       "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7",
-      "checked_at": "2026-10-30T05:48:16+00:00",
+      "checked_at": "2026-10-31T05:48:01+00:00",
       "method": "GET",
       "api_endpoint": true,
       "status": "api_requires_request",
@@ -198,7 +198,7 @@
     },
     "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7&routeId=SJÆ22": {
       "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7&routeId=SJÆ22",
-      "checked_at": "2026-10-30T05:48:16+00:00",
+      "checked_at": "2026-10-31T05:48:01+00:00",
       "method": "GET",
       "api_endpoint": true,
       "status": "ok",
@@ -207,11 +207,11 @@
       "redirect_statuses": [],
       "content_type": "application/json; charset=utf-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:16+00:00"
+      "last_ok_at": "2026-10-31T05:48:01+00:00"
     },
     "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7&routeId=SVE22": {
       "url": "https://new.api.molslinjen.dk/api/v1/ai/markup/data-catalog?language=da&line=7&routeId=SVE22",
-      "checked_at": "2026-10-30T05:48:16+00:00",
+      "checked_at": "2026-10-31T05:48:01+00:00",
       "method": "GET",
       "api_endpoint": true,
       "status": "ok",
@@ -220,11 +220,11 @@
       "redirect_statuses": [],
       "content_type": "application/json; charset=utf-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:16+00:00"
+      "last_ok_at": "2026-10-31T05:48:01+00:00"
     },
     "https://polagent.com/en/sailing-schedule/": {
       "url": "https://polagent.com/en/sailing-schedule/",
-      "checked_at": "2026-10-30T05:48:16+00:00",
+      "checked_at": "2026-10-31T05:48:01+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -233,11 +233,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:16+00:00"
+      "last_ok_at": "2026-10-31T05:48:01+00:00"
     },
     "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html": {
       "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html",
-      "checked_at": "2026-10-30T05:48:16+00:00",
+      "checked_at": "2026-10-31T05:48:01+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -246,11 +246,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:16+00:00"
+      "last_ok_at": "2026-10-31T05:48:01+00:00"
     },
     "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gh": {
       "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gh",
-      "checked_at": "2026-10-30T05:48:16+00:00",
+      "checked_at": "2026-10-31T05:48:02+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -259,11 +259,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:16+00:00"
+      "last_ok_at": "2026-10-31T05:48:02+00:00"
     },
     "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gn": {
       "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=gn",
-      "checked_at": "2026-10-30T05:48:16+00:00",
+      "checked_at": "2026-10-31T05:48:02+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -272,11 +272,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:16+00:00"
+      "last_ok_at": "2026-10-31T05:48:02+00:00"
     },
     "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ng": {
       "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ng",
-      "checked_at": "2026-10-30T05:48:17+00:00",
+      "checked_at": "2026-10-31T05:48:02+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -285,11 +285,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:17+00:00"
+      "last_ok_at": "2026-10-31T05:48:02+00:00"
     },
     "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=st": {
       "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=st",
-      "checked_at": "2026-10-30T05:48:18+00:00",
+      "checked_at": "2026-10-31T05:48:03+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -298,11 +298,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:18+00:00"
+      "last_ok_at": "2026-10-31T05:48:03+00:00"
     },
     "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ts": {
       "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ts",
-      "checked_at": "2026-10-30T05:48:18+00:00",
+      "checked_at": "2026-10-31T05:48:03+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -311,11 +311,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:18+00:00"
+      "last_ok_at": "2026-10-31T05:48:03+00:00"
     },
     "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ys": {
       "url": "https://polferries.com/prices-i-timetable/ferries-to-sweden-timetable.html?code=ys",
-      "checked_at": "2026-10-30T05:48:18+00:00",
+      "checked_at": "2026-10-31T05:48:03+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -324,24 +324,24 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:18+00:00"
+      "last_ok_at": "2026-10-31T05:48:03+00:00"
     },
     "https://rostocktrelleborg.com/timetable/": {
       "url": "https://rostocktrelleborg.com/timetable/",
-      "checked_at": "2026-10-30T05:48:18+00:00",
+      "checked_at": "2026-10-31T05:48:04+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
       "http_status": 200,
       "final_url": "https://rostocktrelleborg.com/timetable/",
       "redirect_statuses": [],
-      "content_type": "text/html; charset=UTF-8",
+      "content_type": "text/html",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:18+00:00"
+      "last_ok_at": "2026-10-31T05:48:04+00:00"
     },
     "https://stenalinefreight.com/timetable/": {
       "url": "https://stenalinefreight.com/timetable/",
-      "checked_at": "2026-10-30T05:48:19+00:00",
+      "checked_at": "2026-10-31T05:48:04+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -350,11 +350,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:19+00:00"
+      "last_ok_at": "2026-10-31T05:48:04+00:00"
     },
     "https://stenalinefreight.com/timetable/GDKA/": {
       "url": "https://stenalinefreight.com/timetable/GDKA/",
-      "checked_at": "2026-10-30T05:48:20+00:00",
+      "checked_at": "2026-10-31T05:48:04+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -363,11 +363,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:20+00:00"
+      "last_ok_at": "2026-10-31T05:48:04+00:00"
     },
     "https://stenalinefreight.com/timetable/GOKL/": {
       "url": "https://stenalinefreight.com/timetable/GOKL/",
-      "checked_at": "2026-10-30T05:48:20+00:00",
+      "checked_at": "2026-10-31T05:48:04+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -376,11 +376,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:20+00:00"
+      "last_ok_at": "2026-10-31T05:48:04+00:00"
     },
     "https://stenalinefreight.com/timetable/NYVE/": {
       "url": "https://stenalinefreight.com/timetable/NYVE/",
-      "checked_at": "2026-10-30T05:48:20+00:00",
+      "checked_at": "2026-10-31T05:48:04+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -389,11 +389,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:20+00:00"
+      "last_ok_at": "2026-10-31T05:48:04+00:00"
     },
     "https://stenalinefreight.com/timetable/TGRO/": {
       "url": "https://stenalinefreight.com/timetable/TGRO/",
-      "checked_at": "2026-10-30T05:48:20+00:00",
+      "checked_at": "2026-10-31T05:48:04+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -402,37 +402,37 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:20+00:00"
+      "last_ok_at": "2026-10-31T05:48:04+00:00"
     },
     "https://sundbusserne.dk/fartplan/": {
       "url": "https://sundbusserne.dk/fartplan/",
-      "checked_at": "2026-10-30T05:48:20+00:00",
+      "checked_at": "2026-10-31T05:48:05+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
       "http_status": 200,
       "final_url": "https://sundbusserne.dk/fartplan/",
       "redirect_statuses": [],
-      "content_type": "text/html; charset=UTF-8",
+      "content_type": "text/html",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:20+00:00"
+      "last_ok_at": "2026-10-31T05:48:05+00:00"
     },
     "https://sundbusserne.dk/sv/tidtabell/": {
       "url": "https://sundbusserne.dk/sv/tidtabell/",
-      "checked_at": "2026-10-30T05:48:20+00:00",
+      "checked_at": "2026-10-31T05:48:05+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
       "http_status": 200,
       "final_url": "https://sundbusserne.dk/sv/tidtabell/",
       "redirect_statuses": [],
-      "content_type": "text/html; charset=UTF-8",
+      "content_type": "text/html",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:20+00:00"
+      "last_ok_at": "2026-10-31T05:48:05+00:00"
     },
     "https://wallenius-sol.com/en/timetable": {
       "url": "https://wallenius-sol.com/en/timetable",
-      "checked_at": "2026-10-30T05:48:21+00:00",
+      "checked_at": "2026-10-31T05:48:05+00:00",
       "method": "GET",
       "api_endpoint": false,
       "reason": "destination_placeholder",
@@ -450,7 +450,7 @@
     },
     "https://www.bornholmslinjen.dk/fartplan": {
       "url": "https://www.bornholmslinjen.dk/fartplan",
-      "checked_at": "2026-10-30T05:48:21+00:00",
+      "checked_at": "2026-10-31T05:48:05+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -459,11 +459,11 @@
       "redirect_statuses": [],
       "content_type": "text/html;charset=utf-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:21+00:00"
+      "last_ok_at": "2026-10-31T05:48:05+00:00"
     },
     "https://www.colorline.se/stromstad-sandefjord": {
       "url": "https://www.colorline.se/stromstad-sandefjord",
-      "checked_at": "2026-10-30T05:48:21+00:00",
+      "checked_at": "2026-10-31T05:48:05+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -472,11 +472,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:21+00:00"
+      "last_ok_at": "2026-10-31T05:48:05+00:00"
     },
     "https://www.colorline.se/tidtabeller": {
       "url": "https://www.colorline.se/tidtabeller",
-      "checked_at": "2026-10-30T05:48:22+00:00",
+      "checked_at": "2026-10-31T05:48:05+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -485,11 +485,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:22+00:00"
+      "last_ok_at": "2026-10-31T05:48:05+00:00"
     },
     "https://www.dfds.com/api/timetable": {
       "url": "https://www.dfds.com/api/timetable",
-      "checked_at": "2026-10-30T05:48:22+00:00",
+      "checked_at": "2026-10-31T05:48:05+00:00",
       "method": "GET",
       "api_endpoint": true,
       "status": "api_requires_request",
@@ -501,7 +501,7 @@
     },
     "https://www.dfds.com/en/freight-ferries-and-logistics/routes-and-schedules/klaipeda-trelleborg": {
       "url": "https://www.dfds.com/en/freight-ferries-and-logistics/routes-and-schedules/klaipeda-trelleborg",
-      "checked_at": "2026-10-30T05:48:22+00:00",
+      "checked_at": "2026-10-31T05:48:06+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -510,11 +510,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=utf-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:22+00:00"
+      "last_ok_at": "2026-10-31T05:48:06+00:00"
     },
     "https://www.dfds.com/sv-se/fraktfarjor-och-logistik/rutter-och-tidtabeller": {
       "url": "https://www.dfds.com/sv-se/fraktfarjor-och-logistik/rutter-och-tidtabeller",
-      "checked_at": "2026-10-30T05:48:22+00:00",
+      "checked_at": "2026-10-31T05:48:06+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -523,11 +523,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=utf-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:22+00:00"
+      "last_ok_at": "2026-10-31T05:48:06+00:00"
     },
     "https://www.eckerolinjen.se/en/timetable": {
       "url": "https://www.eckerolinjen.se/en/timetable",
-      "checked_at": "2026-10-30T05:48:22+00:00",
+      "checked_at": "2026-10-31T05:48:06+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -536,11 +536,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=utf-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:22+00:00"
+      "last_ok_at": "2026-10-31T05:48:06+00:00"
     },
     "https://www.eckerolinjen.se/turlista": {
       "url": "https://www.eckerolinjen.se/turlista",
-      "checked_at": "2026-10-30T05:48:22+00:00",
+      "checked_at": "2026-10-31T05:48:06+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -549,11 +549,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=utf-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:22+00:00"
+      "last_ok_at": "2026-10-31T05:48:06+00:00"
     },
     "https://www.ferryhopper.com/en/ferry-routes/direct/frederikshavn-gothenburg": {
       "url": "https://www.ferryhopper.com/en/ferry-routes/direct/frederikshavn-gothenburg",
-      "checked_at": "2026-10-30T05:48:22+00:00",
+      "checked_at": "2026-10-31T05:48:06+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -562,11 +562,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:22+00:00"
+      "last_ok_at": "2026-10-31T05:48:06+00:00"
     },
     "https://www.ferryhopper.com/en/ferry-routes/direct/gdynia-karlskrona": {
       "url": "https://www.ferryhopper.com/en/ferry-routes/direct/gdynia-karlskrona",
-      "checked_at": "2026-10-30T05:48:22+00:00",
+      "checked_at": "2026-10-31T05:48:06+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -575,11 +575,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:22+00:00"
+      "last_ok_at": "2026-10-31T05:48:06+00:00"
     },
     "https://www.ferryhopper.com/en/ferry-routes/direct/gothenburg-frederikshavn": {
       "url": "https://www.ferryhopper.com/en/ferry-routes/direct/gothenburg-frederikshavn",
-      "checked_at": "2026-10-30T05:48:23+00:00",
+      "checked_at": "2026-10-31T05:48:06+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -588,11 +588,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:23+00:00"
+      "last_ok_at": "2026-10-31T05:48:06+00:00"
     },
     "https://www.ferryhopper.com/en/ferry-routes/direct/karlskrona-gdynia": {
       "url": "https://www.ferryhopper.com/en/ferry-routes/direct/karlskrona-gdynia",
-      "checked_at": "2026-10-30T05:48:23+00:00",
+      "checked_at": "2026-10-31T05:48:07+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -601,11 +601,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:23+00:00"
+      "last_ok_at": "2026-10-31T05:48:07+00:00"
     },
     "https://www.finnlines.com/freight/schedules/": {
       "url": "https://www.finnlines.com/freight/schedules/",
-      "checked_at": "2026-10-30T05:48:23+00:00",
+      "checked_at": "2026-10-31T05:48:07+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -614,7 +614,7 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:23+00:00"
+      "last_ok_at": "2026-10-31T05:48:07+00:00"
     },
     "https://www.finnlines.com/routes/malmo-travemunde/": {
       "url": "https://www.finnlines.com/routes/malmo-travemunde/",
@@ -644,7 +644,7 @@
     },
     "https://www.finnlines.com/sv/rutter/malmo-swinoujscie/": {
       "url": "https://www.finnlines.com/sv/rutter/malmo-swinoujscie/",
-      "checked_at": "2026-10-30T05:48:23+00:00",
+      "checked_at": "2026-10-31T05:48:07+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -653,11 +653,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:23+00:00"
+      "last_ok_at": "2026-10-31T05:48:07+00:00"
     },
     "https://www.marinetraffic.com/en/ais/home/centerx:11.97/centery:57.7/zoom:10": {
       "url": "https://www.marinetraffic.com/en/ais/home/centerx:11.97/centery:57.7/zoom:10",
-      "checked_at": "2026-10-30T05:48:23+00:00",
+      "checked_at": "2026-10-31T05:48:07+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -666,11 +666,11 @@
       "redirect_statuses": [],
       "content_type": "text/html",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:23+00:00"
+      "last_ok_at": "2026-10-31T05:48:07+00:00"
     },
     "https://www.marinetraffic.com/en/ais/home/centerx:13.15/centery:55.55/zoom:10": {
       "url": "https://www.marinetraffic.com/en/ais/home/centerx:13.15/centery:55.55/zoom:10",
-      "checked_at": "2026-10-30T05:48:23+00:00",
+      "checked_at": "2026-10-31T05:48:07+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -679,11 +679,11 @@
       "redirect_statuses": [],
       "content_type": "text/html",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:23+00:00"
+      "last_ok_at": "2026-10-31T05:48:07+00:00"
     },
     "https://www.marinetraffic.com/en/ais/home/centerx:18/centery:59/zoom:7": {
       "url": "https://www.marinetraffic.com/en/ais/home/centerx:18/centery:59/zoom:7",
-      "checked_at": "2026-10-30T05:48:23+00:00",
+      "checked_at": "2026-10-31T05:48:07+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -692,11 +692,11 @@
       "redirect_statuses": [],
       "content_type": "text/html",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:23+00:00"
+      "last_ok_at": "2026-10-31T05:48:07+00:00"
     },
     "https://www.nordicmarketing.de/en/blog/schedule-update-viking-glory-to-operate-evening-departures-from-turku": {
       "url": "https://www.nordicmarketing.de/en/blog/schedule-update-viking-glory-to-operate-evening-departures-from-turku",
-      "checked_at": "2026-10-30T05:48:24+00:00",
+      "checked_at": "2026-10-31T05:48:07+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -705,11 +705,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:24+00:00"
+      "last_ok_at": "2026-10-31T05:48:07+00:00"
     },
     "https://www.oresundslinjen.com/timetable": {
       "url": "https://www.oresundslinjen.com/timetable",
-      "checked_at": "2026-10-30T05:48:24+00:00",
+      "checked_at": "2026-10-31T05:48:07+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -718,11 +718,11 @@
       "redirect_statuses": [],
       "content_type": "text/html;charset=utf-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:24+00:00"
+      "last_ok_at": "2026-10-31T05:48:07+00:00"
     },
     "https://www.portofgothenburg.com/maritime/arrivals-departures/": {
       "url": "https://www.portofgothenburg.com/maritime/arrivals-departures/",
-      "checked_at": "2026-10-30T05:48:24+00:00",
+      "checked_at": "2026-10-31T05:48:07+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -731,11 +731,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=utf-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:24+00:00"
+      "last_ok_at": "2026-10-31T05:48:07+00:00"
     },
     "https://www.portofhelsinki.fi/en/passengers/information-for-passengers/arrivals-and-departures/": {
       "url": "https://www.portofhelsinki.fi/en/passengers/information-for-passengers/arrivals-and-departures/",
-      "checked_at": "2026-10-30T05:48:24+00:00",
+      "checked_at": "2026-10-31T05:48:07+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -744,11 +744,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:24+00:00"
+      "last_ok_at": "2026-10-31T05:48:07+00:00"
     },
     "https://www.portofkiel.com/": {
       "url": "https://www.portofkiel.com/",
-      "checked_at": "2026-10-30T05:48:24+00:00",
+      "checked_at": "2026-10-31T05:48:07+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -759,11 +759,11 @@
       ],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:24+00:00"
+      "last_ok_at": "2026-10-31T05:48:07+00:00"
     },
     "https://www.sales.vikingline.com/find-trip/timetable/stockholm-helsinki/": {
       "url": "https://www.sales.vikingline.com/find-trip/timetable/stockholm-helsinki/",
-      "checked_at": "2026-10-30T05:48:24+00:00",
+      "checked_at": "2026-10-31T05:48:07+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "blocked_or_limited",
@@ -776,7 +776,7 @@
     },
     "https://www.sales.vikingline.com/find-trip/timetable/stockholm-turku/": {
       "url": "https://www.sales.vikingline.com/find-trip/timetable/stockholm-turku/",
-      "checked_at": "2026-10-30T05:48:24+00:00",
+      "checked_at": "2026-10-31T05:48:08+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "blocked_or_limited",
@@ -789,7 +789,7 @@
     },
     "https://www.sales.vikingline.com/find-trip/timetable/traffic-bulletin/": {
       "url": "https://www.sales.vikingline.com/find-trip/timetable/traffic-bulletin/",
-      "checked_at": "2026-10-30T05:48:24+00:00",
+      "checked_at": "2026-10-31T05:48:08+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "blocked_or_limited",
@@ -801,7 +801,7 @@
     },
     "https://www.sca.com/siteassets/logistik/vara-tjanster/schedule-sca-roro-2026-q1-q3.pdf": {
       "url": "https://www.sca.com/siteassets/logistik/vara-tjanster/schedule-sca-roro-2026-q1-q3.pdf",
-      "checked_at": "2026-10-30T05:48:24+00:00",
+      "checked_at": "2026-10-31T05:48:08+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -810,11 +810,11 @@
       "redirect_statuses": [],
       "content_type": "application/pdf",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:24+00:00"
+      "last_ok_at": "2026-10-31T05:48:08+00:00"
     },
     "https://www.stenalinetravel.com/routes/kiel-gothenburg": {
       "url": "https://www.stenalinetravel.com/routes/kiel-gothenburg",
-      "checked_at": "2026-10-30T05:48:25+00:00",
+      "checked_at": "2026-10-31T05:48:08+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -823,11 +823,11 @@
       "redirect_statuses": [],
       "content_type": "text/html;charset=utf-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:25+00:00"
+      "last_ok_at": "2026-10-31T05:48:08+00:00"
     },
     "https://www.stockholmshamnar.se/fartygsanloep/": {
       "url": "https://www.stockholmshamnar.se/fartygsanloep/",
-      "checked_at": "2026-10-30T05:48:25+00:00",
+      "checked_at": "2026-10-31T05:48:08+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -836,11 +836,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=utf-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:25+00:00"
+      "last_ok_at": "2026-10-31T05:48:08+00:00"
     },
     "https://www.tallink.com/sv/tidtabeller": {
       "url": "https://www.tallink.com/sv/tidtabeller",
-      "checked_at": "2026-10-30T05:48:25+00:00",
+      "checked_at": "2026-10-31T05:48:08+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -849,24 +849,24 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=utf-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:25+00:00"
+      "last_ok_at": "2026-10-31T05:48:08+00:00"
     },
     "https://www.trelleborgshamn.se/en/english/about-the-port/arrivals-and-departures/": {
       "url": "https://www.trelleborgshamn.se/en/english/about-the-port/arrivals-and-departures/",
-      "checked_at": "2026-10-30T05:48:25+00:00",
+      "checked_at": "2026-10-31T05:48:08+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
       "http_status": 200,
       "final_url": "https://www.trelleborgshamn.se/en/english/about-the-port/arrivals-and-departures/",
       "redirect_statuses": [],
-      "content_type": "text/html; charset=UTF-8",
+      "content_type": "text/html",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:25+00:00"
+      "last_ok_at": "2026-10-31T05:48:08+00:00"
     },
     "https://www.ttline.com/en/freight/timetable/": {
       "url": "https://www.ttline.com/en/freight/timetable/",
-      "checked_at": "2026-10-30T05:48:25+00:00",
+      "checked_at": "2026-10-31T05:48:08+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "blocked_or_limited",
@@ -879,7 +879,7 @@
     },
     "https://www.ttline.com/en/timetables/": {
       "url": "https://www.ttline.com/en/timetables/",
-      "checked_at": "2026-10-30T05:48:25+00:00",
+      "checked_at": "2026-10-31T05:48:08+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "blocked_or_limited",
@@ -891,7 +891,7 @@
     },
     "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026-karcon.pdf": {
       "url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026-karcon.pdf",
-      "checked_at": "2026-10-30T05:48:25+00:00",
+      "checked_at": "2026-10-31T05:48:09+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -900,11 +900,11 @@
       "redirect_statuses": [],
       "content_type": "application/pdf",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:25+00:00"
+      "last_ok_at": "2026-10-31T05:48:09+00:00"
     },
     "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_swi.pdf": {
       "url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_swi.pdf",
-      "checked_at": "2026-10-30T05:48:25+00:00",
+      "checked_at": "2026-10-31T05:48:09+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -913,11 +913,11 @@
       "redirect_statuses": [],
       "content_type": "application/pdf",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:25+00:00"
+      "last_ok_at": "2026-10-31T05:48:09+00:00"
     },
     "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_tra.pdf": {
       "url": "https://www.ttline.com/globalassets/freight/images/pdf-timetable/standard-timetable-2026_tra.pdf",
-      "checked_at": "2026-10-30T05:48:25+00:00",
+      "checked_at": "2026-10-31T05:48:09+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -926,7 +926,7 @@
       "redirect_statuses": [],
       "content_type": "application/pdf",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:25+00:00"
+      "last_ok_at": "2026-10-31T05:48:09+00:00"
     },
     "https://www.ttline.com/globalassets/pdf/standard-timetable-2026_karcon3.pdf": {
       "url": "https://www.ttline.com/globalassets/pdf/standard-timetable-2026_karcon3.pdf",
@@ -943,7 +943,7 @@
     },
     "https://www.vesselfinder.com/vessels": {
       "url": "https://www.vesselfinder.com/vessels",
-      "checked_at": "2026-10-30T05:48:25+00:00",
+      "checked_at": "2026-10-31T05:48:09+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -952,11 +952,11 @@
       "redirect_statuses": [],
       "content_type": "text/html;charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:25+00:00"
+      "last_ok_at": "2026-10-31T05:48:09+00:00"
     },
     "https://www.wasaline.com/en/timetable/": {
       "url": "https://www.wasaline.com/en/timetable/",
-      "checked_at": "2026-10-30T05:48:25+00:00",
+      "checked_at": "2026-10-31T05:48:09+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -965,11 +965,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:25+00:00"
+      "last_ok_at": "2026-10-31T05:48:09+00:00"
     },
     "https://www.wasaline.com/tidtabell/": {
       "url": "https://www.wasaline.com/tidtabell/",
-      "checked_at": "2026-10-30T05:48:26+00:00",
+      "checked_at": "2026-10-31T05:48:09+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -978,11 +978,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:26+00:00"
+      "last_ok_at": "2026-10-31T05:48:09+00:00"
     },
     "https://www.finnlines.com/sv/rutter/kapellskar-langnas-nadendal/": {
       "url": "https://www.finnlines.com/sv/rutter/kapellskar-langnas-nadendal/",
-      "checked_at": "2026-10-30T05:48:23+00:00",
+      "checked_at": "2026-10-31T05:48:07+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -991,11 +991,11 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:23+00:00"
+      "last_ok_at": "2026-10-31T05:48:07+00:00"
     },
     "https://www.finnlines.com/sv/rutter/malmo-travemunde/": {
       "url": "https://www.finnlines.com/sv/rutter/malmo-travemunde/",
-      "checked_at": "2026-10-30T05:48:23+00:00",
+      "checked_at": "2026-10-31T05:48:07+00:00",
       "method": "GET",
       "api_endpoint": false,
       "status": "ok",
@@ -1004,7 +1004,7 @@
       "redirect_statuses": [],
       "content_type": "text/html; charset=UTF-8",
       "safe_redirect": false,
-      "last_ok_at": "2026-10-30T05:48:23+00:00"
+      "last_ok_at": "2026-10-31T05:48:07+00:00"
     },
     "https://wallenius-sol.com/en/wallenius-sol-route-network-page-under-construction-if-you-have-questions-about-our-route-network": {
       "url": "https://wallenius-sol.com/en/wallenius-sol-route-network-page-under-construction-if-you-have-questions-about-our-route-network",
