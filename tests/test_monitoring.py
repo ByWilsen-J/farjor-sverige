@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime, timezone
 
 from audit_source_links import check_url, classify_status, replace_data_urls, safe_redirect
-from check_site_health import LIVE_SOURCE_NAMES, check_data, check_published, live_source_issues
+from check_site_health import LIVE_SOURCE_NAMES, check_data, check_published, classify_live_issues, live_source_issues
 
 
 class Response:
@@ -123,3 +123,13 @@ class LiveSourceTests(unittest.TestCase):
         data["meta"]["source_refresh"]["Finnlines"]["checked_at"] = "2026-10-19T11:00:00Z"
         del data["meta"]["source_refresh"]["DFDS"]
         self.assertEqual({row["source"] for row in live_source_issues(data, self.now)}, {"Finnlines", "DFDS"})
+
+    def test_known_issues_warn_new_issues_fail_and_recovery_is_reported(self):
+        data = self.healthy()
+        data["meta"]["source_refresh"]["TT-Line"]["status"] = "empty"
+        data["meta"]["source_refresh"]["Finnlines"]["status"] = "error"
+        known = {"TT-Line": {"note": "Cloudflare"}, "Viking Line": {"note": "403"}}
+        new, known_open, recovered = classify_live_issues(live_source_issues(data, self.now), known)
+        self.assertEqual([row["source"] for row in new], ["Finnlines"])
+        self.assertEqual([row["source"] for row in known_open], ["TT-Line"])
+        self.assertEqual(recovered, ["Viking Line"])
