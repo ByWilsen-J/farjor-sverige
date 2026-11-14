@@ -16,9 +16,17 @@ import requests
 GRAPHQL_URL = "https://dm3xyy44wbeivgqmeymvmw22be.appsync-api.eu-central-1.amazonaws.com/graphql"
 API_KEY = "da2-zvuktusyubbstlw7khps4vyeie"
 SOURCE_DETAIL = "Finnlines GraphQL timetable API"
+# Finnlines AWS WAF blockerar standard-User-Agent från requests/curl
+# (WAFForbiddenException 403). Webbläsarlik UA krävs; nyckeln är oförändrad.
 HEADERS = {
     "Content-Type": "application/json",
     "x-api-key": API_KEY,
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/130.0 Safari/537.36"
+    ),
+    "Origin": "https://www.finnlines.com",
+    "Referer": "https://www.finnlines.com/",
 }
 
 PORT_NAMES = {
