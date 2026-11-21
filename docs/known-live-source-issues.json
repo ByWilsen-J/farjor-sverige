@@ -1,0 +1,13 @@
+{
+  "_info": "Livekällor här ger bara varning i den dagliga kontrollen, inte rött jobb. Ta bort en källa när den fungerar igen, annars larmar inte nya fel för den.",
+  "sources": {
+    "Viking Line": {
+      "tillagd": "2026-10-23",
+      "note": "API svarar 403 på serveranrop; livehämtning avstängd tills API:t återverifierats. Officiellt veckoschema används."
+    },
+    "TT-Line": {
+      "tillagd": "2026-10-23",
+      "note": "ttline.com ligger bakom Cloudflare-utmaning (403 'Just a moment...'). Reservschema används."
+    }
+  }
+}
